@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CLL Spheroid EDA — Data Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:   #0f1f3d;
+    --teal:   #007A7A;
+    --amber:  #c8813a;
+    --cream:  #f7f4ef;
+    --slate:  #4a5568;
+    --light:  #e8e4dc;
+    --red:    #982649;
+    --green:  #2d7a4a;
+    --navy-mid: #1a3060;
+    --teal-dim: rgba(0,122,122,0.18);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--slate);
+    line-height: 1.6;
+  }
+
+  /* ── Hero ──────────────────────────────────────────────────────── */
+  .hero {
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-accent {
+    position: absolute;
+    top: 0; left: 0;
+    width: 5px; height: 100%;
+    background: var(--teal);
+  }
+
+  .hero-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 60px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+    z-index: 2;
+  }
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: rgba(255,255,255,0.9); }
+
+  .hero-body {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    padding: 80px 60px 60px;
+    gap: 60px;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-left { flex: 1; max-width: 640px; }
+  .hero-right { width: 380px; flex-shrink: 0; }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--teal);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--teal);
+  }
+
+  .hero-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 24px;
+  }
+  .hero-title em {
+    color: var(--teal);
+    font-style: italic;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+    color: #8ba0b8;
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 36px;
+    max-width: 520px;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--teal);
+    color: #fff;
+    text-decoration: none;
+    padding: 13px 26px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .hero-cta:hover { background: #005f5f; transform: translateY(-1px); }
+  .hero-cta-arrow { font-size: 16px; }
+
+  .hero-stats {
+    display: flex;
+    gap: 36px;
+    margin-top: 52px;
+    padding-top: 36px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .stat-item {}
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Right panel: context box */
+  .context-box {
+    background: var(--teal-dim);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .context-box .cb-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--teal);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .context-box p {
+    font-size: 13px;
+    color: #b0c4d8;
+    line-height: 1.65;
+  }
+
+  .pipeline-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 16px;
+  }
+  .pf-step {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .pf-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .pf-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #d0dce8;
+    margin-bottom: 2px;
+  }
+  .pf-desc {
+    font-size: 11px;
+    color: #6a809a;
+    line-height: 1.45;
+  }
+  .pf-arrow {
+    text-align: center;
+    color: rgba(0,122,122,0.4);
+    font-size: 12px;
+    line-height: 1;
+    padding: 2px 0;
+  }
+
+  /* ── Analyses section ───────────────────────────────────────────── */
+  .analyses {
+    background: var(--cream);
+    padding: 80px 60px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--teal);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--navy);
+    font-weight: 400;
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .theme-card {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 20px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .theme-card:hover:not(.card-disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.07);
+  }
+  .theme-card.card-disabled { opacity: 0.55; }
+
+  .card-top {
+    background: var(--navy);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.12em;
+  }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .badge-ready   { background: rgba(0,122,122,0.35); color: #7dd8d8; }
+  .badge-soon    { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); }
+  .badge-partial { background: rgba(200,129,58,0.3); color: #e8a86a; }
+
+  .card-body {
+    padding: 20px 20px 0;
+    flex: 1;
+  }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--navy);
+    font-weight: 400;
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--slate);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 20px;
+  }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--teal);
+    background: rgba(0,122,122,0.08);
+    border: 1px solid rgba(0,122,122,0.2);
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.06em;
+  }
+
+  .card-footer {
+    border-top: 1px solid var(--light);
+    padding: 14px 20px;
+  }
+  .card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--teal);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: gap 0.15s;
+  }
+  .card-link:hover { gap: 11px; }
+  .card-link-disabled {
+    font-size: 13px;
+    color: rgba(0,0,0,0.25);
+    font-style: italic;
+  }
+
+  /* ── About section ──────────────────────────────────────────────── */
+  .about {
+    background: var(--navy);
+    padding: 80px 60px;
+  }
+  .about-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .about h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: #fff;
+    font-weight: 400;
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+  .about p {
+    font-size: 14px;
+    color: #8ba0b8;
+    line-height: 1.75;
+    margin-bottom: 14px;
+  }
+  .about-col2 {}
+  .method-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .method-item:last-child { border-bottom: none; }
+  .method-icon {
+    width: 36px; height: 36px;
+    background: var(--teal-dim);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  .method-body {}
+  .method-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #d0dce8;
+    margin-bottom: 3px;
+  }
+  .method-desc {
+    font-size: 12px;
+    color: #6a809a;
+    line-height: 1.5;
+  }
+
+  /* ── Footer ─────────────────────────────────────────────────────── */
+  footer {
+    background: #080f1f;
+    padding: 32px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-left {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.1em;
+  }
+  .footer-right {
+    font-size: 12px;
+    color: rgba(255,255,255,0.2);
+  }
+
+  /* ── Responsive ─────────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .hero-body  { flex-direction: column; padding: 50px 30px 40px; }
+    .hero-right { width: 100%; }
+    .about-inner { grid-template-columns: 1fr; }
+    .analyses   { padding: 50px 30px; }
+    .about      { padding: 50px 30px; }
+    footer      { flex-direction: column; gap: 10px; text-align: center; }
+    .nav-links  { display: none; }
+    .hero-nav   { padding: 20px 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<section class="hero">
+  <div class="hero-accent"></div>
+
+  <nav class="hero-nav">
+    <div class="nav-logo">CLL &mdash; Spheroid EDA</div>
+    <ul class="nav-links">
+      <li><a href="#analyses">Analyses</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="01_data_audit.html">Data Audit</a></li>
+    </ul>
+  </nav>
+
+  <div class="hero-body">
+    <div class="hero-left">
+      <div class="hero-tag">Master's Research &mdash; Computational Biology</div>
+
+      <h1 class="hero-title">
+        Exploratory Analysis of<br/>
+        <em>CLL Spheroid</em><br/>
+        Imaging Data
+      </h1>
+
+      <p class="hero-subtitle">
+        A systematic audit and characterisation of brightfield microscopy data
+        from Chronic Lymphocytic Leukaemia spheroid drug-screen experiments —
+        covering image quality, segmentation evaluation, and clinical metadata linkage.
+      </p>
+
+      <a href="01_data_audit.html" class="hero-cta">
+        Start with Data Audit
+        <span class="hero-cta-arrow">&#8594;</span>
+      </a>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">51</div>
+          <div class="stat-label">GT annotated pairs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">~102k</div>
+          <div class="stat-label">Raw archive files</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">8</div>
+          <div class="stat-label">Analysis themes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Metadata sources</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="context-box">
+        <div class="cb-label">Research context</div>
+        <p>
+          CLL spheroids are 3-D tumour aggregates grown in 96-well plates and
+          imaged continuously using the IncuCyte system. This pipeline audits
+          image data quality, evaluates segmentation methods, and links imaging
+          findings to patient clinical metadata for downstream drug-response analysis.
+        </p>
+      </div>
+
+      <div class="pipeline-flow">
+        <div class="pf-step">
+          <div class="pf-num">01</div>
+          <div>
+            <div class="pf-title">Data Audit</div>
+            <div class="pf-desc">Scan all image / mask / metadata assets. Assess coverage, QC, and metadata completeness.</div>
+          </div>
+        </div>
+        <div class="pf-arrow">&#8595;</div>
+        <div class="pf-step">
+          <div class="pf-num">02–03</div>
+          <div>
+            <div class="pf-title">Image Quality &amp; Augmentation</div>
+            <div class="pf-desc">Contrast analysis, focus scoring, augmentation availability in time-series data.</div>
+          </div>
+        </div>
+        <div class="pf-arrow">&#8595;</div>
+        <div class="pf-step">
+          <div class="pf-num">04–05</div>
+          <div>
+            <div class="pf-title">Preprocessing Comparison</div>
+            <div class="pf-desc">Evaluate CLAHE, histogram stretching, and normalisation strategies with heuristic vs SAM2 ROI.</div>
+          </div>
+        </div>
+        <div class="pf-arrow">&#8595;</div>
+        <div class="pf-step">
+          <div class="pf-num">06–08</div>
+          <div>
+            <div class="pf-title">Segmentation Evaluation</div>
+            <div class="pf-desc">Compare segmenters (Dice, precision/recall), full pipeline ranking, GT vs prediction panels.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ ANALYSES ════════════════════ -->
+<div class="analyses" id="analyses">
+  <div class="section-header">
+    <span class="section-tag">Themes</span>
+    <h2 class="section-title">Analysis Chapters</h2>
+  </div>
+
+  <div class="theme-grid">
+
+    <!-- 01 DATA AUDIT -->
+    <div class="theme-card">
+      <div class="card-top">
+        <span class="card-num">THEME 01</span>
+        <span class="badge badge-ready">&#10003; Ready</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Data Audit</h3>
+        <p class="card-desc">
+          Complete inventory of all image, mask, and metadata assets. Covers
+          file-type breakdown, GT pool characterisation, raw archive overview,
+          QC checks, and metadata completeness across patient demographics,
+          genetics, and treatment conditions.
+        </p>
+        <div class="card-tags">
+          <span class="tag">BF pool · 51 GT pairs</span>
+          <span class="tag">VID pool</span>
+          <span class="tag">~102k raw files</span>
+          <span class="tag">Metadata · 3 sources</span>
+          <span class="tag">QC</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="01_data_audit.html" class="card-link">
+          View analysis &#8594;
+        </a>
+      </div>
+    </div>
+
+    <!-- 02 IMAGE QUALITY -->
+    <div class="theme-card card-disabled">
+      <div class="card-top">
+        <span class="card-num">THEME 02</span>
+        <span class="badge badge-soon">Coming soon</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Image Quality &amp; Contrast</h3>
+        <p class="card-desc">
+          Contrast distribution analysis, focus scoring, and image quality
+          stratification into low / medium / high bins used by downstream
+          segmentation evaluation.
+        </p>
+        <div class="card-tags">
+          <span class="tag">Contrast bins</span>
+          <span class="tag">Focus scoring</span>
+          <span class="tag">Gallery</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-link-disabled">Analysis in progress&hellip;</span>
+      </div>
+    </div>
+
+    <!-- 03 AUGMENTATION AUDIT -->
+    <div class="theme-card card-disabled">
+      <div class="card-top">
+        <span class="card-num">THEME 03</span>
+        <span class="badge badge-soon">Coming soon</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Augmentation Audit</h3>
+        <p class="card-desc">
+          Temporal coverage of the VID pool. Augmentation availability analysis:
+          how many frames are available per annotated well for pseudo-label generation.
+        </p>
+        <div class="card-tags">
+          <span class="tag">VID timeseries</span>
+          <span class="tag">Timepoints per well</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-link-disabled">Analysis in progress&hellip;</span>
+      </div>
+    </div>
+
+    <!-- 04 PREPROCESSING HEURISTIC -->
+    <div class="theme-card card-disabled">
+      <div class="card-top">
+        <span class="card-num">THEME 04</span>
+        <span class="badge badge-soon">Coming soon</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Preprocessing — Heuristic ROI</h3>
+        <p class="card-desc">
+          Systematic comparison of contrast enhancement and normalisation pipelines
+          evaluated using Dice score against GT masks, with heuristic centre-crop ROI.
+        </p>
+        <div class="card-tags">
+          <span class="tag">CLAHE</span>
+          <span class="tag">Histogram stretching</span>
+          <span class="tag">Dice</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-link-disabled">Analysis in progress&hellip;</span>
+      </div>
+    </div>
+
+    <!-- 05 PREPROCESSING SAM2 -->
+    <div class="theme-card card-disabled">
+      <div class="card-top">
+        <span class="card-num">THEME 05</span>
+        <span class="badge badge-soon">Coming soon</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Preprocessing — SAM2 ROI</h3>
+        <p class="card-desc">
+          Same preprocessing evaluation pipeline repeated using SAM2-predicted
+          regions of interest, compared against heuristic ROI results.
+        </p>
+        <div class="card-tags">
+          <span class="tag">SAM2</span>
+          <span class="tag">ROI comparison</span>
+          <span class="tag">Delta separability</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-link-disabled">Analysis in progress&hellip;</span>
+      </div>
+    </div>
+
+    <!-- 06 SEGMENTER COMPARISON -->
+    <div class="theme-card card-disabled">
+      <div class="card-top">
+        <span class="card-num">THEME 06</span>
+        <span class="badge badge-soon">Coming soon</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Segmenter Comparison</h3>
+        <p class="card-desc">
+          Head-to-head evaluation of classical and deep segmentation methods
+          (Dice, precision, recall) stratified by contrast bin.
+        </p>
+        <div class="card-tags">
+          <span class="tag">Dice distribution</span>
+          <span class="tag">Method heatmap</span>
+          <span class="tag">Precision / Recall</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-link-disabled">Analysis in progress&hellip;</span>
+      </div>
+    </div>
+
+    <!-- 07 PIPELINE ANALYSIS -->
+    <div class="theme-card card-disabled">
+      <div class="card-top">
+        <span class="card-num">THEME 07</span>
+        <span class="badge badge-soon">Coming soon</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">Full Pipeline Analysis</h3>
+        <p class="card-desc">
+          End-to-end ranking of preprocessing &#215; segmenter combinations.
+          Separability vs Dice correlation, winner matrices per contrast bin.
+        </p>
+        <div class="card-tags">
+          <span class="tag">Top-10 pipelines</span>
+          <span class="tag">Winner matrix</span>
+          <span class="tag">Spearman &#961;</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-link-disabled">Analysis in progress&hellip;</span>
+      </div>
+    </div>
+
+    <!-- 08 GT VS PREDICTION -->
+    <div class="theme-card card-disabled">
+      <div class="card-top">
+        <span class="card-num">THEME 08</span>
+        <span class="badge badge-soon">Coming soon</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">GT vs Prediction Panels</h3>
+        <p class="card-desc">
+          Visual comparison panels of ground-truth masks against best-pipeline
+          predictions, stratified by contrast bin (low / medium / high).
+        </p>
+        <div class="card-tags">
+          <span class="tag">Overlay panels</span>
+          <span class="tag">Dice summary</span>
+          <span class="tag">Low / Med / High contrast</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-link-disabled">Analysis in progress&hellip;</span>
+      </div>
+    </div>
+
+  </div><!-- .theme-grid -->
+</div><!-- .analyses -->
+
+<!-- ════════════════════ ABOUT ════════════════════ -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div>
+      <h2>About this analysis</h2>
+      <p>
+        This EDA pipeline systematically characterises a unique biomedical imaging
+        dataset of Chronic Lymphocytic Leukaemia (CLL) spheroids imaged at
+        multiple timepoints under various drug treatment conditions.
+      </p>
+      <p>
+        The dataset includes 51 manually annotated brightfield image–mask pairs
+        (ground truth), a time-series pool of VID experiment images with instance
+        segmentation masks, and a raw IncuCyte archive of approximately 102,000
+        files spanning BTK inhibitor, drug screen, and refractory patient
+        experiments.
+      </p>
+      <p>
+        A key challenge motivating this analysis is the extreme label scarcity:
+        the annotated pool represents only 0.05% of the full imaging archive,
+        motivating semi-supervised and self-supervised learning strategies for
+        downstream spheroid segmentation and drug-response modelling.
+      </p>
+    </div>
+    <div class="about-col2">
+      <div class="method-item">
+        <div class="method-icon">&#128203;</div>
+        <div class="method-body">
+          <div class="method-title">Data Provenance</div>
+          <div class="method-desc">Images exported from Sartorius IncuCyte S3 live-cell imager. Two data transfers covering BTK, drug-screen, NK, T-cell, and refractory experiment classes.</div>
+        </div>
+      </div>
+      <div class="method-item">
+        <div class="method-icon">&#129516;</div>
+        <div class="method-body">
+          <div class="method-title">Patient Cohort</div>
+          <div class="method-desc">Peripheral blood CLL patient samples from three clinical experiment series. Demographics, cytogenetics (IGHV, del13q14, del17p13…), and clinical lab values linked via Excel metadata.</div>
+        </div>
+      </div>
+      <div class="method-item">
+        <div class="method-icon">&#128200;</div>
+        <div class="method-body">
+          <div class="method-title">Evaluation Metrics</div>
+          <div class="method-desc">Binary segmentation: Dice, precision, recall. Instance counting: IoU-matched object recall. Metadata: fill-rate completeness per domain group.</div>
+        </div>
+      </div>
+      <div class="method-item">
+        <div class="method-icon">&#128736;</div>
+        <div class="method-body">
+          <div class="method-title">Pipeline Stack</div>
+          <div class="method-desc">Python · NumPy · pandas · matplotlib · scikit-image · SAM2 (Meta). All outputs reproducible from a single <code style="font-size:11px;background:rgba(255,255,255,0.06);padding:1px 4px;border-radius:3px">run_all.py</code> call.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ FOOTER ════════════════════ -->
+<footer>
+  <div class="footer-left">CLL &mdash; Spheroid EDA Pipeline &nbsp;&#183;&nbsp; Generated 2026</div>
+  <div class="footer-right">Master&rsquo;s Research &mdash; Computational Biology</div>
+</footer>
+
+</body>
+</html>
