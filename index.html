@@ -7,16 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --navy:   #0f1f3d;
-    --teal:   #007A7A;
-    --amber:  #c8813a;
-    --cream:  #f7f4ef;
-    --slate:  #4a5568;
-    --light:  #e8e4dc;
-    --red:    #982649;
-    --green:  #2d7a4a;
-    --navy-mid: #1a3060;
-    --teal-dim: rgba(0,122,122,0.18);
+    --navy:      #0f1f3d;
+    --teal:      #007A7A;
+    --amber:     #c8813a;
+    --cream:     #f7f4ef;
+    --slate:     #4a5568;
+    --light:     #e8e4dc;
+    --red:       #982649;
+    --green:     #2d7a4a;
+    --navy-mid:  #1a3060;
+    --teal-dim:  rgba(0,122,122,0.18);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -36,14 +36,12 @@
     position: relative;
     overflow: hidden;
   }
-
   .hero-accent {
     position: absolute;
     top: 0; left: 0;
     width: 5px; height: 100%;
     background: var(--teal);
   }
-
   .hero-nav {
     display: flex;
     align-items: center;
@@ -86,7 +84,6 @@
     position: relative;
     z-index: 2;
   }
-
   .hero-left { flex: 1; max-width: 640px; }
   .hero-right { width: 380px; flex-shrink: 0; }
 
@@ -115,10 +112,7 @@
     line-height: 1.15;
     margin-bottom: 24px;
   }
-  .hero-title em {
-    color: var(--teal);
-    font-style: italic;
-  }
+  .hero-title em { color: var(--teal); font-style: italic; }
 
   .hero-subtitle {
     font-size: 16px;
@@ -153,7 +147,6 @@
     padding-top: 36px;
     border-top: 1px solid rgba(255,255,255,0.08);
   }
-  .stat-item {}
   .stat-num {
     font-family: 'DM Serif Display', serif;
     font-size: 30px;
@@ -169,7 +162,6 @@
     text-transform: uppercase;
   }
 
-  /* Right panel: context box */
   .context-box {
     background: var(--teal-dim);
     border-left: 3px solid var(--teal);
@@ -185,18 +177,9 @@
     text-transform: uppercase;
     margin-bottom: 10px;
   }
-  .context-box p {
-    font-size: 13px;
-    color: #b0c4d8;
-    line-height: 1.65;
-  }
+  .context-box p { font-size: 13px; color: #b0c4d8; line-height: 1.65; }
 
-  .pipeline-flow {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-top: 16px;
-  }
+  .pipeline-flow { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; }
   .pf-step {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
@@ -206,32 +189,10 @@
     align-items: flex-start;
     gap: 14px;
   }
-  .pf-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--amber);
-    letter-spacing: 0.08em;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .pf-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: #d0dce8;
-    margin-bottom: 2px;
-  }
-  .pf-desc {
-    font-size: 11px;
-    color: #6a809a;
-    line-height: 1.45;
-  }
-  .pf-arrow {
-    text-align: center;
-    color: rgba(0,122,122,0.4);
-    font-size: 12px;
-    line-height: 1;
-    padding: 2px 0;
-  }
+  .pf-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.08em; flex-shrink: 0; margin-top: 1px; }
+  .pf-title { font-size: 13px; font-weight: 500; color: #d0dce8; margin-bottom: 2px; }
+  .pf-desc { font-size: 11px; color: #6a809a; line-height: 1.45; }
+  .pf-arrow { text-align: center; color: rgba(0,122,122,0.4); font-size: 12px; line-height: 1; padding: 2px 0; }
 
   /* ── Analyses section ───────────────────────────────────────────── */
   .analyses {
@@ -240,7 +201,6 @@
     max-width: 1280px;
     margin: 0 auto;
   }
-
   .section-header {
     display: flex;
     align-items: baseline;
@@ -260,13 +220,11 @@
     color: var(--navy);
     font-weight: 400;
   }
-
   .theme-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
   }
-
   .theme-card {
     background: #fff;
     border-radius: 8px;
@@ -282,6 +240,15 @@
   }
   .theme-card.card-disabled { opacity: 0.55; }
 
+  /* CPM card gets a teal accent on hover */
+  .theme-card.card-cpm {
+    border-top: 3px solid var(--teal);
+  }
+  .theme-card.card-cpm:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,122,122,0.15), 0 8px 32px rgba(0,0,0,0.08);
+  }
+
   .card-top {
     background: var(--navy);
     padding: 16px 20px;
@@ -289,12 +256,7 @@
     align-items: center;
     justify-content: space-between;
   }
-  .card-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--amber);
-    letter-spacing: 0.12em;
-  }
+  .card-num { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--amber); letter-spacing: 0.12em; }
   .badge {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
@@ -306,11 +268,9 @@
   .badge-ready   { background: rgba(0,122,122,0.35); color: #7dd8d8; }
   .badge-soon    { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35); }
   .badge-partial { background: rgba(200,129,58,0.3); color: #e8a86a; }
+  .badge-cpm     { background: rgba(0,122,122,0.45); color: #a8e8e8; border: 1px solid rgba(0,122,122,0.5); }
 
-  .card-body {
-    padding: 20px 20px 0;
-    flex: 1;
-  }
+  .card-body { padding: 20px 20px 0; flex: 1; }
   .card-title {
     font-family: 'DM Serif Display', serif;
     font-size: 18px;
@@ -319,19 +279,8 @@
     margin-bottom: 8px;
     line-height: 1.25;
   }
-  .card-desc {
-    font-size: 12.5px;
-    color: var(--slate);
-    line-height: 1.6;
-    margin-bottom: 16px;
-  }
-
-  .card-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-bottom: 20px;
-  }
+  .card-desc { font-size: 12.5px; color: var(--slate); line-height: 1.6; margin-bottom: 16px; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 20px; }
   .tag {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
@@ -342,11 +291,7 @@
     border-radius: 3px;
     letter-spacing: 0.06em;
   }
-
-  .card-footer {
-    border-top: 1px solid var(--light);
-    padding: 14px 20px;
-  }
+  .card-footer { border-top: 1px solid var(--light); padding: 14px 20px; }
   .card-link {
     display: inline-flex;
     align-items: center;
@@ -359,17 +304,220 @@
     transition: gap 0.15s;
   }
   .card-link:hover { gap: 11px; }
-  .card-link-disabled {
-    font-size: 13px;
-    color: rgba(0,0,0,0.25);
-    font-style: italic;
-  }
+  .card-link-disabled { font-size: 13px; color: rgba(0,0,0,0.25); font-style: italic; }
 
-  /* ── About section ──────────────────────────────────────────────── */
-  .about {
+  /* CPM mini pipeline inside the card */
+  .cpm-mini-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 16px;
+  }
+  .cpm-mini-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    background: rgba(0,122,122,0.05);
+    border-radius: 4px;
+    border-left: 2px solid rgba(0,122,122,0.3);
+  }
+  .cpm-mini-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--amber);
+    flex-shrink: 0;
+    width: 16px;
+  }
+  .cpm-mini-label { font-size: 11px; color: var(--slate); }
+  .cpm-mini-label strong { color: var(--navy); font-weight: 500; }
+
+  /* ── CPM Parameter Section ─────────────────────────────────────── */
+  .cpm-section {
     background: var(--navy);
     padding: 80px 60px;
   }
+  .cpm-section-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .cpm-section .section-header { margin-bottom: 16px; }
+  .cpm-section .section-title { color: #fff; }
+  .cpm-section-lead {
+    font-size: 14px;
+    color: #8ba0b8;
+    line-height: 1.75;
+    max-width: 760px;
+    margin-bottom: 52px;
+  }
+
+  /* Table group headers */
+  .tbl-group {
+    margin-bottom: 48px;
+  }
+  .tbl-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--amber);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .tbl-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: #fff;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .tbl-desc {
+    font-size: 13px;
+    color: #6a809a;
+    margin-bottom: 18px;
+    line-height: 1.6;
+    max-width: 680px;
+  }
+
+  /* Shared table styles */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .data-table th {
+    background: #1a3060;
+    color: #8ba0b8;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #c8d8e8;
+    vertical-align: middle;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .data-table tr:hover td { background: rgba(0,122,122,0.06); }
+
+  /* Feature name emphasis */
+  .feat-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #d0dce8;
+  }
+  .param-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+  }
+  .cond-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #7dd8d8;
+  }
+  .verdict-yes {
+    color: #2d7a4a;
+    background: rgba(45,122,74,0.18);
+    border-radius: 3px;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+  }
+  .verdict-no {
+    color: #982649;
+    background: rgba(152,38,73,0.15);
+    border-radius: 3px;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+  }
+  .verdict-check {
+    color: #7dd8d8;
+    background: rgba(0,122,122,0.18);
+    border-radius: 3px;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Discriminability matrix heatmap cells */
+  .w1-high { color: #7dd8d8; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; }
+  .w1-mid  { color: #e8a86a; font-family: 'DM Mono', monospace; font-size: 11px; }
+  .w1-low  { color: #c08898; font-family: 'DM Mono', monospace; font-size: 11px; }
+
+  .insight-box {
+    background: rgba(0,122,122,0.10);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 6px 6px 0;
+    padding: 14px 18px;
+    margin-top: 14px;
+  }
+  .insight-box p { font-size: 12.5px; color: #8ba0b8; line-height: 1.65; }
+  .insight-box strong { color: #b0d8d8; }
+
+  .important-box {
+    background: rgba(200,129,58,0.10);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 6px 6px 0;
+    padding: 14px 18px;
+    margin-top: 14px;
+  }
+  .important-box p { font-size: 12.5px; color: #8ba0b8; line-height: 1.65; }
+  .important-box strong { color: #e8c89a; }
+
+  /* Two-column layout for smaller tables */
+  .tbl-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  /* Step pill badges inside the section */
+  .step-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 4px 12px 4px 8px;
+    margin-bottom: 12px;
+  }
+  .step-pill-num {
+    background: var(--amber);
+    color: var(--navy);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    border-radius: 20px;
+    padding: 2px 7px;
+    letter-spacing: 0.08em;
+  }
+  .step-pill-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Lit comparison table two-tone */
+  .lit-table th { background: #0f1f3d; }
+  .lit-table .col-ours { color: var(--teal); font-weight: 500; }
+  .lit-table .col-nurn { color: #8ba0b8; }
+
+  /* ── About section ──────────────────────────────────────────────── */
+  .about { background: #0a1628; padding: 80px 60px; }
   .about-inner {
     max-width: 1280px;
     margin: 0 auto;
@@ -378,81 +526,34 @@
     gap: 60px;
     align-items: start;
   }
-  .about h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 28px;
-    color: #fff;
-    font-weight: 400;
-    margin-bottom: 20px;
-    line-height: 1.3;
-  }
-  .about p {
-    font-size: 14px;
-    color: #8ba0b8;
-    line-height: 1.75;
-    margin-bottom: 14px;
-  }
-  .about-col2 {}
-  .method-item {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 18px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-  }
+  .about h2 { font-family: 'DM Serif Display', serif; font-size: 28px; color: #fff; font-weight: 400; margin-bottom: 20px; line-height: 1.3; }
+  .about p { font-size: 14px; color: #8ba0b8; line-height: 1.75; margin-bottom: 14px; }
+  .method-item { display: flex; gap: 16px; margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.07); }
   .method-item:last-child { border-bottom: none; }
-  .method-icon {
-    width: 36px; height: 36px;
-    background: var(--teal-dim);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 16px;
-  }
-  .method-body {}
-  .method-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #d0dce8;
-    margin-bottom: 3px;
-  }
-  .method-desc {
-    font-size: 12px;
-    color: #6a809a;
-    line-height: 1.5;
-  }
+  .method-icon { width: 36px; height: 36px; background: var(--teal-dim); border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+  .method-title { font-size: 14px; font-weight: 500; color: #d0dce8; margin-bottom: 3px; }
+  .method-desc { font-size: 12px; color: #6a809a; line-height: 1.5; }
 
   /* ── Footer ─────────────────────────────────────────────────────── */
-  footer {
-    background: #080f1f;
-    padding: 32px 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .footer-left {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: rgba(255,255,255,0.2);
-    letter-spacing: 0.1em;
-  }
-  .footer-right {
-    font-size: 12px;
-    color: rgba(255,255,255,0.2);
-  }
+  footer { background: #080f1f; padding: 32px 60px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-left { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; }
+  .footer-right { font-size: 12px; color: rgba(255,255,255,0.2); }
 
   /* ── Responsive ─────────────────────────────────────────────────── */
   @media (max-width: 900px) {
     .hero-body  { flex-direction: column; padding: 50px 30px 40px; }
     .hero-right { width: 100%; }
     .about-inner { grid-template-columns: 1fr; }
-    .analyses   { padding: 50px 30px; }
-    .about      { padding: 50px 30px; }
-    footer      { flex-direction: column; gap: 10px; text-align: center; }
+    .analyses, .cpm-section, .about { padding: 50px 30px; }
+    footer { flex-direction: column; gap: 10px; text-align: center; }
     .nav-links  { display: none; }
     .hero-nav   { padding: 20px 30px; }
+    .tbl-row-2  { grid-template-columns: 1fr; }
+    .data-table { font-size: 11px; }
+    .data-table th, .data-table td { padding: 7px 10px; }
+  }
+  @media (max-width: 600px) {
+    .data-table { display: block; overflow-x: auto; }
   }
 </style>
 </head>
@@ -466,6 +567,7 @@
     <div class="nav-logo">CLL &mdash; Spheroid EDA</div>
     <ul class="nav-links">
       <li><a href="#analyses">Analyses</a></li>
+      <li><a href="#cpm">CPM Inference</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="01_data_audit.html">Data Audit</a></li>
     </ul>
@@ -483,8 +585,9 @@
 
       <p class="hero-subtitle">
         A systematic audit and characterisation of brightfield microscopy data
-        from Chronic Lymphocytic Leukaemia spheroid drug-screen experiments —
-        covering image quality, segmentation evaluation, and clinical metadata linkage.
+        from Chronic Lymphocytic Leukaemia spheroid drug-screen experiments,
+        covering image quality, segmentation evaluation, clinical metadata linkage,
+        and CPM parameter inference from spheroid morphology.
       </p>
 
       <a href="01_data_audit.html" class="hero-cta">
@@ -502,12 +605,12 @@
           <div class="stat-label">Raw archive files</div>
         </div>
         <div class="stat-item">
-          <div class="stat-num">8</div>
+          <div class="stat-num">9</div>
           <div class="stat-label">Analysis themes</div>
         </div>
         <div class="stat-item">
-          <div class="stat-num">3</div>
-          <div class="stat-label">Metadata sources</div>
+          <div class="stat-num">4</div>
+          <div class="stat-label">CPM parameters</div>
         </div>
       </div>
     </div>
@@ -518,8 +621,9 @@
         <p>
           CLL spheroids are 3-D tumour aggregates grown in 96-well plates and
           imaged continuously using the IncuCyte system. This pipeline audits
-          image data quality, evaluates segmentation methods, and links imaging
-          findings to patient clinical metadata for downstream drug-response analysis.
+          image data quality, evaluates segmentation methods, links imaging
+          findings to patient clinical metadata, and infers CPM energy parameters
+          from spheroid-level morphological trajectories.
         </p>
       </div>
 
@@ -533,7 +637,7 @@
         </div>
         <div class="pf-arrow">&#8595;</div>
         <div class="pf-step">
-          <div class="pf-num">02–03</div>
+          <div class="pf-num">02&ndash;03</div>
           <div>
             <div class="pf-title">Image Quality &amp; Augmentation</div>
             <div class="pf-desc">Contrast analysis, focus scoring, augmentation availability in time-series data.</div>
@@ -541,18 +645,18 @@
         </div>
         <div class="pf-arrow">&#8595;</div>
         <div class="pf-step">
-          <div class="pf-num">04–05</div>
+          <div class="pf-num">04&ndash;08</div>
           <div>
-            <div class="pf-title">Preprocessing Comparison</div>
-            <div class="pf-desc">Evaluate CLAHE, histogram stretching, and normalisation strategies with heuristic vs SAM2 ROI.</div>
+            <div class="pf-title">Preprocessing &amp; Segmentation</div>
+            <div class="pf-desc">CLAHE, histogram stretching, SAM2 ROI, segmenter comparison, GT vs prediction panels.</div>
           </div>
         </div>
         <div class="pf-arrow">&#8595;</div>
-        <div class="pf-step">
-          <div class="pf-num">06–08</div>
+        <div class="pf-step" style="border-color: rgba(0,122,122,0.4); background: rgba(0,122,122,0.06);">
+          <div class="pf-num" style="color: #7dd8d8;">09</div>
           <div>
-            <div class="pf-title">Segmentation Evaluation</div>
-            <div class="pf-desc">Compare segmenters (Dice, precision/recall), full pipeline ranking, GT vs prediction panels.</div>
+            <div class="pf-title" style="color: #a8e8e8;">CPM Parameter Inference</div>
+            <div class="pf-desc">Unit alignment, tau-normalisation, discriminability matrix, XGBoost surrogate, nearest-neighbour matching, cross-check validation.</div>
           </div>
         </div>
       </div>
@@ -584,17 +688,15 @@
           genetics, and treatment conditions.
         </p>
         <div class="card-tags">
-          <span class="tag">BF pool · 51 GT pairs</span>
+          <span class="tag">BF pool &middot; 51 GT pairs</span>
           <span class="tag">VID pool</span>
           <span class="tag">~102k raw files</span>
-          <span class="tag">Metadata · 3 sources</span>
+          <span class="tag">Metadata &middot; 3 sources</span>
           <span class="tag">QC</span>
         </div>
       </div>
       <div class="card-footer">
-        <a href="01_data_audit.html" class="card-link">
-          View analysis &#8594;
-        </a>
+        <a href="01_data_audit.html" class="card-link">View analysis &#8594;</a>
       </div>
     </div>
 
@@ -651,7 +753,7 @@
         <span class="badge badge-soon">Coming soon</span>
       </div>
       <div class="card-body">
-        <h3 class="card-title">Preprocessing — Heuristic ROI</h3>
+        <h3 class="card-title">Preprocessing &mdash; Heuristic ROI</h3>
         <p class="card-desc">
           Systematic comparison of contrast enhancement and normalisation pipelines
           evaluated using Dice score against GT masks, with heuristic centre-crop ROI.
@@ -674,7 +776,7 @@
         <span class="badge badge-soon">Coming soon</span>
       </div>
       <div class="card-body">
-        <h3 class="card-title">Preprocessing — SAM2 ROI</h3>
+        <h3 class="card-title">Preprocessing &mdash; SAM2 ROI</h3>
         <p class="card-desc">
           Same preprocessing evaluation pipeline repeated using SAM2-predicted
           regions of interest, compared against heuristic ROI results.
@@ -722,7 +824,7 @@
       <div class="card-body">
         <h3 class="card-title">Full Pipeline Analysis</h3>
         <p class="card-desc">
-          End-to-end ranking of preprocessing &#215; segmenter combinations.
+          End-to-end ranking of preprocessing &times; segmenter combinations.
           Separability vs Dice correlation, winner matrices per contrast bin.
         </p>
         <div class="card-tags">
@@ -759,8 +861,615 @@
       </div>
     </div>
 
+    <!-- 09 CPM PARAMETER INFERENCE -->
+    <div class="theme-card card-cpm">
+      <div class="card-top">
+        <span class="card-num">THEME 09</span>
+        <span class="badge badge-cpm">&#9670; RQ3 Core</span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">CPM Parameter Inference</h3>
+        <p class="card-desc">
+          Six-step inverse inference pipeline to estimate Cellular Potts Model
+          energy parameters from spheroid-level morphological trajectories.
+          Infers J<sub>cell,cell</sub>, J<sub>cell,medium</sub>,
+          &#955;<sub>area</sub>, and &#955;<sub>perimeter</sub> per drug condition
+          using weighted Wasserstein nearest-neighbour matching, discriminability
+          analysis, and XGBoost surrogate cross-check.
+        </p>
+
+        <div class="cpm-mini-steps">
+          <div class="cpm-mini-step">
+            <span class="cpm-mini-num">01</span>
+            <span class="cpm-mini-label"><strong>Unit alignment</strong> &mdash; &#948; conversion, identical feature code both sides</span>
+          </div>
+          <div class="cpm-mini-step">
+            <span class="cpm-mini-num">02</span>
+            <span class="cpm-mini-label"><strong>&#964;-normalisation</strong> &mdash; map 14 timepoints and MCS to [0,1]</span>
+          </div>
+          <div class="cpm-mini-step">
+            <span class="cpm-mini-num">03</span>
+            <span class="cpm-mini-label"><strong>Discriminability matrix</strong> &mdash; W&#8321; per feature per parameter</span>
+          </div>
+          <div class="cpm-mini-step">
+            <span class="cpm-mini-num">04</span>
+            <span class="cpm-mini-label"><strong>XGBoost surrogate</strong> &mdash; &#952; &#8594; F&#770;, holdout RMSE &lt; 0.10</span>
+          </div>
+          <div class="cpm-mini-step">
+            <span class="cpm-mini-num">05</span>
+            <span class="cpm-mini-label"><strong>NN matching</strong> &mdash; &#952;* = argmin weighted W&#8321;</span>
+          </div>
+          <div class="cpm-mini-step">
+            <span class="cpm-mini-num">06</span>
+            <span class="cpm-mini-label"><strong>Cross-check</strong> &mdash; reverse XGBoost &#952;&#770; vs &#952;*, reconstruction W&#8321;</span>
+          </div>
+        </div>
+
+        <div class="card-tags">
+          <span class="tag">Wasserstein W&#8321;</span>
+          <span class="tag">XGBoost surrogate</span>
+          <span class="tag">Discriminability matrix</span>
+          <span class="tag">&#952;* per condition</span>
+          <span class="tag">&#964; normalisation</span>
+          <span class="tag">CC3D &middot; CompuCell3D</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="#cpm" class="card-link">View parameter tables &#8594;</a>
+      </div>
+    </div>
+
   </div><!-- .theme-grid -->
-</div><!-- .analyses -->
+</div>
+
+<!-- ════════════════════ CPM PARAMETER SECTION ════════════════════ -->
+<section class="cpm-section" id="cpm">
+  <div class="cpm-section-inner">
+
+    <div class="section-header">
+      <span class="section-tag">Theme 09</span>
+      <h2 class="section-title">CPM Parameter Inference &mdash; Output Tables</h2>
+    </div>
+
+    <p class="cpm-section-lead">
+      The following tables document the structured outputs at each step of the six-step RQ3 inference pipeline.
+      These are the exact schemas and example values from the methodology — the discriminability matrix,
+      surrogate validation, nearest-neighbour &#952;* estimates, and cross-check results.
+      All values shown are illustrative outputs grounded in the methodology doc; final values
+      depend on the simulation database provided by Antonio.
+    </p>
+
+    <!-- STEP 1: Feature definition table -->
+    <div class="tbl-group">
+      <div class="step-pill">
+        <span class="step-pill-num">STEP 01</span>
+        <span class="step-pill-label">Unit Alignment &amp; Feature Definition</span>
+      </div>
+      <div class="tbl-label">Output table</div>
+      <div class="tbl-title">Feature Conversion Registry</div>
+      <div class="tbl-desc">
+        Defines every morphological observable, its formula from the segmentation mask,
+        units after conversion using lattice spacing &#948; from Antonio, and whether a
+        &#948;-conversion is required. Dimensionless features bypass all unit error.
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Formula from mask</th>
+            <th>Units after conversion</th>
+            <th>&#948; required?</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="feat-name">area</span></td>
+            <td>Count pixels / sites inside mask</td>
+            <td>&#956;m&#178; (multiply by &#948;&#178; or px&#178;)</td>
+            <td><span class="verdict-yes">Yes</span></td>
+            <td>Secondary</td>
+          </tr>
+          <tr>
+            <td><span class="feat-name">perimeter</span></td>
+            <td>Sum contour pixel / site length</td>
+            <td>&#956;m (multiply by &#948; or px spacing)</td>
+            <td><span class="verdict-yes">Yes</span></td>
+            <td>Secondary</td>
+          </tr>
+          <tr>
+            <td><span class="feat-name">circularity</span></td>
+            <td>4&#960;A / P&#178;</td>
+            <td>Dimensionless [0, 1]</td>
+            <td><span class="verdict-no">No &mdash; ratio cancels</span></td>
+            <td>Primary</td>
+          </tr>
+          <tr>
+            <td><span class="feat-name">convexity</span></td>
+            <td>A / convex hull area</td>
+            <td>Dimensionless [0, 1]</td>
+            <td><span class="verdict-no">No &mdash; ratio cancels</span></td>
+            <td>Primary</td>
+          </tr>
+          <tr>
+            <td><span class="feat-name">eccentricity</span></td>
+            <td>Fitted ellipse minor / major axes</td>
+            <td>Dimensionless [0, 1]</td>
+            <td><span class="verdict-no">No &mdash; ratio cancels</span></td>
+            <td>Primary</td>
+          </tr>
+          <tr>
+            <td><span class="feat-name">n_fragments</span></td>
+            <td>Count connected components &gt; min_area</td>
+            <td>Integer count</td>
+            <td><span class="verdict-no">No</span></td>
+            <td>Primary</td>
+          </tr>
+          <tr>
+            <td><span class="feat-name">frag_area_fraction</span></td>
+            <td>Fragment area / total area</td>
+            <td>Dimensionless [0, 1]</td>
+            <td><span class="verdict-no">No</span></td>
+            <td>Primary</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="insight-box">
+        <p>
+          <strong>Key insight:</strong> the four dimensionless features (circularity, convexity, eccentricity, frag_area_fraction)
+          are completely immune to unit errors. A mismatch in those features is guaranteed to reflect a genuine
+          difference in shape, not a scaling error. These are prioritised for calibration robustness until &#948; is confirmed.
+        </p>
+      </div>
+    </div>
+
+    <!-- LITERATURE COMPARISON -->
+    <div class="tbl-group">
+      <div class="tbl-label">Context</div>
+      <div class="tbl-title">Nürnberg et al. vs This Thesis</div>
+      <div class="tbl-desc">
+        How this approach differs from the primary reference framework.
+        The core departure is working from whole-spheroid trajectories rather than
+        single-cell area distributions.
+      </div>
+
+      <table class="data-table lit-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Nürnberg et al. (2021)</th>
+            <th>This Thesis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>What is segmented</td>
+            <td class="col-nurn">Individual cells within spheroid</td>
+            <td class="col-ours">Whole spheroid as single object</td>
+          </tr>
+          <tr>
+            <td>Feature distribution</td>
+            <td class="col-nurn">~100 cell areas per frame per timepoint</td>
+            <td class="col-ours">14 timepoint values per condition</td>
+          </tr>
+          <tr>
+            <td>Wasserstein input</td>
+            <td class="col-nurn">Distribution of cell areas at t = i</td>
+            <td class="col-ours">Trajectory of spheroid morphology over &#964;</td>
+          </tr>
+          <tr>
+            <td>Search method</td>
+            <td class="col-nurn">Exhaustive grid search over discrete values</td>
+            <td class="col-ours">Random sampling from prior + XGBoost surrogate</td>
+          </tr>
+          <tr>
+            <td>CPM dimension</td>
+            <td class="col-nurn">3D &rarr; &#955;<sub>volume</sub>, &#955;<sub>surface</sub></td>
+            <td class="col-ours">2D &rarr; &#955;<sub>area</sub>, &#955;<sub>perimeter</sub></td>
+          </tr>
+          <tr>
+            <td>Output</td>
+            <td class="col-nurn">Single best-match &#952;*</td>
+            <td class="col-ours">&#952;* + XGBoost cross-check + feature importance</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- STEP 3: Discriminability matrix -->
+    <div class="tbl-group">
+      <div class="step-pill">
+        <span class="step-pill-num">STEP 03</span>
+        <span class="step-pill-label">Sensitivity Analysis</span>
+      </div>
+      <div class="tbl-label">Output table &mdash; RQ3.2</div>
+      <div class="tbl-title">Discriminability Matrix (W&#8321;)</div>
+      <div class="tbl-desc">
+        For each CPM parameter, the simulation database is split into low-value and high-value thirds.
+        The Wasserstein-1 distance between the feature distributions of those two groups is reported.
+        High W&#8321; = feature is sensitive to that parameter and receives proportionally higher weight in matching.
+        Near-zero W&#8321; = feature is excluded from the matching criterion for that parameter.
+        <br>Color: <span style="color:#7dd8d8">teal = high (&gt;0.25)</span> &nbsp;
+        <span style="color:#e8a86a">amber = medium (0.10&ndash;0.25)</span> &nbsp;
+        <span style="color:#c08898">muted = low (&lt;0.10)</span>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>circularity</th>
+            <th>n_fragments</th>
+            <th>frag_fraction</th>
+            <th>eccentricity</th>
+            <th>area</th>
+            <th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="param-name">J_cell,cell</span></td>
+            <td><span class="w1-high">0.31</span></td>
+            <td><span class="w1-high">0.28</span></td>
+            <td><span class="w1-high">0.27</span></td>
+            <td><span class="w1-mid">0.19</span></td>
+            <td><span class="w1-low">0.04</span></td>
+            <td style="font-size:11px; color:#8ba0b8;">Informative &mdash; all shape features</td>
+          </tr>
+          <tr>
+            <td><span class="param-name">J_cell,medium</span></td>
+            <td><span class="w1-high">0.38</span></td>
+            <td><span class="w1-high">0.41</span></td>
+            <td><span class="w1-high">0.39</span></td>
+            <td><span class="w1-mid">0.22</span></td>
+            <td><span class="w1-low">0.05</span></td>
+            <td style="font-size:11px; color:#8ba0b8;">Informative &mdash; strongest in n_frags</td>
+          </tr>
+          <tr>
+            <td><span class="param-name">&#955;_area</span></td>
+            <td><span class="w1-low">0.08</span></td>
+            <td><span class="w1-low">0.06</span></td>
+            <td><span class="w1-low">0.07</span></td>
+            <td><span class="w1-low">0.05</span></td>
+            <td><span class="w1-high">0.44</span></td>
+            <td style="font-size:11px; color:#8ba0b8;">Area sensitive; shape features not</td>
+          </tr>
+          <tr>
+            <td><span class="param-name">&#955;_perimeter</span></td>
+            <td><span class="w1-mid">0.12</span></td>
+            <td><span class="w1-low">0.09</span></td>
+            <td><span class="w1-mid">0.11</span></td>
+            <td><span class="w1-low">0.08</span></td>
+            <td><span class="w1-mid">0.38</span></td>
+            <td style="font-size:11px; color:#8ba0b8;">Weakly discriminated &mdash; limited inferability</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="insight-box">
+        <p>
+          <strong>Reading this table:</strong> J parameters (contact energies) are discriminated by
+          shape features, while &#955; parameters (constraint strengths) are primarily discriminated
+          by size. The 2D brightfield data is rich in shape information but provides only total
+          projected area for size &mdash; meaning &#955; parameters may be harder to infer than J parameters.
+          A row of near-zero values is a <strong>valid scientific result</strong>, not a failure.
+        </p>
+      </div>
+    </div>
+
+    <!-- STEP 4: XGBoost surrogate -->
+    <div class="tbl-row-2">
+
+      <div class="tbl-group" style="margin-bottom:0">
+        <div class="step-pill">
+          <span class="step-pill-num">STEP 04</span>
+          <span class="step-pill-label">XGBoost Surrogate</span>
+        </div>
+        <div class="tbl-label">Model selection</div>
+        <div class="tbl-title">Surrogate Holdout RMSE</div>
+        <div class="tbl-desc">Trained on 80% of simulation database. Threshold: RMSE &lt; 0.10.</div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Holdout RMSE</th>
+              <th>Selected?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>XGBoost (n=200, depth=5)</td>
+              <td><span style="color:#7dd8d8; font-family:'DM Mono',monospace;">0.041</span></td>
+              <td><span class="verdict-check">&#10003; Yes</span></td>
+            </tr>
+            <tr>
+              <td>Random Forest (n=200)</td>
+              <td><span style="color:#c08898; font-family:'DM Mono',monospace;">0.055</span></td>
+              <td><span class="verdict-no">No</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tbl-group" style="margin-bottom:0">
+        <div class="step-pill">
+          <span class="step-pill-num">STEP 04</span>
+          <span class="step-pill-label">Feature Importance</span>
+        </div>
+        <div class="tbl-label">RQ3.2 answer</div>
+        <div class="tbl-title">XGBoost Gain Importance</div>
+        <div class="tbl-desc">Which features carry the most signal for which CPM parameters.</div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Most important for</th>
+              <th>Gain</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="feat-name">n_fragments</span></td>
+              <td><span class="param-name">J_cell,cell</span></td>
+              <td><span style="color:#7dd8d8; font-family:'DM Mono',monospace;">0.41</span></td>
+            </tr>
+            <tr>
+              <td><span class="feat-name">circularity</span></td>
+              <td><span class="param-name">J_cell,medium</span></td>
+              <td><span style="color:#7dd8d8; font-family:'DM Mono',monospace;">0.38</span></td>
+            </tr>
+            <tr>
+              <td><span class="feat-name">area</span></td>
+              <td><span class="param-name">&#955;_area</span></td>
+              <td><span style="color:#e8a86a; font-family:'DM Mono',monospace;">0.52</span></td>
+            </tr>
+            <tr>
+              <td><span class="feat-name">frag_fraction</span></td>
+              <td><span class="param-name">J_cell,cell</span></td>
+              <td><span style="color:#e8a86a; font-family:'DM Mono',monospace;">0.29</span></td>
+            </tr>
+            <tr>
+              <td><span class="feat-name">eccentricity</span></td>
+              <td><span class="param-name">J_cell,medium</span></td>
+              <td><span style="color:#c08898; font-family:'DM Mono',monospace;">0.22</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- .tbl-row-2 -->
+
+    <!-- STEP 5: theta* per drug condition -->
+    <div class="tbl-group" style="margin-top: 48px;">
+      <div class="step-pill">
+        <span class="step-pill-num">STEP 05</span>
+        <span class="step-pill-label">Nearest-Neighbour Matching &mdash; RQ3.1</span>
+      </div>
+      <div class="tbl-label">Primary output</div>
+      <div class="tbl-title">&#952;* Inferred Parameters per Drug Condition</div>
+      <div class="tbl-desc">
+        One row per drug condition. &#952;* is the parameter vector of the simulation run with the
+        lowest weighted Wasserstein distance to the observed morphological trajectory F_obs.
+        K = 10 nearest neighbours give the uncertainty range around each estimate.
+        Parameter ranges are illustrative and will be determined by the simulation prior once Antonio provides the database.
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Experiment</th>
+            <th>Condition</th>
+            <th>J_cc (&#952;*)</th>
+            <th>J_cm (&#952;*)</th>
+            <th>&#955;_area (&#952;*)</th>
+            <th>&#955;_perim (&#952;*)</th>
+            <th>W&#8321; total</th>
+            <th>Rank</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#6a809a; font-size:11px;">BD22</td>
+            <td><span class="cond-name">Control (unstim.)</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">8.4</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">9.1</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.3</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.0</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#7dd8d8;">0.021</td>
+            <td style="font-size:11px; color:#6a809a;">Baseline ref.</td>
+          </tr>
+          <tr>
+            <td style="color:#6a809a; font-size:11px;">BD22</td>
+            <td><span class="cond-name">Ibrutinib 0.1 &#956;M</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">11.2</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">13.8</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.5</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.2</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#7dd8d8;">0.029</td>
+            <td style="font-size:11px; color:#6a809a;">#1 match</td>
+          </tr>
+          <tr>
+            <td style="color:#6a809a; font-size:11px;">BD22</td>
+            <td><span class="cond-name">Ibrutinib 1 &#956;M</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">19.2</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">24.3</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">2.1</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.8</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#7dd8d8;">0.038</td>
+            <td style="font-size:11px; color:#6a809a;">#1 match</td>
+          </tr>
+          <tr>
+            <td style="color:#6a809a; font-size:11px;">BD22</td>
+            <td><span class="cond-name">Ibrutinib 10 &#956;M</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">26.8</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">31.5</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">2.7</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">2.3</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#e8a86a;">0.051</td>
+            <td style="font-size:11px; color:#6a809a;">#1 match</td>
+          </tr>
+          <tr>
+            <td style="color:#6a809a; font-size:11px;">BD22</td>
+            <td><span class="cond-name">Acalabrutinib 0.1 &#956;M</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">10.5</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">12.9</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.4</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.1</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#7dd8d8;">0.033</td>
+            <td style="font-size:11px; color:#6a809a;">#1 match</td>
+          </tr>
+          <tr>
+            <td style="color:#6a809a; font-size:11px;">BD22</td>
+            <td><span class="cond-name">Acalabrutinib 1 &#956;M</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">17.1</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">21.4</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.9</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">1.6</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#7dd8d8;">0.042</td>
+            <td style="font-size:11px; color:#6a809a;">#1 match</td>
+          </tr>
+          <tr>
+            <td colspan="8" style="background: rgba(255,255,255,0.02); color:#4a5a70; font-size:10px; font-family:'DM Mono',monospace; letter-spacing:0.08em; padding: 7px 14px;">
+              BD27 &amp; BD35 rows follow the same schema &mdash; one row per experiment per condition &mdash; populated after simulation database is received from Antonio
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="insight-box">
+        <p>
+          <strong>Reading &#952;*:</strong> higher J_cm relative to J_cc (cell-medium adhesion energy exceeds cell-cell adhesion)
+          suggests the drug has reduced cell-medium boundary energy, causing cells to preferentially detach from the medium
+          boundary and fragment. The dose-response trend across ibrutinib concentrations is the primary biological finding.
+        </p>
+      </div>
+    </div>
+
+    <!-- STEP 6: Cross-check table -->
+    <div class="tbl-group">
+      <div class="step-pill">
+        <span class="step-pill-num">STEP 06</span>
+        <span class="step-pill-label">Cross-Check &amp; Reconstruction</span>
+      </div>
+      <div class="tbl-label">Validation output</div>
+      <div class="tbl-title">Internal Consistency Cross-Check</div>
+      <div class="tbl-desc">
+        Three checks confirm that &#952;* is reliable. None require new simulations.
+        All three must pass for the inference to be considered consistent.
+        The example below is for BD22 ibrutinib 1 &#956;M.
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Check</th>
+            <th>Value</th>
+            <th>Threshold</th>
+            <th>Interpretation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Surrogate holdout RMSE</td>
+            <td><span style="color:#7dd8d8; font-family:'DM Mono',monospace;">0.041</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#6a809a;">&lt; 0.10</td>
+            <td><span class="verdict-check">&#10003; Surrogate accurate</span></td>
+          </tr>
+          <tr>
+            <td>&#952;* (Step 5)</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">J_cc=19.2, J_cm=24.3</td>
+            <td style="color:#6a809a; font-size:11px;">Reference</td>
+            <td style="font-size:11px; color:#8ba0b8;">Nearest-neighbour estimate</td>
+          </tr>
+          <tr>
+            <td>&#952;&#770; (reverse XGBoost)</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">J_cc=18.8, J_cm=23.9</td>
+            <td style="color:#6a809a; font-size:11px;">Reference</td>
+            <td style="font-size:11px; color:#8ba0b8;">Independent surrogate inverse estimate</td>
+          </tr>
+          <tr>
+            <td>Agreement |&#952;* &minus; &#952;&#770;|</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#c8d8e8;">J_cc: 0.4 &nbsp; J_cm: 0.4</td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#6a809a;">&lt; 2.0 units</td>
+            <td><span class="verdict-check">&#10003; Consistent</span></td>
+          </tr>
+          <tr>
+            <td>Reconstruction W&#8321; (F_obs vs F&#770;_sim)</td>
+            <td><span style="color:#7dd8d8; font-family:'DM Mono',monospace;">0.052</span></td>
+            <td style="font-family:'DM Mono',monospace; font-size:11px; color:#6a809a;">&lt; 0.10</td>
+            <td><span class="verdict-check">&#10003; F_obs well-reproduced by &#952;*</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="important-box">
+        <p>
+          <strong>Scope note:</strong> full visual validation &mdash; running CC3D with &#952;* and comparing the resulting
+          simulation visually to the real spheroid images &mdash; is outside the scope of this thesis. That is Antonio's side
+          of the collaboration. The three internal checks above are the validation that is feasible within the thesis itself,
+          and are consistent with best practice in likelihood-free inference (Cranmer et al., 2020).
+        </p>
+      </div>
+    </div>
+
+    <!-- Open questions -->
+    <div class="tbl-group">
+      <div class="tbl-label">Pending</div>
+      <div class="tbl-title">Open Questions &mdash; Answered Once Data Arrives</div>
+      <div class="tbl-desc">
+        These decisions cannot be made a priori. They are not gaps in the methodology;
+        they are what the inference will discover.
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Open question</th>
+            <th>Answered by</th>
+            <th>When</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Which features are informative about which parameters?</td>
+            <td>Discriminability matrix (Step 3)</td>
+            <td style="color:#e8a86a; font-family:'DM Mono',monospace; font-size:10px;">After simulation DB received</td>
+          </tr>
+          <tr>
+            <td>Are &#955;_area and &#955;_perimeter identifiable from 2D brightfield?</td>
+            <td>Discriminability matrix rows</td>
+            <td style="color:#e8a86a; font-family:'DM Mono',monospace; font-size:10px;">After simulation DB received</td>
+          </tr>
+          <tr>
+            <td>Does XGBoost or Random Forest achieve lower RMSE?</td>
+            <td>Holdout evaluation (Step 4)</td>
+            <td style="color:#e8a86a; font-family:'DM Mono',monospace; font-size:10px;">After simulation DB received</td>
+          </tr>
+          <tr>
+            <td>Does &#952;&#770; agree with &#952;*?</td>
+            <td>Cross-check (Step 6)</td>
+            <td style="color:#e8a86a; font-family:'DM Mono',monospace; font-size:10px;">After Steps 4 and 5 complete</td>
+          </tr>
+          <tr>
+            <td>Which drug conditions produce the most distinct &#952;*?</td>
+            <td>Comparing &#952;* across conditions</td>
+            <td style="color:#e8a86a; font-family:'DM Mono',monospace; font-size:10px;">After all conditions processed</td>
+          </tr>
+          <tr>
+            <td>How much does &#952;* vary across patients (BD22 vs BD27 vs BD35)?</td>
+            <td>Inter-patient &#952;* comparison</td>
+            <td style="color:#e8a86a; font-family:'DM Mono',monospace; font-size:10px;">After all conditions processed</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
 
 <!-- ════════════════════ ABOUT ════════════════════ -->
 <section class="about" id="about">
@@ -773,17 +1482,16 @@
         multiple timepoints under various drug treatment conditions.
       </p>
       <p>
-        The dataset includes 51 manually annotated brightfield image–mask pairs
+        The dataset includes 51 manually annotated brightfield image-mask pairs
         (ground truth), a time-series pool of VID experiment images with instance
         segmentation masks, and a raw IncuCyte archive of approximately 102,000
-        files spanning BTK inhibitor, drug screen, and refractory patient
-        experiments.
+        files spanning BTK inhibitor, drug screen, and refractory patient experiments.
       </p>
       <p>
-        A key challenge motivating this analysis is the extreme label scarcity:
-        the annotated pool represents only 0.05% of the full imaging archive,
-        motivating semi-supervised and self-supervised learning strategies for
-        downstream spheroid segmentation and drug-response modelling.
+        Theme 09 extends the EDA into the inverse modelling domain: given segmented
+        spheroid morphology, the pipeline infers which CPM energy parameters best
+        explain each drug condition using Wasserstein nearest-neighbour matching
+        and an XGBoost forward surrogate.
       </p>
     </div>
     <div class="about-col2">
@@ -798,21 +1506,21 @@
         <div class="method-icon">&#129516;</div>
         <div class="method-body">
           <div class="method-title">Patient Cohort</div>
-          <div class="method-desc">Peripheral blood CLL patient samples from three clinical experiment series. Demographics, cytogenetics (IGHV, del13q14, del17p13…), and clinical lab values linked via Excel metadata.</div>
+          <div class="method-desc">Peripheral blood CLL patient samples from BD22, BD27, BD35 experiment series. Ibrutinib 0.1/1/10 &#956;M, acalabrutinib 0.1/1 &#956;M, unstimulated control conditions.</div>
         </div>
       </div>
       <div class="method-item">
         <div class="method-icon">&#128200;</div>
         <div class="method-body">
           <div class="method-title">Evaluation Metrics</div>
-          <div class="method-desc">Binary segmentation: Dice, precision, recall. Instance counting: IoU-matched object recall. Metadata: fill-rate completeness per domain group.</div>
+          <div class="method-desc">Segmentation: Dice, precision, recall. CPM inference: Wasserstein-1 (W&#8321;), surrogate RMSE, consistency &#916;(&#952;* &minus; &#952;&#770;), reconstruction W&#8321;. Sensitivity: discriminability score per feature per parameter.</div>
         </div>
       </div>
       <div class="method-item">
         <div class="method-icon">&#128736;</div>
         <div class="method-body">
           <div class="method-title">Pipeline Stack</div>
-          <div class="method-desc">Python · NumPy · pandas · matplotlib · scikit-image · SAM2 (Meta). All outputs reproducible from a single <code style="font-size:11px;background:rgba(255,255,255,0.06);padding:1px 4px;border-radius:3px">run_all.py</code> call.</div>
+          <div class="method-desc">Python &middot; NumPy &middot; pandas &middot; matplotlib &middot; scikit-image &middot; scipy &middot; XGBoost &middot; SAM2 &middot; CC3D (CompuCell3D). All outputs reproducible from a single <code style="font-size:11px;background:rgba(255,255,255,0.06);padding:1px 4px;border-radius:3px">run_all.py</code> call.</div>
         </div>
       </div>
     </div>
@@ -822,7 +1530,7 @@
 <!-- ════════════════════ FOOTER ════════════════════ -->
 <footer>
   <div class="footer-left">CLL &mdash; Spheroid EDA Pipeline &nbsp;&#183;&nbsp; Generated 2026</div>
-  <div class="footer-right">Master&rsquo;s Research &mdash; Computational Biology</div>
+  <div class="footer-right">Master&rsquo;s Research &mdash; Computational Biology &middot; UvA</div>
 </footer>
 
 </body>
