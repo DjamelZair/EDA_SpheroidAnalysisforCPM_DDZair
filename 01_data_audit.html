@@ -421,17 +421,117 @@
   }
   #top-btn:hover { background: var(--amber); }
 
+  /* ── Collapsible section cards ──────────────────────────────────── */
+  .sc-header {
+    cursor: pointer;
+    user-select: none;
+  }
+  .sc-header::after {
+    content: '▾';
+    margin-left: auto;
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    transition: transform 0.22s;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .section-card.collapsed .sc-header::after {
+    transform: rotate(-90deg);
+  }
+  .section-card.collapsed .sc-body {
+    display: none;
+  }
+
+  /* ── Stat grid (CPM card) ────────────────────────────────────────── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 0 24px 22px;
+  }
+  .stat-box {
+    background: var(--cream);
+    border: 1px solid var(--light);
+    border-radius: 6px;
+    padding: 14px 12px 12px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--teal);
+    line-height: 1.1;
+    margin-bottom: 5px;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--slate);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  /* ── Hamburger button ────────────────────────────────────────────── */
+  #hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 4px;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+    margin-right: 4px;
+  }
+  #hamburger span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: rgba(255,255,255,0.65);
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+  #hamburger:hover span { background: var(--teal); }
+
+  /* ── Mobile sidebar overlay ──────────────────────────────────────── */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 149;
+  }
+  #sidebar-overlay.active { display: block; }
+
+  /* ── Mobile ──────────────────────────────────────────────────────── */
   @media (max-width: 800px) {
-    #sidebar { display: none; }
-    #main { padding: 20px; }
-    #top-strip { padding: 12px 20px; }
+    #hamburger { display: flex; }
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 150;
+      transform: translateX(-100%);
+      transition: transform 0.26s cubic-bezier(.4,0,.2,1);
+    }
+    #sidebar.open { transform: translateX(0); }
+    #main { padding: 16px 14px 48px; }
+    #top-strip { padding: 10px 16px; gap: 8px; }
+    .ts-meta { display: none; }
+    .ts-title { font-size: 14px; }
     .glossary-grid { grid-template-columns: 1fr; }
     .gl-term { border-bottom: none; background: rgba(15,31,61,0.06); color: var(--teal); }
+    .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px 18px; }
+    .stat-val { font-size: 22px; }
+    .filetype-table, .table-wrap table { font-size: 11px; }
+    .sc-title { font-size: 14px; }
   }
 </style>
 </head>
 <body>
 
+<div id="sidebar-overlay"></div>
 <nav id="sidebar">
   <div class="sb-brand">
     <div class="sb-logo">CLL Spheroid EDA</div>
@@ -442,6 +542,9 @@
   <ul><li><a href="#audit-summary" class="theme-link">Audit Summary</a></li>
 <li><a href="#file-inventory" class="sub-link">Data Files</a></li>
 <li><a href="#glossary" class="sub-link">Glossary</a></li>
+<li style="margin-top:10px"><a href="#cpm-modelling" class="theme-link">CPM Parameterisation</a></li>
+<li><a href="#cpm-overview" class="sub-link">Feature Extraction</a></li>
+<li><a href="#cpm-mapping" class="sub-link">Parameter Mapping</a></li>
 <li style="margin-top:10px"><a href="#figures" class="theme-link">Figures</a></li>
 <li><a href="#fig-1" class="sub-link">Dataset Overview</a></li>
 <li><a href="#fig-2" class="sub-link">BF Pool — Treatment Distribution</a></li>
@@ -465,6 +568,9 @@
 
 <div id="main-wrap">
   <div id="top-strip">
+    <button id="hamburger" aria-label="Toggle navigation" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
     <span class="ts-tag">THEME 01</span>
     <span class="ts-title">Data Audit — CLL Spheroid EDA Pipeline</span>
     <span class="ts-meta">Generated 2026-03-14 11:38</span>
@@ -637,6 +743,143 @@
     </div>
   </div>
 </div>
+
+<div id="cpm-modelling">
+  <div class="theme-headline" style="margin-top:40px">
+    <div class="th-tag">Theme 01 — CPM Parameterisation</div>
+    <h1>Cellular Potts Model — Calibration Targets</h1>
+  </div>
+
+  <div class="section-card" id="cpm-overview">
+    <div class="sc-header">
+      <span class="sc-tag">Analysis</span>
+      <span class="sc-title">CPM Feature Extraction — Overview</span>
+    </div>
+    <div class="sc-body">
+      <div class="findings-panel">
+        <h2>What is this?</h2>
+        <p>The Cellular Potts Model (CPM, CompuCell3D) requires biologically grounded energy parameters — volume targets, surface constraints, and adhesion energies. These were extracted empirically from the <strong>51 BF GT image–mask pairs</strong> by measuring morphological features of segmented spheroid objects.</p>
+        <p>The pipeline (<code>make_cpm_overview.py</code>) applies connected-component analysis on binary masks, computes per-object shape descriptors, and estimates cell–cell contact frequency using a <strong>6 px neighbour radius</strong>. Results are saved to <code>outputs/object_features.csv</code> and <code>outputs/image_summary.csv</code>.</p>
+        <h3>Dataset covered</h3>
+        <p><strong>51 images</strong> · <strong>551 segmented objects</strong> · neighbour radius = 6 px · minimum area filter = 50 px²</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-val">551</div>
+          <div class="stat-label">Total objects segmented</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">8</div>
+          <div class="stat-label">Median objects / image</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">9.3%</div>
+          <div class="stat-label">Median foreground coverage</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">3.1%</div>
+          <div class="stat-label">Mean cell–cell contact ratio</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card" id="cpm-mapping" style="margin-top:16px">
+    <div class="sc-header">
+      <span class="sc-tag">Features → CPM</span>
+      <span class="sc-title">Morphological Features &amp; CPM Parameter Mapping</span>
+    </div>
+    <div class="sc-body">
+      <div class="findings-panel">
+        <h2>Feature distributions (per-object, n = 551)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Median</th>
+              <th>Mean</th>
+              <th>CPM Term</th>
+              <th>Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>area_px</code></td>
+              <td>1,542 px</td>
+              <td>14,820 px</td>
+              <td>V<sub>T</sub>, &lambda;<sub>V</sub></td>
+              <td>High variance (&sigma; = 44,368) due to isolated cells and multi-cell clusters; use <strong>median</strong> as calibration target</td>
+            </tr>
+            <tr>
+              <td><code>circularity</code></td>
+              <td>0.614</td>
+              <td>0.548</td>
+              <td>T (membrane fluct.)</td>
+              <td>Moderately round; below 1.0 due to real deformation + BF imaging artefacts. T can be set to a moderate value</td>
+            </tr>
+            <tr>
+              <td><code>solidity</code></td>
+              <td>0.957</td>
+              <td>0.936</td>
+              <td>&lambda;<sub>S</sub> (surface)</td>
+              <td>Very compact objects, no filopodia. Low surface penalty sufficient</td>
+            </tr>
+            <tr>
+              <td><code>eccentricity</code></td>
+              <td>0.380</td>
+              <td>0.373</td>
+              <td>Shape anisotropy</td>
+              <td>Slight elongation; near 0 = near-circular cross-section at imaging plane</td>
+            </tr>
+            <tr>
+              <td><code>neighbor_count</code></td>
+              <td>0</td>
+              <td>0.39</td>
+              <td>Adhesion topology</td>
+              <td>Most cells are isolated; multi-cell clustering is rare in the GT pool</td>
+            </tr>
+            <tr>
+              <td><code>cellcell_contact_ratio</code></td>
+              <td>0.000</td>
+              <td>0.031</td>
+              <td>J<sub>CC</sub> cohesion</td>
+              <td>Low contact (3.1% mean) &rarr; J<sub>CC</sub> &asymp; J<sub>CM</sub>; cells are weakly cohesive</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Design implications for CPM</h2>
+        <ul>
+          <li>Use <strong>median area (1,542 px) as V<sub>T</sub></strong>; exclude outlier clusters (area &gt; 50,000 px) unless simulating aggregates.</li>
+          <li><strong>Low contact ratio</strong> (3.1%) supports weak homotypic adhesion: set J<sub>CC</sub> slightly below J<sub>CM</sub>.</li>
+          <li><strong>High solidity</strong> (0.957) &rarr; cells are smooth blobs; CPM membrane fluctuation amplitude (T) should be moderate to avoid spiky deformations.</li>
+          <li>Area range spans 113–251,202 px — filter fragments &lt; 200 px as debris before parameterisation.</li>
+        </ul>
+
+        <h2>Output files</h2>
+        <table>
+          <thead><tr><th>File</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr><td><code>outputs/object_features.csv</code></td><td>Per-object shape descriptors — 551 rows, 14 columns</td></tr>
+            <tr><td><code>outputs/image_summary.csv</code></td><td>Per-image aggregated statistics — 51 rows</td></tr>
+            <tr><td><code>outputs/cpm_overview_report.pdf</code></td><td>PDF overview with feature distributions and contact analysis</td></tr>
+            <tr><td><code>outputs/cpm_overview_report_UPDATED.pdf</code></td><td>Extended version (6.7 MB) with additional QC visuals</td></tr>
+            <tr><td><code>outputs/cpm_slide_visuals_report.pdf</code></td><td>8-page slide deck — area constraints, cohesion proxies, calibration loop</td></tr>
+            <tr><td><code>outputs/slide_figures/</code></td><td>Individual PNG slides (slide1–8): examples, feature diagrams, CPM mapping table, sensitivity plots</td></tr>
+          </tbody>
+        </table>
+
+        <h2>Notes</h2>
+        <ul>
+          <li>GT pool is <strong>cross-sectional</strong> (no temporal autocorrelation) — object features are independent observations.</li>
+          <li>WRONG_SHAPE images (VID3201, 960&times;1280) were included; their area values carry a minor pixel-scale offset vs. the 1152&times;1536 standard.</li>
+          <li>Scripts: <code>make_cpm_overview.py</code>, <code>make_cpm_gallery_meeting3.py</code>, <code>make_cpm_slide_visuals_report.py</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="figures"><div class="theme-headline" style="margin-top:40px"><div class="th-tag">Theme 01</div><h1>Figures</h1></div></div>
 
 <div class="section-card" id="fig-1">
@@ -4310,6 +4553,54 @@
 </div>
 
 <button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script>
+  /* ── Collapsible section cards ── */
+  document.querySelectorAll('.sc-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+      var card = header.closest('.section-card');
+      if (card) card.classList.toggle('collapsed');
+    });
+  });
+
+  /* ── Mobile sidebar ── */
+  function toggleSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+  }
+  document.getElementById('sidebar-overlay').addEventListener('click', function() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('active');
+  });
+  /* Close sidebar on nav link click (mobile) */
+  document.querySelectorAll('#sidebar a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebar-overlay').classList.remove('active');
+    });
+  });
+
+  /* ── Active nav highlight on scroll ── */
+  var sections = Array.from(document.querySelectorAll('[id]')).filter(function(el) {
+    return el.closest('#sidebar') === null;
+  });
+  var navLinks = document.querySelectorAll('#sidebar a[href^="#"]');
+  window.addEventListener('scroll', function() {
+    var scrollY = window.scrollY + 90;
+    var current = '';
+    sections.forEach(function(sec) {
+      if (sec.offsetTop <= scrollY) current = sec.id;
+    });
+    navLinks.forEach(function(a) {
+      a.style.color = '';
+      if (a.getAttribute('href') === '#' + current) {
+        a.style.color = 'rgba(255,255,255,0.95)';
+      }
+    });
+  }, { passive: true });
+</script>
 
 </body>
 </html>
