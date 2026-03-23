@@ -6,7 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
 <script src="components.js" defer></script>
-<title>Theme 01 — Data Audit | CLL Spheroid EDA</title>
+<title>Theme 01 - Data Audit | CLL Spheroid EDA</title>
 </head>
 <body>
 
@@ -51,30 +51,31 @@
   <div id="top-strip">
     <button id="hamburger" aria-label="Toggle navigation">&#9776;</button>
     <span class="ts-tag">THEME 01</span>
-    <span class="ts-title">Data Audit — CLL Spheroid EDA Pipeline</span>
-    <span class="ts-meta">Generated 2026-03-23 10:06</span>
+    <span class="ts-title">Data Audit - CLL Spheroid EDA Pipeline</span>
+    <span class="ts-meta">Generated 2026-03-23 23:21</span>
   </div>
   <div id="main">
     
 <div id="intro">
   <div class="theme-headline">
-    <div class="th-tag">Theme 01 — Data Audit</div>
+    <div class="th-tag">Theme 01 - Data Audit</div>
     <h1>Introduction</h1>
   </div>
   <div class="section-card">
     <div class="sc-header">
       <span class="sc-tag">Purpose</span>
-      <span class="sc-title">What is this audit and why does it exist?</span>
+      <span class="sc-title">Taking stock of what we have before doing anything else</span>
     </div>
     <div class="sc-body">
       <p style="margin-bottom:14px">
-        Before any modelling begins, this audit establishes a complete inventory of all imaging and metadata
-        assets in the CLL spheroid dataset. It answers three core questions:
+        This is the first step of the EDA pipeline. Before running any segmentation or
+        extracting features, we need to know exactly what data is available, what condition
+        it is in, and what metadata we can link to the images. This audit answers:
       </p>
       <ol style="margin-left:20px;line-height:1.9">
-        <li>What annotated data do we have and is it of sufficient quality for training?</li>
-        <li>What is the full scope of the raw unannotated imaging archive?</li>
-        <li>What patient metadata can be reliably linked to the images?</li>
+        <li>How many annotated images do we have, and what do they cover in terms of treatments and timepoints?</li>
+        <li>How large is the full raw archive, and how is it structured?</li>
+        <li>What patient and clinical metadata is available, and how complete is it?</li>
       </ol>
     </div>
   </div>
@@ -82,7 +83,7 @@
   <div class="section-card" style="margin-top:16px">
     <div class="sc-header">
       <span class="sc-tag">Data Pools</span>
-      <span class="sc-title">Two data sources — one local, one on the cluster</span>
+      <span class="sc-title">Two data sources: local annotations and the cluster archive</span>
     </div>
     <div class="sc-body">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:4px">
@@ -90,38 +91,38 @@
         <div style="background:#f0fafa;border-left:3px solid var(--teal);padding:16px 18px;border-radius:4px">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;
                       text-transform:uppercase;color:var(--teal);margin-bottom:8px">
-            Annotated GT Pool — Local
+            Annotated GT Pool (local)
           </div>
           <p style="margin-bottom:8px">
             <strong>51 brightfield images</strong> with hand-drawn binary segmentation masks,
-            and <strong>84 VID time-series images</strong> with instance masks (one integer per spheroid object).
-            All images are stored on the local workstation.
+            plus <strong>84 VID time-series images</strong> with instance masks (one integer per
+            spheroid object). Stored on the local workstation.
           </p>
           <p style="margin-bottom:8px">
-            These are the only labelled data available. They form the training and evaluation set
-            for the segmentation model.
+            This is all the labelled data we have. It is what we train and evaluate
+            segmentation on.
           </p>
           <p style="font-size:12px;color:#666">
-            Figures 1–4 in this report concern this pool.
+            Figures 1-4 explore this pool.
           </p>
         </div>
 
         <div style="background:#fdf8f0;border-left:3px solid var(--amber);padding:16px 18px;border-radius:4px">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;
                       text-transform:uppercase;color:var(--amber);margin-bottom:8px">
-            Full Raw Archive — Snellius Cluster
+            Full Raw Archive (Snellius cluster)
           </div>
           <p style="margin-bottom:8px">
-            <strong>42,825 raw IncuCyte images</strong> across 19 experiments, covering three
-            experiment categories: BTK inhibitor assays, drug screen assays, and refractory CLL samples.
-            Scanned on the Snellius HPC cluster due to storage and compute constraints.
+            <strong>42,825 raw IncuCyte images</strong> across 19 experiments in three
+            categories: BTK inhibitor assays, drug screen assays, and refractory CLL samples.
+            Stored on the Snellius HPC cluster.
           </p>
           <p style="margin-bottom:8px">
-            These images are unannotated. They represent the unlabelled pool for semi-supervised
-            pre-training and temporal consistency evaluation.
+            These images have no annotations. This is the full pool that segmentation
+            and feature extraction will eventually run on.
           </p>
           <p style="font-size:12px;color:#666">
-            Figures 5–6 in this report concern this archive.
+            Figures 5-6 explore this archive.
           </p>
         </div>
 
@@ -130,13 +131,13 @@
                   padding:14px 18px;border-radius:4px">
         <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.12em;
                     text-transform:uppercase;color:var(--slate);margin-bottom:8px">
-          Patient Metadata — Both Pools
+          Patient Metadata (both pools)
         </div>
         <p>
-          Three Excel metadata files covering <strong>33 unique patients</strong> (2,784 rows, 61 tracked columns).
-          Includes patient demographics, IGHV mutational status, cytogenetics, clinical lab values,
-          and per-well treatment conditions. Metadata is linked to both the annotated pool and the raw archive.
-          Figures 7–11 cover the metadata.
+          Three Excel metadata files covering <strong>33 unique patients</strong> (2,784 rows,
+          61 tracked columns). Includes demographics, IGHV mutational status, cytogenetics,
+          clinical lab values, and per-well treatment conditions. Linked to both the annotated
+          pool and the raw archive. Figures 7-11 explore this metadata.
         </p>
       </div>
     </div>
@@ -145,7 +146,7 @@
 
 <div id="audit-summary">
   <div class="theme-headline">
-    <div class="th-tag">Theme 01 — Data Audit</div>
+    <div class="th-tag">Theme 01 - Data Audit</div>
     <h1>Audit Summary</h1>
   </div>
   <div class="section-card">
@@ -154,7 +155,7 @@
       <span class="sc-title">Stage 1: Data Audit Report</span>
     </div>
     <div class="sc-body">
-      <div class="findings-panel"><h2>Stage 1 — Data Audit Report</h2>
+      <div class="findings-panel"><h2>Stage 1 - Data Audit Report</h2>
 <h2>BF pool (primary GT pool)</h2>
 <ul>
 <li>Total images:        51</li>
@@ -172,7 +173,7 @@
 <li>Images without mask: 0</li>
 <li>Unique VIDs:         ['VID1169', 'VID1873', 'VID2319', 'VID2359', 'VID2651']</li>
 </ul>
-<h2>Raw archive inventory (Snellius — full BTK/T/Refractory scan)</h2>
+<h2>Raw archive inventory (Snellius - full BTK/T/Refractory scan)</h2>
 <ul>
 <li>Total files:           42,825</li>
 <li>Unique experiments:    19</li>
@@ -182,7 +183,7 @@
 <p>    Btk                   19,024</p>
 <p>    Drug_screen           18,605</p>
 <p>    Refractory             5,196</p>
-<h2>GT pool — raw timeseries coverage</h2>
+<h2>GT pool - raw timeseries coverage</h2>
 <ul>
 <li>GT images with matching raw series: 51 / 51</li>
 <li>GT images with NO raw match:        0</li>
@@ -191,43 +192,43 @@
 <ul>
 <li>Unique patients (VIDs): 33</li>
 <li>Sex distribution:       {'Female': 18, 'Male': 15}</li>
-<li>Age: median=66  range=50–85</li>
+<li>Age: median=66  range=50-85</li>
 <li>IGHV:                   {'Mutated': 21, 'Unmutated': 6, 'Polyclonal': 1}</li>
-<li>Columns <50% filled (43): Hb (mmol/L), Thrombocytes (G/L), %CD25high (CLL), %CD25high (CD4), %CD25high (CD8), gMFI CD25 (CLL), gMFI CD5 (CLL), gMFI CXCR4 (CLL), gMFI CD40 (CLL), %CD95high (CLL)…</li>
+<li>Columns below 50% filled (43): Hb (mmol/L), Thrombocytes (G/L), %CD25high (CLL), %CD25high (CD4), %CD25high (CD8), gMFI CD25 (CLL), gMFI CD5 (CLL), gMFI CXCR4 (CLL), gMFI CD40 (CLL), %CD95high (CLL)...</li>
 </ul>
-<h2>QC issues — BF pool (sampled 10 pairs)</h2>
+<h2>QC issues - BF pool (sampled 10 pairs)</h2>
 <ul>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID3201_C4_1_04d16h08mL.jpg</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID3201_C4_1_04d16h08mL_masks.tif</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID3201_D4_1_04d20h08mL.jpg</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID3201_D4_1_04d20h08mL_masks.tif</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID3201_F3_1_04d20h08mL.jpg</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID3201_F3_1_04d20h08mL_masks.tif</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID3201_C4_1_04d16h08mL.jpg</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID3201_C4_1_04d16h08mL_masks.tif</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID3201_D4_1_04d20h08mL.jpg</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID3201_D4_1_04d20h08mL_masks.tif</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID3201_F3_1_04d20h08mL.jpg</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID3201_F3_1_04d20h08mL_masks.tif</li>
 </ul>
-<h2>QC issues — VID pool (sampled 10 pairs)</h2>
+<h2>QC issues - VID pool (sampled 10 pairs)</h2>
 <ul>
-<li>NON_BINARY_VALUES: [0 1 2 3 4 5 6 7] — VID2651_A6_1_01d18h00m_masks.tif</li>
-<li>NON_BINARY_VALUES: [0 1 2 3 4 5 6 7] — VID2651_B3_1_00d06h00m_masks.tif</li>
-<li>NON_BINARY_VALUES: [0 1 2 3 4 5 6 7] — VID2651_C4_1_05d12h00m_masks.tif</li>
-<li>NON_BINARY_VALUES: [0 1 2 3 4 5 6] — VID1169_F7_1_03d12h00m_masks.tif</li>
-<li>NON_BINARY_VALUES: [0 1 2 3 4 5] — VID1873_H4_1_03d07h00m_masks.tif</li>
-<li>NON_BINARY_VALUES: [0 1 2 3] — VID1169_B10_1_02d12h00m_masks.tif</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID2651_A6_1_01d18h00m.jpg</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID2651_A6_1_01d18h00m_masks.tif</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID2651_B3_1_00d06h00m.jpg</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID2651_B3_1_00d06h00m_masks.tif</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID2651_C4_1_05d12h00m.jpg</li>
-<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) — VID2651_C4_1_05d12h00m_masks.tif</li>
+<li>NON_BINARY_VALUES: [0 1 2 3 4 5 6 7] - VID2651_A6_1_01d18h00m_masks.tif</li>
+<li>NON_BINARY_VALUES: [0 1 2 3 4 5 6 7] - VID2651_B3_1_00d06h00m_masks.tif</li>
+<li>NON_BINARY_VALUES: [0 1 2 3 4 5 6 7] - VID2651_C4_1_05d12h00m_masks.tif</li>
+<li>NON_BINARY_VALUES: [0 1 2 3 4 5 6] - VID1169_F7_1_03d12h00m_masks.tif</li>
+<li>NON_BINARY_VALUES: [0 1 2 3 4 5] - VID1873_H4_1_03d07h00m_masks.tif</li>
+<li>NON_BINARY_VALUES: [0 1 2 3] - VID1169_B10_1_02d12h00m_masks.tif</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID2651_A6_1_01d18h00m.jpg</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID2651_A6_1_01d18h00m_masks.tif</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID2651_B3_1_00d06h00m.jpg</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID2651_B3_1_00d06h00m_masks.tif</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID2651_C4_1_05d12h00m.jpg</li>
+<li>WRONG_SHAPE: (960, 1280) (expected (1152, 1536)) - VID2651_C4_1_05d12h00m_masks.tif</li>
 </ul>
 <h2>Notes</h2>
 <ul>
-<li>BF pool masks are binary (0/255).  Fragment count = connected components.</li>
+<li>BF pool masks are binary (0/255). Fragment count = connected components.</li>
 <li>VID pool masks are instance-labeled (0,1,2,...). Count = unique non-zero values.</li>
 <li>BF images come from different drug-screen experiments (different patients/VIDs).</li>
 </ul>
-<p>  They are cross-sectional — NO temporal autocorrelation within this pool.</p>
+<p>  They are cross-sectional, with no temporal autocorrelation within this pool.</p>
 <ul>
-<li>VID pool: same well imaged at multiple timepoints → temporal autocorrelation risk.</li>
+<li>VID pool: same well imaged at multiple timepoints, creating temporal autocorrelation risk.</li>
 </ul>
 <p>  Do NOT treat VID images from the same well as independent observations.</p>
 <ul>
@@ -258,17 +259,17 @@
               <td>Brightfield microscopy images (RGB, 8-bit), exported by IncuCyte software.</td>
               <td>BF pool (GT) · VID pool (time-series)</td></tr>
           <tr><td class="ft-ext">.tif (binary)</td>
-              <td>Binary segmentation mask — pixel 0 = background, 255 = spheroid. Hand-annotated per image.</td>
-              <td>BF pool — ground-truth masks</td></tr>
+              <td>Binary segmentation mask - pixel 0 = background, 255 = spheroid. Hand-annotated per image.</td>
+              <td>BF pool - ground-truth masks</td></tr>
           <tr><td class="ft-ext">.tif (instance)</td>
-              <td>Instance-label mask — each unique integer (1, 2, 3…) identifies one distinct spheroid object.</td>
-              <td>VID pool — instance masks</td></tr>
+              <td>Instance-label mask - each unique integer (1, 2, 3…) identifies one distinct spheroid object.</td>
+              <td>VID pool - instance masks</td></tr>
           <tr><td class="ft-ext">.xlsx</td>
               <td>Excel metadata files: patient demographics, treatment conditions, clinical lab values, cytogenetics per well.</td>
-              <td>Metadata — 3 files (btk · drug_screen · refractory)</td></tr>
+              <td>Metadata - 3 files (btk · drug_screen · refractory)</td></tr>
           <tr><td class="ft-ext">.tif (raw archive)</td>
               <td>Raw unprocessed IncuCyte exports (~102k files). Not annotated. Used for semi-supervised pre-training and temporal analysis.</td>
-              <td>Raw archive — two data transfers</td></tr>
+              <td>Raw archive - two data transfers</td></tr>
           <tr><td class="ft-ext">.csv</td>
               <td>Pipeline-generated manifests, summaries, and QC tables produced by this audit.</td>
               <td>Pipeline outputs</td></tr>
@@ -289,23 +290,23 @@
         Biological and technical terms used throughout this report.
       </p>
       <div class="glossary-grid"><div class="gl-term">BF (Brightfield)</div><div class="gl-def">Imaging mode using transmitted white light. Spheroids appear as dark circular structures against a bright background. No dye required.</div>
-<div class="gl-term">VID</div><div class="gl-def">Video/Experiment identifier — a unique numeric ID for each IncuCyte imaging run. Format: VID followed by 4 digits (e.g. VID1797).</div>
+<div class="gl-term">VID</div><div class="gl-def">Video/Experiment identifier - a unique numeric ID for each IncuCyte imaging run. Format: VID followed by 4 digits (e.g. VID1797).</div>
 <div class="gl-term">GT (Ground Truth)</div><div class="gl-def">Manually annotated binary mask indicating the true spheroid boundary. 51 GT pairs exist in this dataset.</div>
 <div class="gl-term">Binary mask</div><div class="gl-def">An image where pixel value 255 = spheroid foreground and 0 = background. Used for BF pool annotations.</div>
 <div class="gl-term">Instance mask</div><div class="gl-def">A mask where each distinct spheroid object has a unique integer label (1, 2, 3…). Used for VID pool annotations to enable object counting.</div>
 <div class="gl-term">IncuCyte</div><div class="gl-def">Sartorius IncuCyte S3: automated live-cell imaging system. Photographs spheroids in 96-well plates at regular intervals over days.</div>
 <div class="gl-term">Spheroid</div><div class="gl-def">A 3-D aggregate of CLL cells grown in suspension culture, mimicking the tumour micro-environment in vitro.</div>
-<div class="gl-term">CLL</div><div class="gl-def">Chronic Lymphocytic Leukaemia — the most common adult leukaemia in Western countries. B-lymphocytes accumulate in blood, bone marrow, and lymphoid tissues.</div>
-<div class="gl-term">Well</div><div class="gl-def">One compartment of a 96-well microplate (labelled A1–H12). Each well contains one patient sample under one drug condition.</div>
+<div class="gl-term">CLL</div><div class="gl-def">Chronic Lymphocytic Leukaemia - the most common adult leukaemia in Western countries. B-lymphocytes accumulate in blood, bone marrow, and lymphoid tissues.</div>
+<div class="gl-term">Well</div><div class="gl-def">One compartment of a 96-well microplate (labelled A1-H12). Each well contains one patient sample under one drug condition.</div>
 <div class="gl-term">Timepoint</div><div class="gl-def">The time after experiment start at which an image was captured. Format: DDdHHhMMm. E.g. 03d00h00m = 72 h post-seeding.</div>
 <div class="gl-term">IGHV</div><div class="gl-def">Immunoglobulin Heavy chain Variable gene. Mutated IGHV → better prognosis; unmutated → more aggressive CLL with reduced drug response.</div>
-<div class="gl-term">Rai Stage</div><div class="gl-def">Clinical staging for CLL severity (0–4). Stage 0 = lymphocytosis only; Stage 4 = thrombocytopenia. Higher stages = more advanced disease.</div>
+<div class="gl-term">Rai Stage</div><div class="gl-def">Clinical staging for CLL severity (0-4). Stage 0 = lymphocytosis only; Stage 4 = thrombocytopenia. Higher stages = more advanced disease.</div>
 <div class="gl-term">del13q14 / del17p13</div><div class="gl-def">Common chromosomal deletions in CLL. del17p13 (TP53 locus) confers the worst prognosis and resistance to many therapies.</div>
 <div class="gl-term">BTK inhibitor</div><div class="gl-def">Drugs blocking Bruton's Tyrosine Kinase (ibrutinib, acalabrutinib). First-line targeted therapy for CLL.</div>
 <div class="gl-term">BCL-2 inhibitor</div><div class="gl-def">Drugs blocking the BCL-2 survival protein (venetoclax/ABT-199). Highly effective in CLL, especially combined with BTK inhibitors.</div>
 <div class="gl-term">MEK inhibitor</div><div class="gl-def">Drugs blocking the MEK kinase in the MAPK/ERK pathway. Used here in exploratory drug-screen conditions.</div>
 <div class="gl-term">WRONG_SHAPE</div><div class="gl-def">QC flag: image resolution does not match the expected 1152×1536 px standard. Affects ~10 images exported at 960×1280 (different camera setting).</div>
-<div class="gl-term">NON_BINARY_VALUES</div><div class="gl-def">QC flag on VID pool masks: pixel values include 0,1,2,3… (instance labels). This is expected — each integer identifies one spheroid object.</div>
+<div class="gl-term">NON_BINARY_VALUES</div><div class="gl-def">QC flag on VID pool masks: pixel values include 0,1,2,3… (instance labels). This is expected - each integer identifies one spheroid object.</div>
 <div class="gl-term">LOPO</div><div class="gl-def">Leave-One-Patient-Out cross-validation. Required here because multiple images come from the same patient; random splits would leak patient identity across train/test.</div>
 <div class="gl-term">Semi-supervised learning</div><div class="gl-def">ML strategy combining a small labelled set (51 GT pairs) with the large unlabelled archive (~102k images) to improve model generalisation.</div>
 </div>
@@ -317,7 +318,7 @@
 <div style="margin:40px 0 16px 0">
   <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.14em;
               text-transform:uppercase;color:var(--teal);margin-bottom:6px">Annotated GT Pool</div>
-  <p style="font-size:13px;color:var(--slate);max-width:760px;line-height:1.6">Figures 1–4 concern the manually annotated GT pool (local machine). 51 brightfield images + 84 VID time-series images with expert segmentation masks.</p>
+  <p style="font-size:13px;color:var(--slate);max-width:760px;line-height:1.6">Figures 1-4 explore the manually annotated ground truth pool on the local machine: 51 brightfield images with binary masks and 84 VID time-series images with instance masks. This is the labelled data available for training and evaluating segmentation.</p>
   <div style="height:2px;background:linear-gradient(to right,var(--teal),transparent);
               margin-top:10px;max-width:400px"></div>
 </div>
@@ -334,10 +335,10 @@
     </div>
     <div class="findings-panel"><h2>Annotated BF (BrightField) Image Data Overview</h2>
 <h3>How to read</h3>
-<p>There are two folders with manually annotated spheroids as binary masks serving as the </p>
-<p>ground truth. BF and VID in this context refers to the prefix of raw spheroids within each folder. </p>
+<p>There are two folders with manually annotated spheroids as binary masks serving as the</p>
+<p>ground truth. BF and VID in this context refers to the prefix of raw spheroids within each folder.</p>
 <p>Left panel: stacked bar showing how many images in each pool have a ground-truth (GT)</p>
-<p>mask (teal) vs no mask (gold).  </p>
+<p>mask (teal) vs no mask (gold).</p>
 <p>Right panel: pie showing how many BF images with GT could be matched to a treatment label in</p>
 <p>the metadata Excel files.</p>
 <h3>Key findings</h3>
@@ -348,14 +349,14 @@
 </ul>
 <p>in the metadata.</p>
 <h3>What is remarkable</h3>
-<p>The GT pool linked to available metadata.</p>
+<p>The GT pool is fully linked to the available metadata.</p>
 <h3>Implications</h3>
 <ul>
-<li>The 51 BF GT pairs are ready to be included for segmentation model training/evaluation.</li>
+<li>The 51 BF GT pairs are ready for segmentation model training and evaluation.</li>
 <li>No label-leakage risk: every image has both a mask and a treatment label.</li>
-<li>The raw archive (~100k files) represents the unlabelled deployment pool —</li>
+<li>The raw archive (~100k files) represents the unlabelled deployment pool.</li>
 </ul>
-<p>  the gap between these pools is >2000×, which motivates semi-supervised approaches.</p></div>
+<p>  The gap between these pools is >2000x, which motivates semi-supervised approaches.</p></div>
   </div>
 </div>
 
@@ -371,8 +372,8 @@
     </div>
     <div class="findings-panel"><h2>Treatment Distribution of BF-well GT</h2>
 <h3>How to read</h3>
-<p>Horizontal bar chart.  Each bar is one drug treatment condition; bar length = number</p>
-<p>of GT images under that condition.  Teal = untreated controls; gold = drug-treated.</p>
+<p>Horizontal bar chart. Each bar is one drug treatment condition; bar length shows the number</p>
+<p>of GT images under that condition. Teal = untreated controls; gold = drug-treated.</p>
 <h3>Key findings</h3>
 <ul>
 <li>Top treatments: trametinib (8), PD098060 (7), S-63845 (6).</li>
@@ -384,18 +385,18 @@
 <li>Untreated controls in GT pool: <strong>NO</strong>.</li>
 </ul>
 <h3>What is remarkable</h3>
-<p><strong>The GT pool contains zero untreated wells.</strong>  All 51 images come from drug-treated</p>
-<p>conditions.  The MEK inhibitor trametinib is the most represented single drug (8</p>
+<p><strong>The GT pool contains zero untreated wells.</strong> All 51 images come from drug-treated</p>
+<p>conditions. The MEK inhibitor trametinib is the most represented single drug (8</p>
 <p>images), followed by MEK inhibitor PD098060 (7) and BCL-2 family drugs S-63845 and</p>
-<p>PD098059 (6 each).  The spread across BCL-2, MEK, and BTK/SYK pathways is deliberate</p>
-<p>(these are the major CLL therapeutic axes), but the lack of available GT for the control</p>
-<p>group is a bias.</p>
+<p>PD098059 (6 each). The spread across BCL-2, MEK, and BTK/SYK pathways is deliberate</p>
+<p>since these are the major CLL therapeutic axes, but the absence of GT for the control</p>
+<p>group introduces a bias.</p>
 <h3>Implications</h3>
 <ul>
-<li>A segmentation model trained only on these 51 images has never seen an <em>untreated</em></li>
+<li>A segmentation model trained only on these 51 images has never seen an untreated</li>
 </ul>
-<p>  CLL spheroid.  Drug-induced morphological changes (disrupted spheroid compactness,</p>
-<p>  fragmentation) could possibly baked into the training distribution.</p>
+<p>  CLL spheroid. Drug-induced morphological changes (disrupted compactness,</p>
+<p>  fragmentation) could be baked into the training distribution.</p>
 <ul>
 <li>Recommend**: include untreated wells from the raw archive as held-out test images</li>
 </ul>
@@ -403,8 +404,8 @@
 <ul>
 <li>Class imbalance within drug treatments (8 trametinib vs 1 MALTi) may mean the model</li>
 </ul>
-<p>  performs better on MEK-inhibited morphologies than on single-represented drugs, depending</p>
-<p>  on the model choice.</p></div>
+<p>  performs better on MEK-inhibited morphologies than on single-represented drugs,</p>
+<p>  depending on the model choice.</p></div>
   </div>
 </div>
 
@@ -420,34 +421,33 @@
     </div>
     <div class="findings-panel"><h2>bf_timepoints.png</h2>
 <h3>How to read</h3>
-<p>Horizontal bar chart.  Each bar is one imaging timepoint (format: ddDhhHmmM);</p>
-<p>bar length = number of GT images at that timepoint.</p>
+<p>Horizontal bar chart. Each bar represents one imaging timepoint (formatted as ddDhhHmmM).</p>
+<p>The bar length shows the number of ground-truth (GT) images captured at that timepoint.</p>
 <h3>Key findings</h3>
 <ul>
 <li>Timepoints covered: ['00d23h00m', '03d00h00m', '04d16h08m', '04d20h08m', '06d12h00m']</li>
 <li>Image counts per timepoint: {'00d23h00m': 16, '04d20h08m': 14, '03d00h00m': 10, '06d12h00m': 10, '04d16h08m': 1}</li>
-<li>Earliest: ~24 h (16 images).  Latest: ~6.5 days (10 images).</li>
+<li>Earliest: ~24 h (16 images). Latest: ~6.5 days (10 images).</li>
 </ul>
 <h3>What is remarkable</h3>
-<p>Annotations are <strong>not uniformly distributed across time</strong>.  The ~24h timepoint</p>
-<p>dominates (16 images, 31%), followed by the</p>
-<p>~day 4-5 timepoints.  Only 1 image exists at the 04d16h08m timepoint, making it an</p>
-<p>isolated singleton.  Timepoints correspond to IncuCyte scan schedules rather than</p>
-<p>biological milestones.</p>
+<p>Annotations are <strong>not evenly spread across time</strong>. The ~24h timepoint has the most</p>
+<p>images (16 images, 31% of the GT pool), followed by the day 4-5 timepoints.</p>
+<p>Only 1 image exists at the 04d16h08m timepoint, making it an isolated singleton.</p>
+<p>Timepoints correspond to IncuCyte scan schedules rather than biological milestones.</p>
 <h3>Implications</h3>
 <ul>
 <li>Temporal bias: a segmentation model evaluated at the ~24h timepoint will be tested</li>
 </ul>
-<p>  on the most represented morphology.  Performance may be worse at later timepoints</p>
-<p>  (often larger and more fragmented spheroids).</p>
+<p>  on the most heavily represented morphology. Performance may be worse at later timepoints,</p>
+<p>  where spheroids tend to be larger and more fragmented.</p>
 <ul>
-<li>The 04d16h08m singleton should be excluded from hold-out test splits, when supervised</li>
+<li>The 04d16h08m singleton should be excluded from hold-out test splits when supervised</li>
 </ul>
-<p>  learning is applied, as it cannot be representative on its own.</p>
+<p>  learning is applied, since it cannot be representative on its own.</p>
 <ul>
 <li>Raw timeseries data (73+ timepoints for some VIDs) could be used to expand</li>
 </ul>
-<p>  annotation coverage at underrepresented timepoints via active learning.</p></div>
+<p>  annotation coverage at underrepresented timepoints through active learning.</p></div>
   </div>
 </div>
 
@@ -464,7 +464,7 @@
     <div class="findings-panel"><h2>raw_gt_coverage.png</h2>
 <h3>How to read</h3>
 <p>Left panel: horizontal bar per GT image, bar length = number of raw TIF files</p>
-<p>matched (same VID + well).  Teal = match found; cherry = no match.</p>
+<p>matched (same VID + well). Teal = match found; cherry = no match.</p>
 <p>Right panel: pie summarising how many of the 51 GT pairs have vs lack a raw series.</p>
 <h3>Key findings</h3>
 <ul>
@@ -475,10 +475,10 @@
 </ul>
 <h3>What is remarkable</h3>
 <p><strong>Every single annotated GT image has a full raw timeseries in the archive.</strong></p>
-<p>This is not coincidental — the GT images were selected from IncuCyte exports and the</p>
-<p>raw archive preserves those exact exports.  VID1797 provides the richest temporal</p>
+<p>This is not a coincidence - the GT images were selected from IncuCyte exports and the</p>
+<p>raw archive preserves those exact exports. VID1797 provides the richest temporal</p>
 <p>context with <strong>73 timepoints</strong> (~1 scan per 1.2h over 3.5 days) for each of its</p>
-<p>10 annotated wells.  The minimum coverage (VID2356/VID2357) is 24 timepoints.</p>
+<p>10 annotated wells. The minimum coverage (VID2356/VID2357) is 24 timepoints.</p>
 <h3>Implications</h3>
 <ul>
 <li>Every GT annotation can be extended into a <strong>temporal sequence</strong> of 23-73 frames.</li>
@@ -487,12 +487,12 @@
 <p>  time?), (b) using T-1 frames as context input, (c) pseudo-labelling adjacent frames</p>
 <p>  to expand the training set cheaply.</p>
 <ul>
-<li>The 24-timepoint series (VID2356/VID2357 — BH3 mimetics ABT-199, S-63845,</li>
+<li>The 24-timepoint series (VID2356/VID2357, treated with BH3 mimetics ABT-199, S-63845,</li>
 </ul>
-<p>  A-1331852) cover a 24h window — sufficient to capture early drug response</p>
-<p>  (spheroid disruption typically begins within 6-12h of BCL-2 inhibitor treatment).</p>
+<p>  A-1331852) cover a 24h window, which is sufficient to capture early drug response.</p>
+<p>  Spheroid disruption typically begins within 6-12h of BCL-2 inhibitor treatment.</p>
 <ul>
-<li>Action item**: extract the ±3 frame window around each GT annotation and inspect</li>
+<li>Action item**: extract the +/-3 frame window around each GT annotation and inspect</li>
 </ul>
 <p>  visually to confirm the annotated frame is representative and not an artefact.</p></div>
   </div>
@@ -501,7 +501,7 @@
 <div style="margin:40px 0 16px 0">
   <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.14em;
               text-transform:uppercase;color:var(--teal);margin-bottom:6px">Full Raw Archive</div>
-  <p style="font-size:13px;color:var(--slate);max-width:760px;line-height:1.6">Figures 5–6 concern the full unannotated raw archive scanned on the Snellius cluster. 42,825 IncuCyte images across 19 experiments (BTK, Drug Screen, Refractory categories).</p>
+  <p style="font-size:13px;color:var(--slate);max-width:760px;line-height:1.6">Figures 5-6 explore the full unannotated raw archive on the Snellius cluster: 42,825 IncuCyte images across 19 experiments in three categories (BTK, Drug Screen, Refractory). This is the unlabelled pool that segmentation will eventually be applied to.</p>
   <div style="height:2px;background:linear-gradient(to right,var(--teal),transparent);
               margin-top:10px;max-width:400px"></div>
 </div>
@@ -518,7 +518,7 @@
     </div>
     <div class="findings-panel"><h2>The Raw Unannotated Data: Overview</h2>
 <h3>How to read</h3>
-<p>Left panel: stacked bar,where each bar is one data transfer batch (1st vs 2nd), stacked</p>
+<p>Left panel: stacked bar, where each bar is one data transfer batch (1st vs 2nd). Stacked</p>
 <p>segments represent experiment categories (Btk / Drug_screen / NK / Refractory / T-cell).</p>
 <p>Right panel: pie chart of all 42,825 files pooled across both transfers,</p>
 <p>showing the fractional share of each experiment type.</p>
@@ -528,23 +528,21 @@
 <li>By transfer: {'2nd_transfer': 1344, 'single': 41481}</li>
 <li>By category (top 3): {'Btk': 19024, 'Drug_screen': 18605, 'Refractory': 5196}</li>
 <li>Dominant category: <strong>Btk</strong> with 19,024 files (44% of archive).</li>
-<li>GT pool (51 images) represents <strong>0.0%</strong> of the raw archive.</li>
+<li>GT pool (51 images) represents <strong>0.05%</strong> of the raw archive.</li>
 </ul>
 <h3>What is remarkable</h3>
-<p>The annotated GT pool is a <strong>0.05% sample</strong> of the full imaging data.  The T-cell</p>
-<p>experiment category (2nd transfer) alone has 18,605+</p>
-<p>files, dwarfing the entire annotated pool.The 2nd transfer contributes nearly</p>
-<p>half the archive despite covering fewer named experiments, because it uses</p>
-<p>umbrella directories (Btk/, T/) that aggregate multiple patients and timepoints.</p>
+<p>The annotated GT pool is a <strong>0.05% sample</strong> of the full imaging data. The 2nd transfer</p>
+<p>contributes nearly half the archive despite covering fewer named experiments, because</p>
+<p>it uses umbrella directories (Btk/, T/) that aggregate multiple patients and timepoints.</p>
 <h3>Implications</h3>
 <ul>
-<li>Enormous unlabelled pool (~102k images) → strong motivation for semi-supervised</li>
+<li>The enormous unlabelled pool (~42k images) provides strong motivation for semi-supervised</li>
 </ul>
 <p>  or self-supervised pre-training before fine-tuning on the 51 GT pairs.</p>
 <ul>
-<li>The category imbalance (T-cell dominant) means any random sampling of unlabelled</li>
+<li>The category imbalance (Btk dominant) means any random sampling of unlabelled</li>
 </ul>
-<p>  data for pre-training will over-represent T-cell assay morphologies.</p>
+<p>  data for pre-training will over-represent Btk assay morphologies.</p>
 <ul>
 <li>The 2nd transfer archiving convention (no VID in filename for BF-prefix files)</li>
 </ul>
@@ -565,8 +563,8 @@
     </div>
     <div class="findings-panel"><h2>Barchart of the Top Experiments Found in the Raw Archive</h2>
 <h3>How to read</h3>
-<p>Horizontal bar chart, longest bars at the bottom.  Each bar is one experiment</p>
-<p>directory (name truncated to 50 chars).  Colour indicates experiment class:</p>
+<p>Horizontal bar chart, longest bars at the bottom. Each bar is one experiment</p>
+<p>directory (name truncated to 50 chars). Colour indicates experiment class:</p>
 <p>teal = Btk, gold = Drug screen, cherry = Refractory, teal-light = NK/T-cell/Other.</p>
 <p>Bar length = total number of TIF/JPG files in that directory.</p>
 <h3>Key findings</h3>
@@ -586,11 +584,11 @@
 <p>The top two entries are <strong>directory-level aggregates</strong> from the 2nd transfer (Btk/</p>
 <p>and T/ folders containing all sub-experiments), rather than individual assay runs.</p>
 <p>The largest single-experiment timeseries is the 20230209 Spheroid formation assay</p>
-<p>with <strong>73 timepoints</strong> across 84 wells and has the richest temporal coverage in the dataset</p>
+<p>with <strong>73 timepoints</strong> across 84 wells. It has the richest temporal coverage in the dataset</p>
 <p>and provides the source of 10 of the 51 GT annotations.</p>
 <h3>Implications</h3>
 <ul>
-<li>The densely-sampled experiments (73 timepoints, 1 image every ~1.2h) are ideal</li>
+<li>The densely-sampled experiments (73 timepoints, roughly 1 image every ~1.2h) are ideal</li>
 </ul>
 <p>  for evaluating temporal consistency of segmentation models.</p>
 <ul>
@@ -607,7 +605,7 @@
 <div style="margin:40px 0 16px 0">
   <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.14em;
               text-transform:uppercase;color:var(--teal);margin-bottom:6px">Patient Metadata</div>
-  <p style="font-size:13px;color:var(--slate);max-width:760px;line-height:1.6">Figures 7–11 cover the three metadata Excel files: 33 unique patients, 2,784 rows, 61 tracked columns.</p>
+  <p style="font-size:13px;color:var(--slate);max-width:760px;line-height:1.6">Figures 7-11 explore the three metadata Excel files: 33 unique patients, 2,784 rows, 61 tracked columns. This is the clinical context we can link to the images.</p>
   <div style="height:2px;background:linear-gradient(to right,var(--teal),transparent);
               margin-top:10px;max-width:400px"></div>
 </div>
@@ -624,37 +622,37 @@
     </div>
     <div class="findings-panel"><h2>Metadata Completeness</h2>
 <h3>How to read</h3>
-<p>Horizontal bar chart.  Each row is one tracked metadata column, labelled with its</p>
-<p>domain group prefix (e.g. [Cytogen] del13q14).  Bar length = % of rows in</p>
-<p>metadata_combined.csv that have a non-empty value for that column.</p>
+<p>Horizontal bar chart. Each row is one tracked metadata column, labelled with its</p>
+<p>domain group prefix (e.g. [Cytogen] del13q14). Bar length shows the percentage of</p>
+<p>rows in metadata_combined.csv that have a non-empty value for that column.</p>
 <p>Dashed lines mark the 50% (cherry) and 90% (teal-dark) thresholds.</p>
 <p>Colours encode the domain group (see legend).</p>
 <h3>Key findings</h3>
 <ul>
 <li>Mean fill rate across 61 tracked columns: <strong>28.6%</strong>.</li>
 <li>Completely empty columns (0%): ['delNOTCH1', 'delMYD88', 'EZH2']</li>
-<li>Critically sparse columns (<20% fill): ['Hb (mmol/L)', 'Thrombocytes (G/L)', 'gMFI CD5 (CLL)', 'gMFI CXCR4 (CLL)', 'gMFI CD40 (CLL)', 'gMFI Bcl-2 (CLL)', 'gMFI Bcl-XL (CLL)', 'gMFI Mcl-1 (CLL)']…</li>
-<li>Well-filled columns (≥70%): ['Sex', 'Birth year', 'Age', 'Tissue', 'WBC (G/L)', 'Stimulation']</li>
+<li>Critically sparse columns (below 20% fill): ['Hb (mmol/L)', 'Thrombocytes (G/L)', 'gMFI CD5 (CLL)', 'gMFI CXCR4 (CLL)', 'gMFI CD40 (CLL)', 'gMFI Bcl-2 (CLL)', 'gMFI Bcl-XL (CLL)', 'gMFI Mcl-1 (CLL)']</li>
+<li>Well-filled columns (70% or above): ['Sex', 'Birth year', 'Age', 'Tissue', 'WBC (G/L)', 'Stimulation']</li>
 <li>Hb (mmol/L) and Thrombocytes (G/L): only <strong>12.9%</strong> filled.</li>
 </ul>
 <h3>What is remarkable</h3>
-<p>Three cytogenetics columns: <strong>delNOTCH1, delMYD88, EZH2</strong> are **completely</p>
-<p>empty** (0%).  They exist in the metadata template but were never populated.</p>
+<p>Three cytogenetics columns - <strong>delNOTCH1, delMYD88, EZH2</strong> - are **completely</p>
+<p>empty** (0%). They exist in the metadata template but were never populated.</p>
 <p>Similarly, the BCL-2 protein expression markers (gMFI Bcl-2, Bcl-XL, Mcl-1) are</p>
 <p>filled at only <strong>4.6%</strong>, despite being arguably the most drug-relevant biomarkers</p>
-<p>given the BCL-2 inhibitor drugs in the GT pool [SOURCE].  Hb and thrombocytes fall to 12.9%</p>
+<p>given the BCL-2 inhibitor drugs in the GT pool. Hb and thrombocytes fall to 12.9%</p>
 <p>because they were only collected in one of the three metadata files.</p>
 <h3>Implications</h3>
 <ul>
-<li>Do not use** delNOTCH1, delMYD88, EZH2, gMFI CD40 for patient stratification as</li>
+<li>Do not use** delNOTCH1, delMYD88, EZH2, gMFI CD40 for patient stratification,</li>
 </ul>
-<p>  no data exists.</p>
+<p>  as no data exists.</p>
 <ul>
 <li>BCL-2 family protein data (Bcl-2, Bcl-XL, Mcl-1 gMFI) is available for only</li>
 </ul>
-<p>  ~130 wells, which could be used as supplementary validation, not as a primary covariate.</p>
+<p>  ~130 wells, which could be used as supplementary validation but not as a primary covariate.</p>
 <ul>
-<li>For ML covariate selection, restrict to columns with ≥50% fill: IGHV (59%),</li>
+<li>For ML covariate selection, restrict to columns with 50% fill or above: IGHV (59%),</li>
 </ul>
 <p>  Sex (76%), Age (76%), WBC (71%), %Lymphocytes (62%), %CD5+CD19+ (65%).</p>
 <ul>
@@ -676,40 +674,40 @@
     </div>
     <div class="findings-panel"><h2>Metadata Patient Demographics</h2>
 <h3>How to read</h3>
-<p>2×2 panel:</p>
+<p>2x2 panel:</p>
 <ul>
-<li>Top-left: histogram of patient age at sample collection.  Cherry dashed line = median.</li>
+<li>Top-left: histogram of patient age at sample collection. Cherry dashed line = median.</li>
 <li>Top-right: bar chart of sex distribution.</li>
-<li>Bottom-left: bar chart of Rai stage (0–4 scale of CLL disease burden).</li>
+<li>Bottom-left: bar chart of Rai stage (a 0 to 4 scale measuring CLL disease burden).</li>
 <li>Bottom-right: bar chart of patients per experiment class (btk / drug_screen / refractory).</li>
 </ul>
 <p>All panels use unique patients (one row per VID).</p>
 <h3>Key findings</h3>
 <ul>
 <li>33 unique patients (VID-level deduplication).</li>
-<li>Age: median = 66y, range 50–85y.</li>
+<li>Age: median = 66y, range 50 to 85y.</li>
 <li>Sex: {'Female': 18, 'Male': 15}</li>
 <li>Rai stage: {'0.0': 10, '2.0': 5, '1.0': 4, '4.0': 1, '3.0': 1}</li>
 <li>Source breakdown: {'drug_screen': 16, 'btk': 14, 'refractory': 3}</li>
 <li>Patients appearing under multiple VIDs (same Volgnummer): {234.0: 4, 706.0: 3, 1358.0: 2, 782.0: 2, 1199.0: 2, 2891.0: 2, 1043.0: 2}</li>
 </ul>
 <h3>What is remarkable</h3>
-<p>Only <strong>33 unique patients</strong> generate 2,784 metadata rows, which on average is</p>
-<p>84 rows per patient.  This is because each well in each experiment</p>
-<p>has its own row.  Some patients appear under multiple VID numbers (e.g. Volgnummer</p>
-<p>706/234) reflecting repeated sampling across different experiments.  The cohort is</p>
-<p><strong>elderly</strong> (median 66y, consistent with CLL epidemiology) and</p>
-<p>skewed female.</p>
+<p>Only <strong>33 unique patients</strong> generate 2,784 metadata rows, which works out to about</p>
+<p>84 rows per patient on average. This is because each well in each experiment</p>
+<p>has its own row. Some patients appear under multiple VID numbers (e.g. Volgnummer</p>
+<p>706/234), reflecting repeated sampling across different experiments. The cohort is</p>
+<p><strong>elderly</strong> (median 66y, consistent with CLL epidemiology) and slightly</p>
+<p>skewed toward female patients.</p>
 <h3>Implications</h3>
 <ul>
-<li>Patient-level cross-validation is mandatory.**  With only 33 patients, a</li>
+<li>Patient-level cross-validation is mandatory.** With only 33 patients, a</li>
 </ul>
-<p>  random 80/20 image split would leak patients across train and test and as a result will inflate</p>
+<p>  random 80/20 image split would leak patients across train and test, inflating</p>
 <p>  metrics. Use leave-one-patient-out (LOPO) or grouped k-fold by VID.</p>
 <ul>
-<li>The Rai stage distribution (if available for ≥55% of patients) covers early to</li>
+<li>The Rai stage distribution (if available for 55% or more of patients) covers early to</li>
 </ul>
-<p>  late disease — good for generalisation testing but the small n per stage limits</p>
+<p>  late disease, which is good for generalisation testing, but the small n per stage limits</p>
 <p>  stratified analysis.</p>
 <ul>
 <li>Repeated patients across VIDs should be treated as the same biological unit in</li>
@@ -731,37 +729,38 @@
     <div class="findings-panel"><h2>Metadata: IGHV Genetics</h2>
 <h3>How to read</h3>
 <p>Left panel: horizontal bar chart of IGHV mutational status counts (unique patients).</p>
+<p>IGHV (immunoglobulin heavy chain variable region) mutation status is a key CLL prognostic marker.</p>
 <p>Teal = mutated (better prognosis); cherry = unmutated (worse prognosis); gold = other.</p>
 <p>Right panel: horizontal bar chart of cytogenetic aberration prevalence as % of</p>
-<p>patients for whom that marker was tested.  Cherry dashed line at 30%, grey at 10%.</p>
+<p>patients for whom that marker was tested. Cherry dashed line at 30%, grey at 10%.</p>
 <h3>Key findings</h3>
 <ul>
 <li>IGHV status distribution: {'Mutated': 21, 'Unmutated': 6, 'Polyclonal': 1}</li>
 <li>Top cytogenetic aberrations by prevalence: [('delATM', 100.0), ('trisomy19', 100.0), ('del13q14', 87.5), ('trisomy12', 53.3), ('del11q22', 41.7)]</li>
 </ul>
 <h3>What is remarkable</h3>
-<p>The cohort has a <strong>mutated IGHV predominance</strong>, this is by design (drug screen</p>
+<p>The cohort has a <strong>mutated IGHV predominance</strong>. This is by design, since drug screen</p>
 <p>experiments preferentially enroll CLL patients for whom novel agents are relevant,</p>
-<p>and mutated-IGHV patients are a major target). However, unmutated IGHV CLL is</p>
-<p>clinically more aggressive and drug-resistant and these patients are essential for</p>
+<p>and mutated-IGHV patients are a major target. However, unmutated IGHV CLL is</p>
+<p>clinically more aggressive and drug-resistant, and these patients are essential for</p>
 <p>testing whether the segmentation model and downstream response predictions generalise</p>
 <p>to the harder clinical scenario.</p>
-<p>The cytogenetic profile shows del13q14 (most common CLL deletion) and trisomy12 as</p>
-<p>the leading aberrations.  del17p13 (TP53 loss) and del11q22 (ATM loss) are also</p>
-<p>represented, both confer poor prognosis and predict reduced ibrutinib benefit.</p>
+<p>The cytogenetic profile shows del13q14 (the most common CLL deletion) and trisomy12 as</p>
+<p>the leading aberrations. del17p13 (TP53 loss) and del11q22 (ATM loss) are also</p>
+<p>represented; both confer poor prognosis and predict reduced ibrutinib benefit.</p>
 <h3>Implications</h3>
 <ul>
-<li>Stratify any model evaluation by IGHV status.**  Unmutated IGHV patients may</li>
+<li>Stratify any model evaluation by IGHV status.** Unmutated IGHV patients may</li>
 </ul>
 <p>  show fundamentally different spheroid morphologies (more proliferative, less</p>
 <p>  structured) compared to mutated cases.</p>
 <ul>
 <li>del17p13 patients in the drug screen dataset are likely to show different</li>
 </ul>
-<p>  responses to BTK inhibitors as their imaging data should be annotated and</p>
+<p>  responses to BTK inhibitors, so their imaging data should be annotated and</p>
 <p>  analysed separately to detect morphological resistance signatures.</p>
 <ul>
-<li>IGHV data is missing for ~41% of patients meaning imputation or exclusion must be</li>
+<li>IGHV data is missing for ~41% of patients, meaning imputation or exclusion must be</li>
 </ul>
 <p>  decided before any IGHV-stratified analysis.</p></div>
   </div>
@@ -781,42 +780,40 @@
 <h3>How to read</h3>
 <p>One boxplot panel per clinical variable (WBC, % Lymphocytes, Hb, Thrombocytes,</p>
 <p>Viability), split by experiment class (btk / drug_screen / refractory) on the x-axis.</p>
-<p>Box = IQR (25th–75th percentile); horizontal bar = median; whiskers = 1.5×IQR;</p>
-<p>dots = outliers.  Colours: teal = btk, gold = drug_screen, cherry = refractory.</p>
-<p>Note: Hb and Thrombocytes are only 12.9% filled, meaning caution with interpretation.</p>
+<p>Box = IQR (interquartile range, 25th to 75th percentile); horizontal bar = median;</p>
+<p>whiskers = 1.5 x IQR; dots = outliers. Colours: teal = btk, gold = drug_screen,</p>
+<p>cherry = refractory. Note: Hb and Thrombocytes are only 12.9% filled, so interpret</p>
+<p>those panels with caution.</p>
 <h3>Key findings</h3>
 <ul>
-<li>WBC: 20.8 G/L median</li>
-</ul>
-<p>  (range 9.3–2177.0).</p>
-<ul>
+<li>WBC: 20.8 G/L median (range 9.3 to 2177.0).</li>
 <li>% Lymphocytes: 71.4% median.</li>
-<li>Viability: 71.1% median</li>
+<li>Viability: 71.1% median (range 8.0 to 95.4%).</li>
 </ul>
-<p>  (range 8.0–95.4%).</p>
 <h3>What is remarkable</h3>
 <p><strong>Viability</strong> is particularly important: low viability at the time of sample</p>
 <p>preparation means a high proportion of dead cells enter the spheroid assay, which</p>
-<p>directly affects spheroid formation efficiency and compactness.  A viability of</p>
-<p><70% is generally considered problematic for spheroid assays.  The range in this</p>
-<p>cohort spans from very low to 100%, which is a major confounding variable.</p>
-<p>WBC and lymphocyte percentage reflect disease burden at sample collection.  High WBC</p>
-<p>(>50 G/L) patients have more CLL cells available for seeding, potentially forming</p>
-<p>larger or more numerous spheroids even without drug treatment.</p>
+<p>directly affects spheroid formation efficiency and compactness. A viability below</p>
+<p>70% is generally considered problematic for spheroid assays. The range in this</p>
+<p>cohort spans from very low to near 100%, which is a major confounding variable.</p>
+<p>WBC (white blood cell count) and lymphocyte percentage reflect disease burden at</p>
+<p>sample collection. High WBC (above 50 G/L) patients have more CLL cells available</p>
+<p>for seeding, potentially forming larger or more numerous spheroids even without</p>
+<p>drug treatment.</p>
 <h3>Implications</h3>
 <ul>
 <li>Viability must be included as a covariate** in any morphological analysis.</li>
 </ul>
-<p>  It also leads to consider excluding or flagging experiments with viability <60%.</p>
+<p>  It is also worth considering excluding or flagging experiments with viability below 60%.</p>
 <ul>
-<li>WBC and lymphocyte count could explain variance in baseline spheroid size, implicating to</li>
+<li>WBC and lymphocyte count could explain variance in baseline spheroid size, suggesting</li>
 </ul>
-<p>  normalise sphere metrics per-patient rather than across the full cohort.</p>
+<p>  it may be better to normalise sphere metrics per-patient rather than across the full cohort.</p>
 <ul>
 <li>The Refractory class likely has distinct clinical profiles (higher disease burden,</li>
 </ul>
 <p>  prior treatment exposure). Boxplots across classes should be compared</p>
-<p>  to detect systematic differences that could confound drug effect estimates..</p></div>
+<p>  to detect systematic differences that could confound drug effect estimates.</p></div>
   </div>
 </div>
 
@@ -833,8 +830,8 @@
     <div class="findings-panel"><h2>Metadata Treatment Distribution</h2>
 <h3>How to read</h3>
 <p>One horizontal-bar subplot per experiment class (btk / drug_screen / refractory).</p>
-<p>Each bar is one treatment condition; bar length = number of wells (rows) with that</p>
-<p>treatment across all patients in that class.  Teal = untreated controls;</p>
+<p>Each bar is one treatment condition; bar length shows the number of wells (rows) with that</p>
+<p>treatment across all patients in that class. Teal = untreated controls;</p>
 <p>gold = BTK inhibitors; cherry = all other treatments.</p>
 <h3>Key findings</h3>
 <ul>
@@ -843,10 +840,10 @@
 </ul>
 <h3>What is remarkable</h3>
 <p>The <strong>btk class</strong> contains the most balanced treatment representation, with both</p>
-<p>ibrutinib (BTK inhibitor) and untreated controls — enabling direct within-experiment</p>
-<p>comparisons.  The <strong>drug_screen class</strong> covers the widest pharmacological space:</p>
+<p>ibrutinib (BTK inhibitor) and untreated controls, enabling direct within-experiment</p>
+<p>comparisons. The <strong>drug_screen class</strong> covers the widest pharmacological space:</p>
 <p>MEK inhibitors (trametinib, PD098059, U0126), BCL-2 family agents (ABT-199,</p>
-<p>S-63845, A-1331852), and CXCR4/MALTi compounds.  The <strong>refractory class</strong> has</p>
+<p>S-63845, A-1331852), and CXCR4/MALTi compounds. The <strong>refractory class</strong> has</p>
 <p>fewer unique treatments, consistent with its focus on characterising samples from</p>
 <p>patients who have already failed standard therapies rather than testing novel drugs.</p>
 <h3>Implications</h3>
@@ -861,10 +858,10 @@
 <ul>
 <li>Before comparing spheroid features across classes, verify that untreated controls</li>
 </ul>
-<p>  look similar across classes as any systematic difference would suggest batch effects</p>
+<p>  look similar across classes. Any systematic difference would suggest batch effects</p>
 <p>  or patient-selection confounding rather than drug effects.</p>
 <ul>
-<li>The GT pool (51 images) samples only the drug_screen class** which mean the btk</li>
+<li>The GT pool (51 images) samples only the drug_screen class**, which means the btk</li>
 </ul>
 <p>  and refractory morphologies are entirely unrepresented in the annotated pool.</p></div>
   </div>
@@ -1453,7 +1450,7 @@
 <td title='Drug_screen'>Drug_screen</td>
 </tr>
 </tbody></table></div>
-<p class="table-trunc">Showing first 51 rows — open CSV for full table.</p>
+<p class="table-trunc">Showing first 51 rows - open CSV for full table.</p>
   </div>
 </div>
 
@@ -2823,7 +2820,7 @@
 <td title='20211025'>20211025</td>
 </tr>
 </tbody></table></div>
-<p class="table-trunc">Showing first 40 rows — open CSV for full table.</p>
+<p class="table-trunc">Showing first 40 rows - open CSV for full table.</p>
   </div>
 </div>
 
@@ -3773,7 +3770,7 @@
 <td title='4458bd0ada69'>4458bd0ada69</td>
 </tr>
 </tbody></table></div>
-<p class="table-trunc">Showing first 51 rows — open CSV for full table.</p>
+<p class="table-trunc">Showing first 51 rows - open CSV for full table.</p>
   </div>
 </div>
 
