@@ -70,9 +70,17 @@
   }
 
   /* ── Boot ───────────────────────────────────────────────────────────────── */
-  document.addEventListener('DOMContentLoaded', function () {
+  function boot() {
     initCollapsible();
     initSidebar();
     initActiveNav();
-  });
+  }
+
+  // When loaded with `defer`, readyState is already 'interactive' — DOMContentLoaded
+  // may have already fired before our listener is registered. Guard against that.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })();
