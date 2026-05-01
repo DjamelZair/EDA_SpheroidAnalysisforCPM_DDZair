@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SARIMAX Residual Stack · Djamel Zair</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+    --teal-1:#052e36; --teal-2:#0a4a55; --teal-3:#0d5963; --teal-4:#15616d;
+    --paper:#f3ecd6; --paper-2:#e8dab2; --cream:#faf3df;
+    --gold:#c8a05c; --gold-2:#a37432; --gold-3:#e7c98a; --gold-4:#f3dba0; --gold-deep:#6b4416;
+    --muted:#8a9b9f; --muted-2:#a8b5b8; --green:#6dd9a1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+    background:var(--teal-2);
+    background-image:
+        radial-gradient(ellipse 1500px 800px at 50% -200px, var(--teal-3) 0%, transparent 60%),
+        radial-gradient(ellipse 900px 500px at 100% 100%, var(--teal-1) 0%, transparent 70%);
+    color:var(--paper);
+    font-family:'DM Sans',system-ui,sans-serif; font-optical-sizing:auto;
+    line-height:1.6; overflow-x:hidden; min-height:100vh;
+}
+body::before{
+    content:""; position:fixed; inset:0;
+    background-image:
+        radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        repeating-linear-gradient(91deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 130px);
+    background-size:4px 4px, auto auto; pointer-events:none; z-index:0; opacity:0.7;
+}
+a{color:inherit; text-decoration:none}
+.display{font-family:'Anton',Impact,sans-serif; letter-spacing:0.005em; text-transform:uppercase}
+.serif-it{font-family:'Instrument Serif',Georgia,serif; font-style:italic}
+.mono{font-family:'JetBrains Mono',monospace}
+img{max-width:100%; display:block}
+
+header{
+    position:sticky; top:0; z-index:50;
+    background:color-mix(in srgb, var(--teal-2) 92%, transparent);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--gold);
+    padding:0.75rem 2rem;
+    display:flex; align-items:center; gap:1rem;
+}
+.brand-block{display:flex; align-items:center; gap:0.7rem}
+.brand-photo{width:36px; height:36px; border-radius:50%; overflow:hidden; flex-shrink:0; border:1.5px solid var(--gold); box-shadow:0 0 0 2px var(--teal-2), 0 0 0 3px var(--gold)}
+.brand-photo img{width:100%; height:100%; object-fit:cover; object-position:center 30%}
+.brand-name{font-family:'Anton',sans-serif; font-size:1.25rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--paper)}
+.brand-name .dot{color:var(--gold); margin:0 0.4rem}
+.brand-name .role{color:var(--gold-3); font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:500; text-transform:none; letter-spacing:0.01em}
+nav.top{margin-left:auto; display:flex; gap:1.5rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.18em; color:var(--gold-3)}
+nav.top a{padding-bottom:4px; border-bottom:1.5px solid transparent; transition:all 0.2s}
+nav.top a:hover{color:var(--gold); border-color:var(--gold)}
+.cta{font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:500; text-transform:uppercase; letter-spacing:0.16em; padding:0.6rem 1.05rem; border:1.5px solid var(--gold); border-radius:3px; background:transparent; color:var(--paper); cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:0.45rem}
+.cta:hover{background:var(--gold); color:var(--teal-1)}
+.cta.primary{background:var(--gold); color:var(--teal-1); border-color:var(--gold); font-weight:600}
+.cta.primary:hover{background:var(--gold-3); border-color:var(--gold-3)}
+
+main{max-width:1340px; margin:0 auto; padding:1.6rem 1.5rem 4rem; position:relative; z-index:1}
+.back{display:inline-flex; align-items:center; gap:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.18em; color:var(--gold-3); margin-bottom:1.2rem; transition:all 0.2s; padding:0.4rem 0}
+.back:hover{color:var(--gold); transform:translateX(-3px)}
+
+.hero{background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; padding:2.4rem 2.8rem 2.2rem; margin-bottom:1.6rem; position:relative; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.4)}
+.hero::before{content:""; position:absolute; right:-130px; top:-130px; width:480px; height:480px; background:radial-gradient(circle at 35% 35%, var(--gold-4) 0%, var(--gold) 45%, var(--gold-2) 80%, var(--gold-deep) 100%); border-radius:50%; opacity:0.32; z-index:0}
+.hero-meta{font-family:'JetBrains Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.22em; color:var(--gold); font-weight:600; margin-bottom:0.9rem; display:flex; align-items:center; gap:0.6rem; position:relative; z-index:2}
+.hero-meta .dot{color:var(--gold-3); opacity:0.7}
+.hero h1{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(2.8rem,5.4vw,5rem); line-height:0.92; letter-spacing:0.005em; color:var(--paper); margin-bottom:0.6rem; position:relative; z-index:2; max-width:22ch}
+.hero h1 .gold{color:var(--gold)}
+.hero h1 .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold-3); letter-spacing:-0.01em; font-size:0.95em}
+.hero .lede{font-family:'Instrument Serif',serif; font-style:italic; font-size:1.4rem; line-height:1.4; color:var(--gold-3); max-width:60ch; margin-bottom:1.6rem; position:relative; z-index:2}
+.hero .summary{font-size:1.05rem; line-height:1.65; color:var(--paper); max-width:70ch; border-left:4px solid var(--gold); padding-left:1rem; margin-bottom:1.6rem; position:relative; z-index:2; opacity:0.95}
+.hero .summary strong{color:var(--gold-3); font-weight:600}
+.hero-cta{display:flex; gap:0.55rem; flex-wrap:wrap; position:relative; z-index:2}
+
+.kpi-strip{display:grid; grid-template-columns:repeat(4,1fr); gap:1.1rem; margin-bottom:1.6rem}
+.kpi{background:var(--teal-3); border:1px solid var(--gold); border-radius:4px; padding:1.5rem 1.6rem 1.7rem; position:relative; overflow:hidden; color:var(--paper); box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3); transition:transform 0.25s}
+.kpi:hover{transform:translateY(-3px)}
+.kpi.gold{background:linear-gradient(135deg, var(--gold-3) 0%, var(--gold) 50%, var(--gold-2) 100%); color:var(--teal-1); box-shadow:inset 0 0 0 1px rgba(5,46,54,0.3), inset 0 0 0 6px var(--gold), inset 0 0 0 7px rgba(5,46,54,0.4)}
+.kpi.gold .lbl, .kpi.gold .desc{color:var(--teal-1)}
+.kpi .lbl{font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.22em; color:var(--gold-3); margin-bottom:0.75rem}
+.kpi .num{font-family:'Anton',sans-serif; font-size:clamp(2.6rem,4.4vw,3.4rem); line-height:0.9; margin-bottom:0.55rem; color:var(--gold)}
+.kpi.gold .num{color:var(--teal-1)}
+.kpi .desc{font-size:0.86rem; line-height:1.4; opacity:0.92; color:var(--paper)}
+@media (max-width:800px){.kpi-strip{grid-template-columns:1fr 1fr}}
+
+.diagram-block{background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; margin-bottom:1.6rem; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3)}
+.diagram-block .diagram-img{background:var(--teal-2); line-height:0; border-bottom:2px solid var(--gold)}
+.diagram-block .diagram-img img{width:100%; height:auto; display:block}
+.diagram-block .diagram-cap{padding:1rem 1.6rem; font-family:'Instrument Serif',serif; font-style:italic; font-size:1rem; color:var(--gold-3); text-align:center}
+.diagram-block .diagram-cap .small{display:block; font-family:'JetBrains Mono',monospace; font-style:normal; font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-top:0.3rem}
+
+.sec-h{display:flex; align-items:baseline; gap:1rem; border-bottom:2px solid var(--gold); padding-bottom:0.55rem; margin:2.4rem 0 1.4rem}
+.sec-h h2{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(1.9rem,3vw,2.4rem); line-height:1; letter-spacing:0.005em; color:var(--paper)}
+.sec-h h2 .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold); font-size:1.05em; letter-spacing:-0.01em}
+.sec-h .right{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold-3)}
+
+.method-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.8rem}
+.method-card{background:var(--teal-3); border:1px solid var(--gold); border-radius:4px; padding:1.2rem 1.3rem 1.3rem; position:relative; overflow:hidden; color:var(--paper); box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3); transition:transform 0.25s}
+.method-card.highlight{background:linear-gradient(135deg, var(--gold-3) 0%, var(--gold) 50%, var(--gold-2) 100%); color:var(--teal-1); box-shadow:inset 0 0 0 1px rgba(5,46,54,0.3), inset 0 0 0 6px var(--gold), inset 0 0 0 7px rgba(5,46,54,0.4)}
+.method-card.highlight .step-num, .method-card.highlight h4, .method-card.highlight p{color:var(--teal-1)}
+.method-card:hover{transform:translateY(-3px)}
+.method-card .step-num{font-family:'JetBrains Mono',monospace; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.22em; color:var(--gold); margin-bottom:0.5rem}
+.method-card h4{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:1.3rem; line-height:1; letter-spacing:0.005em; color:var(--paper); margin-bottom:0.5rem}
+.method-card p{font-size:0.88rem; line-height:1.5; color:var(--paper); opacity:0.9}
+@media (max-width:1000px){.method-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.method-grid{grid-template-columns:1fr}}
+
+.result-block{background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; padding:1.8rem 2rem; margin-bottom:1.8rem; display:grid; grid-template-columns:1fr 1fr; gap:2rem; color:var(--paper); box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3)}
+.result-l{display:flex; flex-direction:column; gap:0.85rem}
+.result-l h3{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(1.6rem,2.6vw,2rem); line-height:1.05; letter-spacing:0.005em; color:var(--paper)}
+.result-l h3 .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold-3); letter-spacing:-0.01em}
+.result-l p{font-size:1rem; line-height:1.65; color:var(--paper); opacity:0.95}
+.result-l p strong{color:var(--gold-3); font-weight:600}
+.result-l .verdict{background:var(--teal-1); border-left:4px solid var(--gold); padding:0.85rem 1rem; border-radius:2px; font-family:'Instrument Serif',serif; font-style:italic; font-size:1.1rem; color:var(--gold-3); margin-top:0.4rem}
+.result-r{display:flex; flex-direction:column; gap:0.7rem}
+.result-r-h{display:flex; align-items:baseline; justify-content:space-between; padding-bottom:0.5rem; border-bottom:1px solid color-mix(in srgb, var(--gold) 40%, transparent)}
+.result-r-h .ttl{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:1rem; letter-spacing:0.005em}
+.result-r-h .sub{font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--gold-3)}
+.result-chart{height:340px; position:relative}
+@media (max-width:900px){.result-block{grid-template-columns:1fr}}
+
+.gallery-row{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.8rem}
+.gallery-card{background:var(--teal-1); border:1.5px solid var(--gold); border-radius:4px; overflow:hidden; transition:transform 0.25s}
+.gallery-card:hover{transform:translateY(-4px)}
+.gallery-card img{width:100%; height:auto; display:block; background:var(--paper)}
+.gallery-card .cap{padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.16em; color:var(--gold-3); border-top:1px solid var(--gold)}
+@media (max-width:900px){.gallery-row{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.gallery-row{grid-template-columns:1fr}}
+
+.stack-row{background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; padding:1.4rem 1.8rem; margin-bottom:1.6rem; display:flex; align-items:baseline; gap:1.4rem; flex-wrap:wrap; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3)}
+.stack-row .lbl{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:1.3rem; color:var(--paper); flex-shrink:0}
+.stack-row .lbl .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold)}
+.stack-chips{display:flex; gap:0.5rem; flex-wrap:wrap}
+.chip{font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:500; text-transform:uppercase; letter-spacing:0.14em; padding:0.45rem 0.85rem; border:1.5px solid var(--gold); border-radius:3px; background:transparent; color:var(--paper)}
+.chip.gold{background:var(--gold); color:var(--teal-1); border-color:var(--gold); font-weight:600}
+
+.big-cta{background:var(--teal-1); border:1.5px solid var(--gold); border-radius:4px; padding:2rem 2.4rem; margin-bottom:1.4rem; display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:center; position:relative; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-1), inset 0 0 0 7px rgba(199,160,92,0.3)}
+.big-cta::before{content:""; position:absolute; left:-90px; bottom:-90px; width:320px; height:320px; background:radial-gradient(circle, var(--gold) 0%, var(--gold-2) 70%, transparent 100%); border-radius:50%; opacity:0.55; z-index:0}
+.big-cta h3{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(1.8rem,3.2vw,2.4rem); line-height:1; letter-spacing:0.005em; color:var(--paper); position:relative; z-index:1}
+.big-cta h3 .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold-3)}
+.big-cta .links{display:flex; gap:0.55rem; flex-wrap:wrap; position:relative; z-index:1}
+
+footer{text-align:center; padding-top:1.8rem; border-top:1px solid color-mix(in srgb, var(--gold) 30%, transparent); margin-top:1.6rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--gold-3)}
+footer a{color:inherit; border-bottom:1px solid currentColor; padding-bottom:1px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-block">
+    <div class="brand-photo"><img src="proffoto.png" alt=""></div>
+    <span class="brand-name">DJAMEL ZAIR<span class="dot">·</span><span class="role">Data Analyst · FEC</span></span>
+  </div>
+  <nav class="top">
+    <a href="index.html">Works</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+  <a class="cta" href="CV_C1_Portrait_v2.pdf" target="_blank">CV (PDF)</a>
+  <a class="cta primary" href="index.html#contact">Hire me</a>
+</header>
+
+<main>
+  <a class="back" href="index.html">← Back to portfolio</a>
+
+  <section class="hero">
+    <div class="hero-meta">
+      <span>Forecasting</span><span class="dot">·</span><span>M5 retail demand</span><span class="dot">·</span><span>2025</span>
+    </div>
+    <h1 class="display">SARIMAX <span class="it">residual</span> stack</h1>
+    <p class="lede">Hybrid forecasting on intermittent retail demand.</p>
+    <p class="summary">Gradient-boosted trees stacked on SARIMAX residuals across <strong>823 retail series</strong>, with a held-out shrinkage sweep that reveals where the gain is real and where it isn't. Validation MAE drops <strong>26%</strong> against the SARIMAX baseline; on test, the shrinkage sweep returns the verdict <strong>α* = 0</strong> for the average series, a result the linear baseline alone could not deliver consistently.</p>
+    <div class="hero-cta">
+      <a class="cta primary" href="https://github.com/DjamelZair/sarimax-residual-stack" target="_blank" rel="noopener">View on GitHub ↗</a>
+      <a class="cta" href="index.html">Other projects →</a>
+    </div>
+  </section>
+
+  <section class="kpi-strip">
+    <div class="kpi gold"><div class="lbl">Val MAE vs SARIMAX</div><div class="num display">−26%</div><div class="desc">Best stacked configuration over 823 series.</div></div>
+    <div class="kpi"><div class="lbl">Series</div><div class="num display">823</div><div class="desc">Retail SKUs across 4 store-product groups.</div></div>
+    <div class="kpi gold"><div class="lbl">Boosters compared</div><div class="num display">7</div><div class="desc">HGB, Tree, XGB, MLP, centered &amp; per-group variants.</div></div>
+    <div class="kpi"><div class="lbl">Test verdict</div><div class="num display">α* = 0</div><div class="desc">Shrinkage sweep favours the linear baseline on test.</div></div>
+  </section>
+
+  <div class="sec-h"><h2 class="display">The <span class="it">pipeline</span></h2><span class="right">8 stages · 1 feedback loop</span></div>
+  <section class="diagram-block">
+    <div class="diagram-img"><img src="assets/diagrams/sarimax_pipeline.png" alt="SARIMAX residual stack pipeline"></div>
+    <div class="diagram-cap">Eight-stage flow from raw daily demand to the test verdict.<span class="small">Input → SARIMAX → Residuals → Feature Eng → ML Stack → Stacked Forecast → Shrinkage Sweep → Output</span></div>
+  </section>
+
+  <div class="sec-h"><h2 class="display">How it <span class="it">works</span></h2><span class="right">Per-stage breakdown</span></div>
+  <section class="method-grid">
+    <div class="method-card"><div class="step-num">Stage 01</div><h4>Input</h4><p>823 daily retail series across 4 store-product groups (G1 to G4), with calendar and price covariates.</p></div>
+    <div class="method-card"><div class="step-num">Stage 02</div><h4>SARIMAX</h4><p>Per-series Seasonal ARIMA fit. Acts as the linear baseline and the source of residuals for the booster.</p></div>
+    <div class="method-card"><div class="step-num">Stage 03</div><h4>Residuals</h4><p>ε_t = y_t − ŷ_t^SARIMAX. The boosters learn structure that the linear model could not absorb.</p></div>
+    <div class="method-card"><div class="step-num">Stage 04</div><h4>Feature engineering</h4><p>Lags, calendar features, group identifiers, price, and per-group aggregates fed to the booster.</p></div>
+    <div class="method-card highlight"><div class="step-num">Stage 05 · Highlight</div><h4>ML stack</h4><p>HGB (per-group + centered), Tree, XGB (centered), MLP (centered) trained on the residuals. 7 boosters compared.</p></div>
+    <div class="method-card"><div class="step-num">Stage 06</div><h4>Stacked forecast</h4><p>Final forecast = ŷ_t^SARIMAX + α · ε̂_t^ML, with α swept on a held-out window.</p></div>
+    <div class="method-card"><div class="step-num">Stage 07</div><h4>Shrinkage sweep</h4><p>α ∈ [0, 1] evaluated against the held-out window. The sweep reveals where the gain is real.</p></div>
+    <div class="method-card"><div class="step-num">Stage 08</div><h4>Output</h4><p>Per-group RMSE, MAE, horizon MAE; sample forecasts; test verdict (α* = 0 for the average series).</p></div>
+  </section>
+
+  <div class="sec-h"><h2 class="display">The <span class="it">leaderboard</span></h2><span class="right">Validation RMSE · lower is better</span></div>
+  <section class="result-block">
+    <div class="result-l">
+      <h3>Eight model families, ranked on <span class="it">validation RMSE</span>.</h3>
+      <p>HGB·pg (per-group) wins validation RMSE at <strong>2.379</strong>, beating the SARIMAX baseline at 2.650. The Tree booster and centered HGB variant tie close behind. XGB sits one rung lower, MLP closes the bottom.</p>
+      <p>Boosters trained on residuals consistently outperform the linear baseline on the validation window. But the shrinkage sweep on test pulls α back toward 0 for the average series, meaning the gain doesn't always survive a true held-out evaluation.</p>
+      <div class="verdict">A real win on validation does not always survive the shrinkage sweep. Always evaluate on the held-out window.</div>
+    </div>
+    <div class="result-r">
+      <div class="result-r-h"><span class="ttl display">Val RMSE leaderboard</span><span class="sub">n=8 · lower is better</span></div>
+      <div class="result-chart"><canvas id="chartLeaderboard"></canvas></div>
+    </div>
+  </section>
+
+  <div class="sec-h"><h2 class="display">Sample <span class="it">forecasts</span></h2><span class="right">Tree booster on G1 to G4</span></div>
+  <section class="gallery-row">
+    <div class="gallery-card"><img src="assets/sarimax/forecast_001_tree_boost.png" alt="Group 1 tree booster forecast"><div class="cap">G1 · tree booster</div></div>
+    <div class="gallery-card"><img src="assets/sarimax/forecast_002_tree_boost.png" alt="Group 2 tree booster forecast"><div class="cap">G2 · tree booster</div></div>
+    <div class="gallery-card"><img src="assets/sarimax/forecast_003_tree_boost.png" alt="Group 3 tree booster forecast"><div class="cap">G3 · tree booster</div></div>
+    <div class="gallery-card"><img src="assets/sarimax/forecast_004_tree_boost.png" alt="Group 4 tree booster forecast"><div class="cap">G4 · tree booster</div></div>
+  </section>
+
+  <section class="stack-row">
+    <div class="lbl"><span class="it">Tools</span> &amp; tech</div>
+    <div class="stack-chips">
+      <span class="chip gold">SARIMAX · statsmodels</span>
+      <span class="chip">scikit-learn · HistGradientBoosting</span>
+      <span class="chip">XGBoost</span>
+      <span class="chip">PyTorch · MLP</span>
+      <span class="chip">Pandas · NumPy</span>
+      <span class="chip">Matplotlib</span>
+      <span class="chip">Held-out shrinkage sweep</span>
+    </div>
+  </section>
+
+  <section class="big-cta">
+    <h3>Want the <span class="it">code</span>?</h3>
+    <div class="links">
+      <a class="cta primary" href="https://github.com/DjamelZair/sarimax-residual-stack" target="_blank" rel="noopener">Code on GitHub ↗</a>
+      <a class="cta" href="index.html">Other projects →</a>
+    </div>
+  </section>
+
+  <footer>© 2026 Djamel Zair · Amsterdam · <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a> · <a href="https://linkedin.com/in/djamelzair" target="_blank" rel="noopener">LinkedIn</a></footer>
+</main>
+
+<script>
+const TEAL_1='#052e36', GOLD='#c8a05c', GOLD_2='#a37432', PAPER='#f3ecd6';
+{
+    const ctx = document.getElementById('chartLeaderboard');
+    const labels = ['HGB·pg','Tree','HGB·c','XGB·c','XGB','MLP·c','SARIMAX','MLP'];
+    const data   = [2.379, 2.412, 2.414, 2.503, 2.505, 2.620, 2.650, 2.651];
+    new Chart(ctx, {
+        type:'bar',
+        data:{ labels, datasets:[{ data, backgroundColor: data.map(v => v <= 2.5 ? GOLD : (v <= 2.62 ? GOLD_2 : 'rgba(168,181,184,0.6)')), borderColor: TEAL_1, borderWidth: 1.5 }] },
+        options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+            animation:{duration:1000, easing:'easeOutCubic'},
+            plugins:{ legend:{display:false}, tooltip:{ backgroundColor:TEAL_1, titleColor:PAPER, bodyColor:PAPER, padding:8, cornerRadius:2, displayColors:false, borderColor:GOLD, borderWidth:1, callbacks:{ label: c => 'RMSE ' + c.parsed.x.toFixed(3) } } },
+            scales:{
+                x:{ ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false}, min:2.3, max:2.7 },
+                y:{ ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false} }
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>

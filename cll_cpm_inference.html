@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RQ3 · CPM Parameter Inference · CLL Spheroid Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--teal-1:#052e36;--teal-2:#0a4a55;--teal-3:#0d5963;--teal-4:#15616d;--paper:#f3ecd6;--paper-2:#e8dab2;--cream:#faf3df;--gold:#c8a05c;--gold-2:#a37432;--gold-3:#e7c98a;--gold-4:#f3dba0;--gold-deep:#6b4416;--muted:#8a9b9f;--muted-2:#a8b5b8;--green:#6dd9a1;--clay:#c44a30}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--teal-2);background-image:radial-gradient(ellipse 1500px 800px at 50% -200px,var(--teal-3) 0%,transparent 60%),radial-gradient(ellipse 900px 500px at 100% 100%,var(--teal-1) 0%,transparent 70%);color:var(--paper);font-family:'DM Sans',system-ui,sans-serif;font-optical-sizing:auto;line-height:1.6;overflow-x:hidden;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),repeating-linear-gradient(91deg,rgba(255,255,255,0.018) 0 1px,transparent 1px 130px);background-size:4px 4px,auto auto;pointer-events:none;z-index:0;opacity:0.7}
+a{color:inherit;text-decoration:none}
+.display{font-family:'Anton',Impact,sans-serif;letter-spacing:0.005em;text-transform:uppercase}
+.serif-it{font-family:'Instrument Serif',Georgia,serif;font-style:italic}
+.mono{font-family:'JetBrains Mono',monospace}
+img{max-width:100%;display:block}
+
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--teal-2) 92%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--gold);padding:0.75rem 2rem;display:flex;align-items:center;gap:1rem}
+.brand-block{display:flex;align-items:center;gap:0.7rem}
+.brand-photo{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid var(--gold);box-shadow:0 0 0 2px var(--teal-2),0 0 0 3px var(--gold)}
+.brand-photo img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.brand-name{font-family:'Anton',sans-serif;font-size:1.25rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--paper)}
+.brand-name .dot{color:var(--gold);margin:0 0.4rem}
+.brand-name .role{color:var(--gold-3);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;text-transform:none;letter-spacing:0.01em}
+nav.top{margin-left:auto;display:flex;gap:1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-3)}
+nav.top a{padding-bottom:4px;border-bottom:1.5px solid transparent;transition:all 0.2s}
+nav.top a:hover{color:var(--gold);border-color:var(--gold)}
+.cta{font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:500;text-transform:uppercase;letter-spacing:0.16em;padding:0.6rem 1.05rem;border:1.5px solid var(--gold);border-radius:3px;background:transparent;color:var(--paper);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.45rem}
+.cta:hover{background:var(--gold);color:var(--teal-1)}
+.cta.primary{background:var(--gold);color:var(--teal-1);border-color:var(--gold);font-weight:600}
+.cta.primary:hover{background:var(--gold-3);border-color:var(--gold-3)}
+
+main{max-width:1340px;margin:0 auto;padding:1.6rem 1.5rem 4rem;position:relative;z-index:1}
+.back{display:inline-flex;align-items:center;gap:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-3);margin-bottom:1.2rem;transition:all 0.2s;padding:0.4rem 0}
+.back:hover{color:var(--gold);transform:translateX(-3px)}
+
+.rq-tabs{display:flex;gap:0;border:1.5px solid var(--gold);border-radius:3px;overflow:hidden;margin-bottom:1.4rem;background:var(--teal-3)}
+.rq-tabs a{flex:1;padding:0.85rem 1.2rem;border-right:1.5px solid var(--gold);font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.16em;color:var(--gold-3);transition:all 0.2s;text-align:center;font-weight:500}
+.rq-tabs a:last-child{border-right:none}
+.rq-tabs a:hover{background:rgba(199,160,92,0.15);color:var(--gold)}
+.rq-tabs a.active{background:var(--gold);color:var(--teal-1);font-weight:600}
+.rq-tabs a .label{display:block;font-family:'Anton',sans-serif;font-size:1rem;letter-spacing:0.005em;margin-top:0.18rem}
+
+.hero{background:var(--teal-3);border:1.5px solid var(--gold);border-radius:4px;padding:2.2rem 2.4rem 2rem;margin-bottom:1.6rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.4)}
+.hero::before{content:"";position:absolute;right:-130px;top:-130px;width:480px;height:480px;background:radial-gradient(circle at 35% 35%,var(--gold-4) 0%,var(--gold) 45%,var(--gold-2) 80%,var(--gold-deep) 100%);border-radius:50%;opacity:0.32;z-index:0}
+.hero-content{position:relative;z-index:2}
+.hero-meta{font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--gold);font-weight:600;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
+.hero-meta .dot{color:var(--gold-3);opacity:0.7}
+.hero h1{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:clamp(2.6rem,5vw,4.6rem);line-height:0.92;letter-spacing:0.005em;color:var(--paper);margin-bottom:0.6rem;max-width:22ch}
+.hero h1 .gold{color:var(--gold)}
+.hero h1 .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold-3);letter-spacing:-0.01em;font-size:0.95em}
+.hero .lede{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.3rem;line-height:1.4;color:var(--gold-3);max-width:60ch;margin-bottom:1.2rem}
+.hero .summary{font-size:1rem;line-height:1.65;color:var(--paper);max-width:70ch;border-left:4px solid var(--gold);padding-left:1rem;margin-bottom:1.2rem;opacity:0.95}
+.hero .summary strong{color:var(--gold-3);font-weight:600}
+
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-bottom:1.6rem}
+.kpi{background:var(--teal-3);border:1px solid var(--gold);border-radius:4px;padding:1.4rem 1.5rem 1.6rem;position:relative;overflow:hidden;color:var(--paper);box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.3);transition:transform 0.25s}
+.kpi:hover{transform:translateY(-3px)}
+.kpi.gold{background:linear-gradient(135deg,var(--gold-3) 0%,var(--gold) 50%,var(--gold-2) 100%);color:var(--teal-1);box-shadow:inset 0 0 0 1px rgba(5,46,54,0.3),inset 0 0 0 6px var(--gold),inset 0 0 0 7px rgba(5,46,54,0.4)}
+.kpi.gold .lbl,.kpi.gold .desc{color:var(--teal-1)}
+.kpi .lbl{font-family:'JetBrains Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--gold-3);margin-bottom:0.7rem}
+.kpi .num{font-family:'Anton',sans-serif;font-size:clamp(1.7rem,3vw,2.4rem);line-height:1;margin-bottom:0.5rem;color:var(--gold)}
+.kpi.gold .num{color:var(--teal-1)}
+.kpi .num.numeric{font-size:clamp(2.4rem,4vw,3.2rem)}
+.kpi .desc{font-size:0.84rem;line-height:1.4;opacity:0.92;color:var(--paper)}
+@media (max-width:800px){.kpi-strip{grid-template-columns:1fr 1fr}}
+
+.sec-h{display:flex;align-items:baseline;gap:1rem;border-bottom:2px solid var(--gold);padding-bottom:0.55rem;margin:2.2rem 0 1.3rem}
+.sec-h h2{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:clamp(1.8rem,2.8vw,2.2rem);line-height:1;letter-spacing:0.005em;color:var(--paper)}
+.sec-h h2 .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold);font-size:1.05em;letter-spacing:-0.01em}
+.sec-h .right{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.66rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold-3)}
+
+.card{background:var(--teal-3);border:1.5px solid var(--gold);border-radius:4px;padding:1.6rem 1.8rem;margin-bottom:1.6rem;color:var(--paper);box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.3);position:relative}
+.card-h{display:flex;align-items:center;justify-content:space-between;padding-bottom:0.55rem;border-bottom:1px solid color-mix(in srgb,var(--gold) 40%,transparent);margin-bottom:1rem;flex-wrap:wrap;gap:0.6rem}
+.card-h .ttl{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:1.2rem;letter-spacing:0.005em;color:var(--paper)}
+.card-h .ttl .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold-3)}
+.card-h .sub{font-family:'JetBrains Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-3)}
+
+.chart-host{height:340px;position:relative}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;margin-bottom:1.6rem}
+@media (max-width:900px){.two-col{grid-template-columns:1fr}}
+
+/* Sweep explorer */
+.sweep-controls{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:0.8rem}
+.sweep-controls .group{display:flex;flex-direction:column;gap:0.3rem}
+.sweep-controls .group .lbl{font-family:'JetBrains Mono',monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-3)}
+.sweep-controls .pill-row{display:flex;gap:0;border:1.5px solid var(--gold);border-radius:3px;overflow:hidden;flex-wrap:wrap}
+.sweep-controls .pill-row button{font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;padding:0.45rem 0.8rem;border:none;background:transparent;color:var(--paper);cursor:pointer;transition:all 0.18s;border-right:1.5px solid var(--gold)}
+.sweep-controls .pill-row button:last-child{border-right:none}
+.sweep-controls .pill-row button.active{background:var(--gold);color:var(--teal-1)}
+.sweep-controls .pill-row button:not(.active):hover{background:rgba(199,160,92,0.18)}
+
+/* HEATMAP for weights matrix */
+.weights-wrap{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;margin-bottom:0.8rem;overflow-x:auto}
+.weights-rowlabels{display:flex;flex-direction:column;gap:3px;padding-top:48px}
+.weights-rowlabels .row-label{height:42px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--paper);text-align:right;padding-right:0.6rem;white-space:nowrap}
+.weights-grid{flex:1;min-width:0}
+.weights-collabels{display:grid;gap:3px;margin-bottom:3px}
+.weights-collabels .col-label{font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:var(--gold-3);text-transform:uppercase;letter-spacing:0.08em;text-align:center;padding:0.3rem 0.2rem;line-height:1.2;min-height:44px;display:flex;align-items:center;justify-content:center}
+.weights-rows{display:flex;flex-direction:column;gap:3px}
+.weights-row{display:grid;gap:3px}
+.w-cell{height:42px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:600;border-radius:2px;cursor:default;transition:transform 0.15s,box-shadow 0.15s;position:relative}
+.w-cell:hover{transform:scale(1.08);z-index:5;box-shadow:0 4px 12px rgba(0,0,0,0.5)}
+.w-cell.strong{outline:2px solid var(--gold);outline-offset:-2px}
+.w-cell .tt{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--teal-1);color:var(--paper);padding:0.4rem 0.6rem;border:1px solid var(--gold);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:10}
+.w-cell:hover .tt{opacity:1}
+
+.verdict{background:var(--teal-1);border-left:4px solid var(--gold);padding:0.85rem 1rem;border-radius:2px;font-family:'Instrument Serif',serif;font-style:italic;font-size:1.08rem;color:var(--gold-3);margin-top:0.4rem;line-height:1.5}
+.verdict .small{display:block;font-family:'JetBrains Mono',monospace;font-style:normal;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted-2);margin-top:0.5rem}
+
+.stack-row{background:var(--teal-3);border:1.5px solid var(--gold);border-radius:4px;padding:1.4rem 1.8rem;margin-bottom:1.6rem;display:flex;align-items:baseline;gap:1.4rem;flex-wrap:wrap;box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.3)}
+.stack-row .lbl{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:1.3rem;color:var(--paper);flex-shrink:0}
+.stack-row .lbl .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold)}
+.stack-chips{display:flex;gap:0.5rem;flex-wrap:wrap}
+.chip{font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:500;text-transform:uppercase;letter-spacing:0.14em;padding:0.45rem 0.85rem;border:1.5px solid var(--gold);border-radius:3px;background:transparent;color:var(--paper)}
+.chip.gold{background:var(--gold);color:var(--teal-1);border-color:var(--gold);font-weight:600}
+
+.big-cta{background:var(--teal-1);border:1.5px solid var(--gold);border-radius:4px;padding:2rem 2.4rem;margin-bottom:1.4rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-1),inset 0 0 0 7px rgba(199,160,92,0.3)}
+.big-cta::before{content:"";position:absolute;left:-90px;bottom:-90px;width:320px;height:320px;background:radial-gradient(circle,var(--gold) 0%,var(--gold-2) 70%,transparent 100%);border-radius:50%;opacity:0.55;z-index:0}
+.big-cta h3{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:clamp(1.6rem,2.8vw,2.2rem);line-height:1;letter-spacing:0.005em;color:var(--paper);position:relative;z-index:1}
+.big-cta h3 .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold-3)}
+.big-cta .links{display:flex;gap:0.55rem;flex-wrap:wrap;position:relative;z-index:1}
+
+footer{text-align:center;padding-top:1.8rem;border-top:1px solid color-mix(in srgb,var(--gold) 30%,transparent);margin-top:1.6rem;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--gold-3)}
+footer a{color:inherit;border-bottom:1px solid currentColor;padding-bottom:1px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-block">
+    <div class="brand-photo"><img src="proffoto.png" alt=""></div>
+    <span class="brand-name">DJAMEL ZAIR<span class="dot">·</span><span class="role">Data Analyst · FEC</span></span>
+  </div>
+  <nav class="top">
+    <a href="index.html">Works</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+  <a class="cta" href="CV_C1_Portrait_v2.pdf" target="_blank">CV (PDF)</a>
+  <a class="cta primary" href="index.html#contact">Hire me</a>
+</header>
+
+<main>
+  <a class="back" href="cll_thesis.html">← Back to CLL thesis</a>
+
+  <nav class="rq-tabs">
+    <a href="cll_segmentation.html">RQ 01<span class="label">Segmentation</span></a>
+    <a href="cll_morphology.html">Theme 02<span class="label">Shape numbers</span></a>
+    <a href="cll_cpm_inference.html" class="active">Theme 03<span class="label">Simulation</span></a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-meta">
+        <span>Theme 03</span><span class="dot">·</span><span>Estimating drug effect</span><span class="dot">·</span><span>1,152 simulation runs</span>
+      </div>
+      <h1 class="display">A <span class="gold">simulation</span> that <span class="it">re-creates</span> the spheroids we just measured</h1>
+      <p class="lede">Which simulation knobs control the shape numbers we trust, and how strongly?</p>
+      <p class="summary">A <strong>Cellular Potts Model</strong> is a physics-style cellular simulation. Cells are voxel patches that grow, move, and stick together according to a few energy rules. The model has seven knobs (cell-cell adhesion, cell-medium adhesion, perimeter penalty, target volume, etc.). To find the right knob settings for a given drug condition, we (a) run the simulation across many knob combinations, (b) extract the same shape numbers from each run, (c) match those numbers to the real spheroid measurements. This page audits which knobs actually move the shape numbers, and how reliably the knobs can be recovered from a finite sample.</p>
+    </div>
+  </section>
+
+  <!-- Simulation hero image -->
+  <section class="card" style="background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; margin-bottom:1.6rem; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3);">
+    <div style="line-height:0; border-bottom:2px solid var(--gold);"><img src="assets/cll/figures/cpm/cpm_simulation.png" alt="Cellular Potts Model simulation frames" style="width:100%; height:auto; display:block;"></div>
+    <p style="padding:1.1rem 1.6rem 1.4rem; font-size:0.94rem; line-height:1.6; color:var(--paper); opacity:0.92;">
+      Snapshots from the simulation. Cells are coloured patches in a virtual dish; they push and pull on each other according to adhesion energies and grow toward a target size. Different knob settings produce different cluster shapes, and we read out the same six shape numbers from these as we read from real microscopy.
+    </p>
+  </section>
+
+  <section class="kpi-strip">
+    <div class="kpi"><div class="lbl">Parameter screens</div><div class="num numeric"><span class="counter" data-target="7">0</span></div><div class="desc">One per simulation knob, asking how strongly each knob moves the shape numbers.</div></div>
+    <div class="kpi gold"><div class="lbl">Simulation runs</div><div class="num numeric"><span class="counter" data-target="1152">0</span></div><div class="desc">Global sensitivity sample (Saltelli sequence) over all seven knobs at once.</div></div>
+    <div class="kpi"><div class="lbl">Strongest signal</div><div class="num">area</div><div class="desc">Cluster size carries the clearest dose-response signal across simulations.</div></div>
+    <div class="kpi gold"><div class="lbl">Hardest knob to recover</div><div class="num">temperature</div><div class="desc">Controls cellular noise; effects are subtle and easy to confuse with the other knobs.</div></div>
+  </section>
+
+  <!-- Discriminability + Identifiability -->
+  <section class="two-col">
+    <div class="card">
+      <div class="card-h"><span class="ttl">Which shape numbers <span class="it">carry signal</span>?</span><span class="sub">signal-to-noise per feature</span></div>
+      <div class="chart-host"><canvas id="chartDisc"></canvas></div>
+      <p style="font-size:0.92rem;line-height:1.55;color:var(--paper);opacity:0.92;margin-top:0.8rem;">For each shape number, this asks: how strongly does it move when you change a simulation knob, relative to its random run-to-run noise? <strong style="color:var(--gold-3);">Area</strong> and <strong style="color:var(--gold-3);">diameter</strong> dominate, the same two numbers the previous theme found reliable from microscopy. Elongation and roundness barely move with any knob.</p>
+    </div>
+    <div class="card">
+      <div class="card-h"><span class="ttl">How well can each <span class="it">knob</span> be recovered?</span><span class="sub">average recovery error per knob</span></div>
+      <div class="chart-host"><canvas id="chartIdent"></canvas></div>
+      <p style="font-size:0.92rem;line-height:1.55;color:var(--paper);opacity:0.92;margin-top:0.8rem;">Lower bar means the knob can be recovered more accurately from a finite simulation sample. <strong style="color:var(--gold-3);">Contact adhesion</strong> and <strong style="color:var(--gold-3);">neighbour adhesion</strong> are the easiest knobs to identify. <strong style="color:var(--clay);">Temperature</strong> (cellular noise) and <strong style="color:var(--clay);">target width</strong> are the hardest because their effects on shape are subtle.</p>
+    </div>
+  </section>
+
+  <!-- Drug-level signature reference (real spheroid trajectories) -->
+  <section class="card" style="background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; margin-bottom:1.6rem; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3);">
+    <div style="padding:1.4rem 1.6rem 0.6rem;">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; padding-bottom:0.5rem; border-bottom:1px solid color-mix(in srgb, var(--gold) 40%, transparent); flex-wrap:wrap; gap:0.5rem;">
+        <span style="font-family:'Anton',sans-serif; text-transform:uppercase; font-size:1.05rem; letter-spacing:0.005em; color:var(--paper);">What we want the simulation to <span style="font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold-3);">reproduce</span></span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--gold-3);">three drug conditions, real microscopy</span>
+      </div>
+    </div>
+    <div style="line-height:0; padding:0 1.6rem 1.6rem;"><img src="assets/cll/figures/morphology/feature_trajectories.png" alt="Six panels: shape numbers under three drugs over five days" style="width:100%; height:auto; display:block; border:1px solid color-mix(in srgb, var(--gold) 40%, transparent); border-radius:2px;"></div>
+    <p style="padding:0 1.6rem 1.4rem; font-size:0.92rem; line-height:1.55; color:var(--paper); opacity:0.92;">These are the trajectories the simulation needs to match: the shape numbers extracted from real microscopy under three drug conditions. The next step (matching simulated to real distributions, with optimal transport) recovers the simulation knob settings that explain each drug condition.</p>
+  </section>
+
+  <!-- Interactive sweep explorer -->
+  <div class="sec-h"><h2 class="display">Knob <span class="it">explorer</span></h2><span class="right">pick a knob and a shape number</span></div>
+  <section class="card">
+    <div class="card-h"><span class="ttl">Shape-number response to knob settings</span><span class="sub" id="sweepSub">target width × area</span></div>
+    <div class="sweep-controls">
+      <div class="group">
+        <span class="lbl">Knob</span>
+        <div class="pill-row" id="paramPicker"></div>
+      </div>
+      <div class="group">
+        <span class="lbl">Shape number</span>
+        <div class="pill-row" id="featurePicker"></div>
+      </div>
+    </div>
+    <div class="chart-host"><canvas id="chartSweep"></canvas></div>
+    <p style="font-size:0.9rem;line-height:1.55;color:var(--paper);opacity:0.92;margin-top:0.6rem;">How a chosen shape number responds when one knob is swept across its full range and the other knobs are held fixed. A flat line means the shape number is insensitive to that knob; a steep, monotone line means the knob can be inferred from that shape number.</p>
+  </section>
+
+  <!-- Weights matrix heatmap -->
+  <div class="sec-h"><h2 class="display">Sensitivity <span class="it">map</span></h2><span class="right">six shape numbers × five simulation knobs</span></div>
+  <section class="card">
+    <div class="card-h"><span class="ttl">Which knob drives which shape number?</span><span class="sub">hover for value · gold-outlined cells are dominant drivers</span></div>
+    <div class="weights-wrap">
+      <div class="weights-rowlabels" id="wRowLabels"></div>
+      <div class="weights-grid">
+        <div class="weights-collabels" id="wColLabels"></div>
+        <div class="weights-rows" id="wRows"></div>
+      </div>
+    </div>
+    <div class="verdict">
+      <strong style="color:var(--paper);">Area</strong> is moved by nearly every knob (most strongly by target width and contact adhesion). Elongation and roundness barely respond to any knob. This matches the reliability finding from the previous theme: size features are the only channel through which simulation knobs can be inferred reliably on this dataset.
+    </div>
+  </section>
+
+  <!-- Sobol indices image (S1 vs ST) -->
+  <div class="sec-h"><h2 class="display">Global sensitivity <span class="it">indices</span></h2><span class="right">Sobol decomposition · main effect vs total effect</span></div>
+  <section class="card" style="padding:0; overflow:hidden;">
+    <div style="line-height:0;"><img src="assets/cll/figures/cpm/sobol_S1_vs_ST.png" alt="Sobol indices: main effect vs total effect per knob" style="width:100%; height:auto; display:block;"></div>
+    <p style="padding:1.1rem 1.6rem 1.4rem; font-size:0.92rem; line-height:1.6; color:var(--paper); opacity:0.92;">From the same 1,152-run sample, this is the formal sensitivity analysis (Sobol indices). For each knob: the dark bar is its standalone effect on shape; the lighter bar adds in interactions with all other knobs. Knobs where the lighter bar is much taller than the dark bar are entangled with others, meaning they cannot be identified independently from a single shape readout.</p>
+  </section>
+
+  <!-- Tools -->
+  <section class="stack-row">
+    <div class="lbl"><span class="it">Tools</span> · Theme 03</div>
+    <div class="stack-chips">
+      <span class="chip gold">Cellular Potts Model (CompuCell3D)</span>
+      <span class="chip">Sobol global sensitivity (SALib)</span>
+      <span class="chip">XGBoost (surrogate emulator)</span>
+      <span class="chip">Optimal-transport matching (next phase)</span>
+      <span class="chip">Pandas · NumPy</span>
+      <span class="chip">Matplotlib</span>
+    </div>
+  </section>
+
+  <section class="big-cta">
+    <h3>Back to the <span class="it">overview</span>.</h3>
+    <div class="links">
+      <a class="cta primary" href="cll_thesis.html">Thesis overview →</a>
+      <a class="cta" href="cll_segmentation.html">← Theme 01 · Outlines</a>
+      <a class="cta" href="cll_morphology.html">← Theme 02 · Shape numbers</a>
+    </div>
+  </section>
+
+  <footer>© 2026 Djamel Zair · Amsterdam · <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a> · <a href="https://linkedin.com/in/djamelzair" target="_blank" rel="noopener">LinkedIn</a></footer>
+</main>
+
+<script>
+const TEAL_1='#052e36', TEAL_3='#0d5963', GOLD='#c8a05c', GOLD_2='#a37432', GOLD_3='#e7c98a', PAPER='#f3ecd6', MUTED='#8a9b9f', CLAY='#c44a30';
+
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+function animateCounter(el){
+    const target = parseFloat(el.dataset.target);
+    const start = performance.now();
+    function step(now){
+        const t = Math.min(1, (now - start) / 1200);
+        const v = target * easeOutCubic(t);
+        el.textContent = Math.round(v).toLocaleString();
+        if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ animateCounter(e.target); obs.unobserve(e.target); } }), { threshold: 0.4 });
+document.querySelectorAll('.counter').forEach(el => obs.observe(el));
+
+const baseAxes = {
+    color: PAPER, gridColor: 'rgba(199,160,92,0.12)'
+};
+
+/* Discriminability bar chart */
+fetch('assets/cll/data/cpm_discriminability.json').then(r => r.json()).then(d => {
+    const sorted = [...d].sort((a,b) => b.snr - a.snr);
+    const labels = sorted.map(x => x.feature.replace(/_/g,' '));
+    const snr = sorted.map(x => x.snr);
+    const cohens = sorted.map(x => x.cohens_d);
+    new Chart(document.getElementById('chartDisc'), {
+        type:'bar',
+        data:{ labels, datasets:[
+            { label:'SNR', data:snr, backgroundColor:GOLD, borderColor:TEAL_1, borderWidth:1.2 },
+            { label:"Cohen's d", data:cohens, backgroundColor:GOLD_2, borderColor:TEAL_1, borderWidth:1.2 }
+        ] },
+        options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+            animation:{ duration:900, easing:'easeOutCubic' },
+            plugins:{ legend:{ display:true, position:'top', align:'end', labels:{ color:PAPER, font:{family:'JetBrains Mono', size:10, weight:'500'}, boxWidth:14, boxHeight:14 } },
+                      tooltip:{ backgroundColor:TEAL_1, titleColor:PAPER, bodyColor:PAPER, borderColor:GOLD, borderWidth:1, padding:9, cornerRadius:2,
+                                callbacks:{ label: c => c.dataset.label + ' ' + c.parsed.x.toFixed(2),
+                                            afterBody: items => {
+                                                const f = sorted[items[0].dataIndex];
+                                                return ['Pearson r ' + f.pearson_r.toFixed(2), 'W1 norm ' + f.w1_norm.toFixed(2)];
+                                            } } } },
+            scales:{ x:{min:0, ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}, callback:v=>v.toFixed(1)}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false}},
+                     y:{ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false}} }
+        }
+    });
+});
+
+/* Identifiability chart */
+fetch('assets/cll/data/cpm_identifiability.json').then(r => r.json()).then(d => {
+    const sorted = [...d].sort((a,b) => a.mean_norm_err - b.mean_norm_err);
+    const labels = sorted.map(x => x.param.replace(/_/g,' '));
+    const meanErr = sorted.map(x => x.mean_norm_err);
+    const colors = meanErr.map(v => v < 0.01 ? GOLD : v < 0.018 ? GOLD_2 : CLAY);
+    new Chart(document.getElementById('chartIdent'), {
+        type:'bar',
+        data:{ labels, datasets:[{ label:'Mean normalised abs error', data:meanErr, backgroundColor:colors, borderColor:TEAL_1, borderWidth:1.2 }] },
+        options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+            animation:{duration:900, easing:'easeOutCubic'},
+            plugins:{ legend:{display:false},
+                      tooltip:{backgroundColor:TEAL_1, titleColor:PAPER, bodyColor:PAPER, borderColor:GOLD, borderWidth:1, padding:9, cornerRadius:2,
+                               callbacks:{ label: c => 'Mean norm err ' + (c.parsed.x*100).toFixed(2) + '%',
+                                           afterBody: items => {
+                                               const f = sorted[items[0].dataIndex];
+                                               return ['Mean abs err ' + f.mean_abs_err.toFixed(2),
+                                                       'Median abs err ' + f.median_abs_err.toFixed(2),
+                                                       'p90 abs err ' + f.p90_abs_err.toFixed(2),
+                                                       'Range ' + f.param_range.toFixed(0) + ' · n = ' + f.n];
+                                           } } } },
+            scales:{ x:{min:0, ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}, callback:v=>(v*100).toFixed(1)+'%'}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false}},
+                     y:{ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false}} }
+        }
+    });
+});
+
+/* Sweep explorer */
+let sweepData = null;
+let currentParam = null, currentFeature = null;
+let sweepChart = null;
+const featureLabels = { total_area:'total area', equivalent_diameter:'equiv. diameter', eccentricity:'eccentricity', solidity:'solidity', perimeter:'perimeter', circularity:'circularity' };
+
+function buildPicker(elId, items, current, onPick){
+    const el = document.getElementById(elId);
+    el.innerHTML = '';
+    items.forEach(it => {
+        const b = document.createElement('button');
+        b.textContent = it.label;
+        if (it.value === current) b.classList.add('active');
+        b.addEventListener('click', () => onPick(it.value));
+        el.appendChild(b);
+    });
+}
+function renderSweep(){
+    if (!sweepData) return;
+    const ps = sweepData[currentParam];
+    if (!ps || !ps.features[currentFeature]) return;
+    const labels = ps.levels;
+    const values = ps.features[currentFeature];
+    if (sweepChart) sweepChart.destroy();
+    sweepChart = new Chart(document.getElementById('chartSweep'), {
+        type:'line',
+        data:{ labels, datasets:[{
+            label: featureLabels[currentFeature] || currentFeature,
+            data: values,
+            borderColor: GOLD,
+            backgroundColor: 'rgba(199,160,92,0.18)',
+            borderWidth: 2.5,
+            tension: 0.25,
+            fill: true,
+            pointBackgroundColor: GOLD,
+            pointBorderColor: TEAL_1,
+            pointBorderWidth: 1.5,
+            pointRadius: 5,
+            pointHoverRadius: 8
+        }] },
+        options:{ responsive:true, maintainAspectRatio:false,
+            animation:{duration:700, easing:'easeOutCubic'},
+            plugins:{ legend:{display:false},
+                      tooltip:{backgroundColor:TEAL_1, titleColor:PAPER, bodyColor:PAPER, borderColor:GOLD, borderWidth:1, padding:9, cornerRadius:2,
+                               callbacks:{ title: c => currentParam + ' = ' + c[0].label,
+                                           label: c => featureLabels[currentFeature] + ': ' + c.parsed.y.toFixed(3) } } },
+            scales:{ x:{title:{display:true, text:currentParam, color:GOLD_3, font:{family:'JetBrains Mono', size:10, weight:'500'}}, ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false}},
+                     y:{title:{display:true, text:featureLabels[currentFeature], color:GOLD_3, font:{family:'JetBrains Mono', size:10, weight:'500'}}, ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false}} }
+        }
+    });
+    document.getElementById('sweepSub').textContent = currentParam + ' × ' + featureLabels[currentFeature];
+}
+fetch('assets/cll/data/cpm_sweeps.json').then(r => r.json()).then(d => {
+    sweepData = d;
+    const params = Object.keys(d);
+    currentParam = params[0];
+    const features = Object.keys(d[currentParam].features);
+    currentFeature = features[0];
+    buildPicker('paramPicker', params.map(p => ({ value:p, label:p })), currentParam, p => {
+        currentParam = p;
+        const newFeats = Object.keys(d[currentParam].features);
+        if (!newFeats.includes(currentFeature)) currentFeature = newFeats[0];
+        buildPicker('featurePicker', newFeats.map(f => ({ value:f, label:featureLabels[f] || f })), currentFeature, f => { currentFeature = f; renderSweep(); buildPicker('paramPicker', params.map(p => ({value:p, label:p})), currentParam, p => paramOnPick(p)); refreshActives(); });
+        renderSweep();
+        refreshActives();
+    });
+    buildPicker('featurePicker', features.map(f => ({ value:f, label:featureLabels[f] || f })), currentFeature, f => {
+        currentFeature = f;
+        renderSweep();
+        refreshActives();
+    });
+    renderSweep();
+});
+function refreshActives(){
+    document.querySelectorAll('#paramPicker button').forEach(b => b.classList.toggle('active', b.textContent === currentParam));
+    document.querySelectorAll('#featurePicker button').forEach(b => b.classList.toggle('active', b.textContent === (featureLabels[currentFeature] || currentFeature)));
+}
+
+/* Weights matrix */
+fetch('assets/cll/data/cpm_weights_matrix.json').then(r => r.json()).then(d => {
+    const featuresLabels = d.features;
+    const paramsLabels = d.params;
+    const matrix = d.matrix;
+    const nCols = paramsLabels.length;
+
+    /* set col template */
+    const collabelsEl = document.getElementById('wColLabels');
+    collabelsEl.style.gridTemplateColumns = 'repeat(' + nCols + ', 1fr)';
+    paramsLabels.forEach(p => {
+        const c = document.createElement('div');
+        c.className = 'col-label';
+        c.textContent = p;
+        collabelsEl.appendChild(c);
+    });
+
+    const rowLabelsEl = document.getElementById('wRowLabels');
+    const rowsEl = document.getElementById('wRows');
+    featuresLabels.forEach((f, fi) => {
+        const lbl = document.createElement('div');
+        lbl.className = 'row-label';
+        lbl.textContent = f;
+        rowLabelsEl.appendChild(lbl);
+
+        const row = document.createElement('div');
+        row.className = 'weights-row';
+        row.style.gridTemplateColumns = 'repeat(' + nCols + ', 1fr)';
+        matrix[fi].forEach((v, pi) => {
+            const cell = document.createElement('div');
+            cell.className = 'w-cell' + (v >= 0.5 ? ' strong' : '');
+            cell.style.background = wColor(v);
+            cell.style.color = v >= 0.5 ? TEAL_1 : PAPER;
+            cell.textContent = v.toFixed(2);
+            const tt = document.createElement('span');
+            tt.className = 'tt';
+            tt.textContent = f + ' · ' + paramsLabels[pi] + ' · weight ' + v.toFixed(2);
+            cell.appendChild(tt);
+            row.appendChild(cell);
+        });
+        rowsEl.appendChild(row);
+    });
+});
+function wColor(v){
+    const stops = [{p:0.0,c:[26,48,56]},{p:0.25,c:[45,79,94]},{p:0.5,c:[74,120,137]},{p:0.75,c:[200,160,92]},{p:1.0,c:[243,219,160]}];
+    const cap = Math.max(0, Math.min(1, v));
+    let lo = stops[0], hi = stops[stops.length-1];
+    for (let i=0; i<stops.length-1; i++){ if (cap >= stops[i].p && cap <= stops[i+1].p){ lo = stops[i]; hi = stops[i+1]; break; } }
+    const t = (cap - lo.p) / (hi.p - lo.p || 1);
+    return 'rgb(' + Math.round(lo.c[0]+(hi.c[0]-lo.c[0])*t) + ',' + Math.round(lo.c[1]+(hi.c[1]-lo.c[1])*t) + ',' + Math.round(lo.c[2]+(hi.c[2]-lo.c[2])*t) + ')';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unified Tabular Learning · Djamel Zair</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+    --teal-1:#052e36; --teal-2:#0a4a55; --teal-3:#0d5963; --teal-4:#15616d;
+    --paper:#f3ecd6; --paper-2:#e8dab2; --cream:#faf3df;
+    --gold:#c8a05c; --gold-2:#a37432; --gold-3:#e7c98a; --gold-4:#f3dba0; --gold-deep:#6b4416;
+    --muted:#8a9b9f; --muted-2:#a8b5b8; --green:#6dd9a1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--teal-2); background-image:radial-gradient(ellipse 1500px 800px at 50% -200px, var(--teal-3) 0%, transparent 60%), radial-gradient(ellipse 900px 500px at 100% 100%, var(--teal-1) 0%, transparent 70%); color:var(--paper); font-family:'DM Sans',system-ui,sans-serif; font-optical-sizing:auto; line-height:1.6; overflow-x:hidden; min-height:100vh}
+body::before{content:""; position:fixed; inset:0; background-image:radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), repeating-linear-gradient(91deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 130px); background-size:4px 4px, auto auto; pointer-events:none; z-index:0; opacity:0.7}
+a{color:inherit; text-decoration:none}
+.display{font-family:'Anton',Impact,sans-serif; letter-spacing:0.005em; text-transform:uppercase}
+.serif-it{font-family:'Instrument Serif',Georgia,serif; font-style:italic}
+.mono{font-family:'JetBrains Mono',monospace}
+img{max-width:100%; display:block}
+
+header{position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--teal-2) 92%, transparent); backdrop-filter:blur(14px); border-bottom:1px solid var(--gold); padding:0.75rem 2rem; display:flex; align-items:center; gap:1rem}
+.brand-block{display:flex; align-items:center; gap:0.7rem}
+.brand-photo{width:36px; height:36px; border-radius:50%; overflow:hidden; flex-shrink:0; border:1.5px solid var(--gold); box-shadow:0 0 0 2px var(--teal-2), 0 0 0 3px var(--gold)}
+.brand-photo img{width:100%; height:100%; object-fit:cover; object-position:center 30%}
+.brand-name{font-family:'Anton',sans-serif; font-size:1.25rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--paper)}
+.brand-name .dot{color:var(--gold); margin:0 0.4rem}
+.brand-name .role{color:var(--gold-3); font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:500; text-transform:none; letter-spacing:0.01em}
+nav.top{margin-left:auto; display:flex; gap:1.5rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.18em; color:var(--gold-3)}
+nav.top a{padding-bottom:4px; border-bottom:1.5px solid transparent; transition:all 0.2s}
+nav.top a:hover{color:var(--gold); border-color:var(--gold)}
+.cta{font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:500; text-transform:uppercase; letter-spacing:0.16em; padding:0.6rem 1.05rem; border:1.5px solid var(--gold); border-radius:3px; background:transparent; color:var(--paper); cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:0.45rem}
+.cta:hover{background:var(--gold); color:var(--teal-1)}
+.cta.primary{background:var(--gold); color:var(--teal-1); border-color:var(--gold); font-weight:600}
+.cta.primary:hover{background:var(--gold-3); border-color:var(--gold-3)}
+
+main{max-width:1340px; margin:0 auto; padding:1.6rem 1.5rem 4rem; position:relative; z-index:1}
+.back{display:inline-flex; align-items:center; gap:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; text-transform:uppercase; letter-spacing:0.18em; color:var(--gold-3); margin-bottom:1.2rem; transition:all 0.2s; padding:0.4rem 0}
+.back:hover{color:var(--gold); transform:translateX(-3px)}
+
+.hero{background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; padding:2.4rem 2.8rem 2.2rem; margin-bottom:1.6rem; position:relative; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.4)}
+.hero::before{content:""; position:absolute; right:-130px; top:-130px; width:480px; height:480px; background:radial-gradient(circle at 35% 35%, var(--gold-4) 0%, var(--gold) 45%, var(--gold-2) 80%, var(--gold-deep) 100%); border-radius:50%; opacity:0.32; z-index:0}
+.hero-meta{font-family:'JetBrains Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.22em; color:var(--gold); font-weight:600; margin-bottom:0.9rem; display:flex; align-items:center; gap:0.6rem; position:relative; z-index:2}
+.hero-meta .dot{color:var(--gold-3); opacity:0.7}
+.hero h1{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(2.8rem,5.4vw,5rem); line-height:0.92; letter-spacing:0.005em; color:var(--paper); margin-bottom:0.6rem; position:relative; z-index:2; max-width:22ch}
+.hero h1 .gold{color:var(--gold)}
+.hero h1 .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold-3); letter-spacing:-0.01em; font-size:0.95em}
+.hero .lede{font-family:'Instrument Serif',serif; font-style:italic; font-size:1.4rem; line-height:1.4; color:var(--gold-3); max-width:60ch; margin-bottom:1.6rem; position:relative; z-index:2}
+.hero .summary{font-size:1.05rem; line-height:1.65; color:var(--paper); max-width:70ch; border-left:4px solid var(--gold); padding-left:1rem; margin-bottom:1.6rem; position:relative; z-index:2; opacity:0.95}
+.hero .summary strong{color:var(--gold-3); font-weight:600}
+.hero-cta{display:flex; gap:0.55rem; flex-wrap:wrap; position:relative; z-index:2}
+
+.kpi-strip{display:grid; grid-template-columns:repeat(4,1fr); gap:1.1rem; margin-bottom:1.6rem}
+.kpi{background:var(--teal-3); border:1px solid var(--gold); border-radius:4px; padding:1.5rem 1.6rem 1.7rem; position:relative; overflow:hidden; color:var(--paper); box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3); transition:transform 0.25s}
+.kpi:hover{transform:translateY(-3px)}
+.kpi.gold{background:linear-gradient(135deg, var(--gold-3) 0%, var(--gold) 50%, var(--gold-2) 100%); color:var(--teal-1); box-shadow:inset 0 0 0 1px rgba(5,46,54,0.3), inset 0 0 0 6px var(--gold), inset 0 0 0 7px rgba(5,46,54,0.4)}
+.kpi.gold .lbl, .kpi.gold .desc{color:var(--teal-1)}
+.kpi .lbl{font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.22em; color:var(--gold-3); margin-bottom:0.75rem}
+.kpi .num{font-family:'Anton',sans-serif; font-size:clamp(2.6rem,4.4vw,3.4rem); line-height:0.9; margin-bottom:0.55rem; color:var(--gold)}
+.kpi.gold .num{color:var(--teal-1)}
+.kpi .desc{font-size:0.86rem; line-height:1.4; opacity:0.92; color:var(--paper)}
+@media (max-width:800px){.kpi-strip{grid-template-columns:1fr 1fr}}
+
+.sec-h{display:flex; align-items:baseline; gap:1rem; border-bottom:2px solid var(--gold); padding-bottom:0.55rem; margin:2.4rem 0 1.4rem}
+.sec-h h2{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(1.9rem,3vw,2.4rem); line-height:1; letter-spacing:0.005em; color:var(--paper)}
+.sec-h h2 .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold); font-size:1.05em; letter-spacing:-0.01em}
+.sec-h .right{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold-3)}
+
+.method-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.8rem}
+.method-card{background:var(--teal-3); border:1px solid var(--gold); border-radius:4px; padding:1.2rem 1.3rem 1.3rem; position:relative; overflow:hidden; color:var(--paper); box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3); transition:transform 0.25s}
+.method-card.highlight{background:linear-gradient(135deg, var(--gold-3) 0%, var(--gold) 50%, var(--gold-2) 100%); color:var(--teal-1); box-shadow:inset 0 0 0 1px rgba(5,46,54,0.3), inset 0 0 0 6px var(--gold), inset 0 0 0 7px rgba(5,46,54,0.4)}
+.method-card.highlight .step-num, .method-card.highlight h4, .method-card.highlight p{color:var(--teal-1)}
+.method-card:hover{transform:translateY(-3px)}
+.method-card .step-num{font-family:'JetBrains Mono',monospace; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.22em; color:var(--gold); margin-bottom:0.5rem}
+.method-card h4{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:1.3rem; line-height:1; letter-spacing:0.005em; color:var(--paper); margin-bottom:0.5rem}
+.method-card p{font-size:0.88rem; line-height:1.5; color:var(--paper); opacity:0.9}
+@media (max-width:1000px){.method-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.method-grid{grid-template-columns:1fr}}
+
+.result-block{background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; padding:1.8rem 2rem; margin-bottom:1.8rem; display:grid; grid-template-columns:1fr 1fr; gap:2rem; color:var(--paper); box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3)}
+.result-l{display:flex; flex-direction:column; gap:0.85rem}
+.result-l h3{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(1.6rem,2.6vw,2rem); line-height:1.05; letter-spacing:0.005em; color:var(--paper)}
+.result-l h3 .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold-3); letter-spacing:-0.01em}
+.result-l p{font-size:1rem; line-height:1.65; color:var(--paper); opacity:0.95}
+.result-l p strong{color:var(--gold-3); font-weight:600}
+.result-l .verdict{background:var(--teal-1); border-left:4px solid var(--gold); padding:0.85rem 1rem; border-radius:2px; font-family:'Instrument Serif',serif; font-style:italic; font-size:1.1rem; color:var(--gold-3); margin-top:0.4rem}
+.result-r{display:flex; flex-direction:column; gap:0.7rem}
+.result-r-h{display:flex; align-items:baseline; justify-content:space-between; padding-bottom:0.5rem; border-bottom:1px solid color-mix(in srgb, var(--gold) 40%, transparent)}
+.result-r-h .ttl{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:1rem; letter-spacing:0.005em}
+.result-r-h .sub{font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--gold-3)}
+.result-chart{height:340px; position:relative}
+@media (max-width:900px){.result-block{grid-template-columns:1fr}}
+
+.gallery-row{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:1.8rem}
+.gallery-card{background:var(--teal-1); border:1.5px solid var(--gold); border-radius:4px; overflow:hidden; transition:transform 0.25s}
+.gallery-card:hover{transform:translateY(-4px)}
+.gallery-card img{width:100%; height:auto; display:block; background:var(--paper)}
+.gallery-card .cap{padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.16em; color:var(--gold-3); border-top:1px solid var(--gold)}
+@media (max-width:900px){.gallery-row{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.gallery-row{grid-template-columns:1fr}}
+
+.stack-row{background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; padding:1.4rem 1.8rem; margin-bottom:1.6rem; display:flex; align-items:baseline; gap:1.4rem; flex-wrap:wrap; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3)}
+.stack-row .lbl{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:1.3rem; color:var(--paper); flex-shrink:0}
+.stack-row .lbl .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold)}
+.stack-chips{display:flex; gap:0.5rem; flex-wrap:wrap}
+.chip{font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:500; text-transform:uppercase; letter-spacing:0.14em; padding:0.45rem 0.85rem; border:1.5px solid var(--gold); border-radius:3px; background:transparent; color:var(--paper)}
+.chip.gold{background:var(--gold); color:var(--teal-1); border-color:var(--gold); font-weight:600}
+
+.big-cta{background:var(--teal-1); border:1.5px solid var(--gold); border-radius:4px; padding:2rem 2.4rem; margin-bottom:1.4rem; display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:center; position:relative; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-1), inset 0 0 0 7px rgba(199,160,92,0.3)}
+.big-cta::before{content:""; position:absolute; left:-90px; bottom:-90px; width:320px; height:320px; background:radial-gradient(circle, var(--gold) 0%, var(--gold-2) 70%, transparent 100%); border-radius:50%; opacity:0.55; z-index:0}
+.big-cta h3{font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(1.8rem,3.2vw,2.4rem); line-height:1; letter-spacing:0.005em; color:var(--paper); position:relative; z-index:1}
+.big-cta h3 .it{font-family:'Instrument Serif',serif; font-style:italic; text-transform:none; font-weight:400; color:var(--gold-3)}
+.big-cta .links{display:flex; gap:0.55rem; flex-wrap:wrap; position:relative; z-index:1}
+
+footer{text-align:center; padding-top:1.8rem; border-top:1px solid color-mix(in srgb, var(--gold) 30%, transparent); margin-top:1.6rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--gold-3)}
+footer a{color:inherit; border-bottom:1px solid currentColor; padding-bottom:1px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-block">
+    <div class="brand-photo"><img src="proffoto.png" alt=""></div>
+    <span class="brand-name">DJAMEL ZAIR<span class="dot">·</span><span class="role">Data Analyst · FEC</span></span>
+  </div>
+  <nav class="top">
+    <a href="index.html">Works</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+  <a class="cta" href="CV_C1_Portrait_v2.pdf" target="_blank">CV (PDF)</a>
+  <a class="cta primary" href="index.html#contact">Hire me</a>
+</header>
+
+<main>
+  <a class="back" href="index.html">← Back to portfolio</a>
+
+  <section class="hero">
+    <div class="hero-meta">
+      <span>Multi-task learning</span><span class="dot">·</span><span>Self-supervised</span><span class="dot">·</span><span>2025</span>
+    </div>
+    <h1 class="display">Unified <span class="it">tabular</span> learning</h1>
+    <p class="lede">A shared 64-dimensional latent space across heterogeneous tabular datasets.</p>
+    <p class="summary">A self-supervised autoencoder learns a <strong>shared 64-d latent space</strong> across three heterogeneous tabular datasets (Covertype, HIGGS, HELOC). A multi-head MLP and an XGBoost trained on the latents reach <strong>ROC-AUC 0.811</strong>, beating the TabPFN-2.5 baseline at 0.660. Scales past <strong>50,000 samples</strong> where TabPFN starts to degrade, on a single GPU-free machine.</p>
+    <div class="hero-cta">
+      <a class="cta primary" href="https://github.com/DjamelZair/UnifiedTabularLearning" target="_blank" rel="noopener">View on GitHub ↗</a>
+      <a class="cta" href="index.html">Other projects →</a>
+    </div>
+  </section>
+
+  <section class="kpi-strip">
+    <div class="kpi gold"><div class="lbl">ROC-AUC (XGB on latents)</div><div class="num display">0.811</div><div class="desc">Beats TabPFN-2.5 baseline at 0.660.</div></div>
+    <div class="kpi"><div class="lbl">Latent dimension</div><div class="num display">64-d</div><div class="desc">Shared autoencoder latent space across 3 datasets.</div></div>
+    <div class="kpi gold"><div class="lbl">Datasets unified</div><div class="num display">3</div><div class="desc">Covertype, HIGGS, HELOC: heterogeneous schemas.</div></div>
+    <div class="kpi"><div class="lbl">Scales to</div><div class="num display">50k+</div><div class="desc">Samples, on a GPU-free machine.</div></div>
+  </section>
+
+  <div class="sec-h"><h2 class="display">How it <span class="it">works</span></h2><span class="right">Per-stage breakdown</span></div>
+  <section class="method-grid">
+    <div class="method-card"><div class="step-num">Stage 01</div><h4>Three datasets</h4><p>Covertype (forest cover), HIGGS (particle physics), HELOC (credit risk). Heterogeneous schemas, sizes, and class balance.</p></div>
+    <div class="method-card"><div class="step-num">Stage 02</div><h4>Pre-processing</h4><p>Per-dataset standardisation, categorical encoding, alignment of feature dimensions for the shared encoder input.</p></div>
+    <div class="method-card highlight"><div class="step-num">Stage 03 · Highlight</div><h4>Shared autoencoder</h4><p>Self-supervised reconstruction objective on a shared 64-d latent space. The encoder is dataset-agnostic.</p></div>
+    <div class="method-card"><div class="step-num">Stage 04</div><h4>Multi-head MLP</h4><p>Per-dataset classification heads on top of the shared latent. Joint loss over three heads.</p></div>
+    <div class="method-card"><div class="step-num">Stage 05</div><h4>XGBoost on latents</h4><p>The 64-d latent vectors fed into XGBoost. Best of both worlds: representation learning plus tree boosting.</p></div>
+    <div class="method-card"><div class="step-num">Stage 06</div><h4>Baselines</h4><p>Single-head MLP, multi-head MLP, XGBoost on latents, TabPFN-2.5. All compared on the same held-out folds.</p></div>
+    <div class="method-card"><div class="step-num">Stage 07</div><h4>Diagnostics</h4><p>t-SNE on latents, latent correlation matrices, per-dataset confusion matrices and ROC curves.</p></div>
+    <div class="method-card"><div class="step-num">Stage 08</div><h4>Output</h4><p>ROC-AUC 0.811 (XGB on latents), surpassing TabPFN-2.5 at 0.660. Scales smoothly past 50,000 samples.</p></div>
+  </section>
+
+  <div class="sec-h"><h2 class="display">The <span class="it">comparison</span></h2><span class="right">ROC-AUC across heads</span></div>
+  <section class="result-block">
+    <div class="result-l">
+      <h3>The latent space carries the <span class="it">signal</span> better than the raw data.</h3>
+      <p>XGBoost trained on the 64-d shared latent reaches <strong>0.811</strong> ROC-AUC, against the single-head MLP at 0.703 and the multi-head MLP at 0.793. The TabPFN-2.5 baseline sits at <strong>0.660</strong> and does not scale past ~10k samples; the shared autoencoder approach scales cleanly past 50k.</p>
+      <p>The win comes from compressing heterogeneous tabular data into a representation that downstream classifiers can exploit, without per-dataset feature engineering.</p>
+      <div class="verdict">A shared latent space plus a tree booster beats a transformer baseline on heterogeneous tabular data.</div>
+    </div>
+    <div class="result-r">
+      <div class="result-r-h"><span class="ttl display">ROC-AUC across models</span><span class="sub">higher is better</span></div>
+      <div class="result-chart"><canvas id="chartLeaderboard"></canvas></div>
+    </div>
+  </section>
+
+  <div class="sec-h"><h2 class="display">Inside the <span class="it">latent space</span></h2><span class="right">how it actually looks</span></div>
+  <section class="result-block" style="grid-template-columns:1.1fr 1fr;">
+    <div class="result-l">
+      <h3>What this <span class="it">picture</span> means</h3>
+      <p>The shared autoencoder maps every row of every dataset (Higgs particles, HELOC credit decisions, Covertype forest pixels) into the same 64-dimensional space. That's invisible. To see it, t-SNE compresses those 64 numbers down to two, preserving local distances, so similar rows end up near each other. Each colour is a class label; well-separated colours mean the network learned a representation where classes are linearly distinguishable.</p>
+      <p><strong>What to look for in the figure on the right:</strong> three large clusters (one per dataset), with within-cluster colour separation. Higgs (binary) shows a clean two-cluster split; HELOC (binary) is tighter; Covertype (7 classes) splits into multiple bands.</p>
+      <div class="verdict">A picture of a representation that didn't exist before training. One model, three datasets, one shared latent.</div>
+    </div>
+    <div class="result-r">
+      <div class="result-r-h"><span class="ttl display">2D projection of the shared 64-D space</span><span class="sub">t-SNE · class colour-coded</span></div>
+      <div style="line-height:0; border:1px solid var(--gold); border-radius:3px; overflow:hidden;">
+        <img src="assets/unified_tabular_learning/tsne-latents.png" alt="2D projection of the 64-D shared latent space, colour-coded by class across three datasets" style="width:100%; height:auto; display:block;">
+      </div>
+    </div>
+  </section>
+
+  <div class="sec-h"><h2 class="display">More <span class="it">visuals</span></h2><span class="right">latent correlations &amp; ROC</span></div>
+  <section class="gallery-row">
+    <div class="gallery-card"><img src="assets/unified_tabular_learning/latent-correlations-top20.png" alt="The 20 latent dimensions most correlated with input features"><div class="cap">Top 20 latent dimensions, ranked by correlation with input features</div></div>
+    <div class="gallery-card"><img src="assets/unified_tabular_learning/xgb-test-roc.png" alt="ROC curve of an XGBoost classifier trained on the shared latent on the held-out test set"><div class="cap">Classifier ROC on the shared latent (held-out test)</div></div>
+  </section>
+
+  <section class="stack-row">
+    <div class="lbl"><span class="it">Tools</span> &amp; tech</div>
+    <div class="stack-chips">
+      <span class="chip gold">PyTorch · autoencoder</span>
+      <span class="chip">Multi-head MLP</span>
+      <span class="chip">XGBoost</span>
+      <span class="chip">TabPFN-2.5 baseline</span>
+      <span class="chip">scikit-learn</span>
+      <span class="chip">t-SNE</span>
+      <span class="chip">Pandas · NumPy</span>
+      <span class="chip">Matplotlib</span>
+    </div>
+  </section>
+
+  <section class="big-cta">
+    <h3>Want the <span class="it">code</span>?</h3>
+    <div class="links">
+      <a class="cta primary" href="https://github.com/DjamelZair/UnifiedTabularLearning" target="_blank" rel="noopener">Code on GitHub ↗</a>
+      <a class="cta" href="index.html">Other projects →</a>
+    </div>
+  </section>
+
+  <footer>© 2026 Djamel Zair · Amsterdam · <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a> · <a href="https://linkedin.com/in/djamelzair" target="_blank" rel="noopener">LinkedIn</a></footer>
+</main>
+
+<script>
+const TEAL_1='#052e36', GOLD='#c8a05c', GOLD_2='#a37432', PAPER='#f3ecd6';
+{
+    const ctx = document.getElementById('chartLeaderboard');
+    new Chart(ctx, {
+        type:'bar',
+        data:{
+            labels: ['TabPFN-2.5', 'Single-head MLP', 'Multi-head MLP', 'XGB on latents'],
+            datasets:[{ data:[0.660, 0.703, 0.793, 0.811], backgroundColor: ['rgba(168,181,184,0.6)', GOLD_2, GOLD_2, GOLD], borderColor: TEAL_1, borderWidth: 1.5 }]
+        },
+        options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+            animation:{duration:1000, easing:'easeOutCubic'},
+            plugins:{ legend:{display:false}, tooltip:{ backgroundColor:TEAL_1, titleColor:PAPER, bodyColor:PAPER, padding:8, cornerRadius:2, displayColors:false, borderColor:GOLD, borderWidth:1, callbacks:{ label: c => 'AUC ' + c.parsed.x.toFixed(3) } } },
+            scales:{ x:{ ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}, callback: v => v.toFixed(2)}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false}, min:0.6, max:0.85 },
+                     y:{ ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false} } }
+        }
+    });
+}
+</script>
+</body>
+</html>

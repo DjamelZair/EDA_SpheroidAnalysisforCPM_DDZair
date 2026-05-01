@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RQ2 · Morphology &amp; Feature Fidelity · CLL Spheroid Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--teal-1:#052e36;--teal-2:#0a4a55;--teal-3:#0d5963;--teal-4:#15616d;--paper:#f3ecd6;--paper-2:#e8dab2;--cream:#faf3df;--gold:#c8a05c;--gold-2:#a37432;--gold-3:#e7c98a;--gold-4:#f3dba0;--gold-deep:#6b4416;--muted:#8a9b9f;--muted-2:#a8b5b8;--green:#6dd9a1;--clay:#c44a30}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--teal-2);background-image:radial-gradient(ellipse 1500px 800px at 50% -200px,var(--teal-3) 0%,transparent 60%),radial-gradient(ellipse 900px 500px at 100% 100%,var(--teal-1) 0%,transparent 70%);color:var(--paper);font-family:'DM Sans',system-ui,sans-serif;font-optical-sizing:auto;line-height:1.6;overflow-x:hidden;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),repeating-linear-gradient(91deg,rgba(255,255,255,0.018) 0 1px,transparent 1px 130px);background-size:4px 4px,auto auto;pointer-events:none;z-index:0;opacity:0.7}
+a{color:inherit;text-decoration:none}
+.display{font-family:'Anton',Impact,sans-serif;letter-spacing:0.005em;text-transform:uppercase}
+.serif-it{font-family:'Instrument Serif',Georgia,serif;font-style:italic}
+.mono{font-family:'JetBrains Mono',monospace}
+img{max-width:100%;display:block}
+
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--teal-2) 92%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--gold);padding:0.75rem 2rem;display:flex;align-items:center;gap:1rem}
+.brand-block{display:flex;align-items:center;gap:0.7rem}
+.brand-photo{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid var(--gold);box-shadow:0 0 0 2px var(--teal-2),0 0 0 3px var(--gold)}
+.brand-photo img{width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.brand-name{font-family:'Anton',sans-serif;font-size:1.25rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--paper)}
+.brand-name .dot{color:var(--gold);margin:0 0.4rem}
+.brand-name .role{color:var(--gold-3);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;text-transform:none;letter-spacing:0.01em}
+nav.top{margin-left:auto;display:flex;gap:1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-3)}
+nav.top a{padding-bottom:4px;border-bottom:1.5px solid transparent;transition:all 0.2s}
+nav.top a:hover{color:var(--gold);border-color:var(--gold)}
+.cta{font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:500;text-transform:uppercase;letter-spacing:0.16em;padding:0.6rem 1.05rem;border:1.5px solid var(--gold);border-radius:3px;background:transparent;color:var(--paper);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.45rem}
+.cta:hover{background:var(--gold);color:var(--teal-1)}
+.cta.primary{background:var(--gold);color:var(--teal-1);border-color:var(--gold);font-weight:600}
+.cta.primary:hover{background:var(--gold-3);border-color:var(--gold-3)}
+
+main{max-width:1340px;margin:0 auto;padding:1.6rem 1.5rem 4rem;position:relative;z-index:1}
+.back{display:inline-flex;align-items:center;gap:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-3);margin-bottom:1.2rem;transition:all 0.2s;padding:0.4rem 0}
+.back:hover{color:var(--gold);transform:translateX(-3px)}
+
+.rq-tabs{display:flex;gap:0;border:1.5px solid var(--gold);border-radius:3px;overflow:hidden;margin-bottom:1.4rem;background:var(--teal-3)}
+.rq-tabs a{flex:1;padding:0.85rem 1.2rem;border-right:1.5px solid var(--gold);font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.16em;color:var(--gold-3);transition:all 0.2s;text-align:center;font-weight:500}
+.rq-tabs a:last-child{border-right:none}
+.rq-tabs a:hover{background:rgba(199,160,92,0.15);color:var(--gold)}
+.rq-tabs a.active{background:var(--gold);color:var(--teal-1);font-weight:600}
+.rq-tabs a .label{display:block;font-family:'Anton',sans-serif;font-size:1rem;letter-spacing:0.005em;margin-top:0.18rem}
+
+.hero{background:var(--teal-3);border:1.5px solid var(--gold);border-radius:4px;padding:2.2rem 2.4rem 2rem;margin-bottom:1.6rem;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.4)}
+.hero::before{content:"";position:absolute;right:-130px;top:-130px;width:480px;height:480px;background:radial-gradient(circle at 35% 35%,var(--gold-4) 0%,var(--gold) 45%,var(--gold-2) 80%,var(--gold-deep) 100%);border-radius:50%;opacity:0.32;z-index:0}
+.hero-content{position:relative;z-index:2}
+.hero-meta{font-family:'JetBrains Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--gold);font-weight:600;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap}
+.hero-meta .dot{color:var(--gold-3);opacity:0.7}
+.hero h1{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:clamp(2.6rem,5vw,4.6rem);line-height:0.92;letter-spacing:0.005em;color:var(--paper);margin-bottom:0.6rem;max-width:22ch}
+.hero h1 .gold{color:var(--gold)}
+.hero h1 .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold-3);letter-spacing:-0.01em;font-size:0.95em}
+.hero .lede{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.3rem;line-height:1.4;color:var(--gold-3);max-width:60ch;margin-bottom:1.2rem}
+.hero .summary{font-size:1rem;line-height:1.65;color:var(--paper);max-width:70ch;border-left:4px solid var(--gold);padding-left:1rem;margin-bottom:1.2rem;opacity:0.95}
+.hero .summary strong{color:var(--gold-3);font-weight:600}
+
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-bottom:1.6rem}
+.kpi{background:var(--teal-3);border:1px solid var(--gold);border-radius:4px;padding:1.4rem 1.5rem 1.6rem;position:relative;overflow:hidden;color:var(--paper);box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.3);transition:transform 0.25s}
+.kpi:hover{transform:translateY(-3px)}
+.kpi.gold{background:linear-gradient(135deg,var(--gold-3) 0%,var(--gold) 50%,var(--gold-2) 100%);color:var(--teal-1);box-shadow:inset 0 0 0 1px rgba(5,46,54,0.3),inset 0 0 0 6px var(--gold),inset 0 0 0 7px rgba(5,46,54,0.4)}
+.kpi.gold .lbl,.kpi.gold .desc{color:var(--teal-1)}
+.kpi .lbl{font-family:'JetBrains Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--gold-3);margin-bottom:0.7rem}
+.kpi .num{font-family:'Anton',sans-serif;font-size:clamp(1.7rem,3vw,2.4rem);line-height:1;margin-bottom:0.5rem;color:var(--gold)}
+.kpi.gold .num{color:var(--teal-1)}
+.kpi .num.numeric{font-size:clamp(2.4rem,4vw,3.2rem)}
+.kpi .desc{font-size:0.84rem;line-height:1.4;opacity:0.92;color:var(--paper)}
+@media (max-width:800px){.kpi-strip{grid-template-columns:1fr 1fr}}
+
+.sec-h{display:flex;align-items:baseline;gap:1rem;border-bottom:2px solid var(--gold);padding-bottom:0.55rem;margin:2.2rem 0 1.3rem}
+.sec-h h2{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:clamp(1.8rem,2.8vw,2.2rem);line-height:1;letter-spacing:0.005em;color:var(--paper)}
+.sec-h h2 .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold);font-size:1.05em;letter-spacing:-0.01em}
+.sec-h .right{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:0.66rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold-3)}
+
+.card{background:var(--teal-3);border:1.5px solid var(--gold);border-radius:4px;padding:1.6rem 1.8rem;margin-bottom:1.6rem;color:var(--paper);box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.3);position:relative}
+.card-h{display:flex;align-items:center;justify-content:space-between;padding-bottom:0.55rem;border-bottom:1px solid color-mix(in srgb,var(--gold) 40%,transparent);margin-bottom:1rem;flex-wrap:wrap;gap:0.6rem}
+.card-h .ttl{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:1.2rem;letter-spacing:0.005em;color:var(--paper)}
+.card-h .ttl .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold-3)}
+.card-h .sub{font-family:'JetBrains Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-3)}
+
+/* Why CCC explainer */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-bottom:1.6rem}
+.why-card{background:var(--teal-3);border:1.5px solid var(--gold);border-radius:4px;padding:1.6rem 1.8rem;box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.3);display:flex;flex-direction:column;gap:0.85rem}
+.why-card.bad{box-shadow:inset 0 0 0 1px rgba(196,74,48,0.3),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(196,74,48,0.45);border-color:var(--clay)}
+.why-card .tag{font-family:'JetBrains Mono',monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.22em;color:var(--gold);font-weight:600}
+.why-card.bad .tag{color:var(--clay)}
+.why-card h3{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:1.5rem;line-height:1.05;letter-spacing:0.005em;color:var(--paper)}
+.why-card h3 .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold-3)}
+.why-card.bad h3 .it{color:var(--clay)}
+.why-card p{font-size:0.96rem;line-height:1.6;color:var(--paper);opacity:0.95}
+.why-card .formula{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--gold-3);background:var(--teal-1);padding:0.7rem 1rem;border:1px solid color-mix(in srgb,var(--gold) 40%, transparent);border-radius:2px;line-height:1.5;margin-top:0.4rem}
+.why-card.bad .formula{color:var(--muted-2);border-color:color-mix(in srgb,var(--clay) 40%, transparent)}
+@media (max-width:800px){.why-grid{grid-template-columns:1fr}}
+
+/* INTERACTIVE HEATMAP (same look as cll_thesis.html) */
+.heatmap-wrap{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;margin-bottom:1rem;overflow-x:auto}
+.heatmap-rowlabels{display:flex;flex-direction:column;gap:3px;padding-top:34px}
+.heatmap-rowlabels .row-label{height:36px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--paper);text-align:right;padding-right:0.6rem;white-space:nowrap}
+.heatmap-rowlabels .row-label.winner{color:var(--gold);font-weight:600}
+.heatmap-grid{flex:1;min-width:0}
+.heatmap-collabels{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-bottom:3px}
+.heatmap-collabels .col-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--gold-3);text-transform:uppercase;letter-spacing:0.08em;text-align:center;padding:0.3rem 0.2rem;word-break:break-word;line-height:1.2}
+.heatmap-rows{display:flex;flex-direction:column;gap:3px}
+.heatmap-row{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+.hm-cell{height:36px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;font-weight:600;border-radius:2px;cursor:default;transition:transform 0.15s,box-shadow 0.15s;position:relative}
+.hm-cell:hover{transform:scale(1.08);z-index:5;box-shadow:0 4px 12px rgba(0,0,0,0.5)}
+.hm-cell.crosses{outline:2px solid var(--gold);outline-offset:-2px;box-shadow:0 0 0 2px var(--teal-3) inset}
+.hm-cell .tt{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--teal-1);color:var(--paper);padding:0.4rem 0.6rem;border:1px solid var(--gold);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.15s;z-index:10}
+.hm-cell:hover .tt{opacity:1}
+.heatmap-legend{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding-top:1rem;border-top:1px solid color-mix(in srgb,var(--gold) 30%,transparent);font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--gold-3)}
+.heatmap-legend .scale{display:flex;align-items:center;gap:0.4rem}
+.heatmap-legend .scale .grad{width:140px;height:10px;background:linear-gradient(90deg,#1a3038,#2d4f5e,#4a7889,#c8a05c,#f3dba0);border:1px solid var(--gold);border-radius:2px}
+.heatmap-legend .scale .ends{display:flex;justify-content:space-between;width:140px;font-size:0.6rem;color:var(--muted-2);margin-top:0.2rem}
+.heatmap-legend .threshold{display:inline-flex;align-items:center;gap:0.4rem}
+.heatmap-legend .threshold .swatch{width:16px;height:16px;outline:2px solid var(--gold);outline-offset:-2px;background:var(--teal-3);border-radius:2px}
+
+/* Feature definitions grid */
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.6rem}
+.feature-def{background:var(--teal-3);border:1px solid var(--gold);border-radius:4px;padding:1.2rem 1.3rem;display:flex;flex-direction:column;gap:0.5rem;box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.3);transition:transform 0.2s}
+.feature-def:hover{transform:translateY(-3px)}
+.feature-def.crosses{box-shadow:inset 0 0 0 1px rgba(199,160,92,0.5),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px var(--gold)}
+.feature-def .name{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:1.15rem;color:var(--paper);letter-spacing:0.005em}
+.feature-def .name .crosses-tag{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;background:var(--gold);color:var(--teal-1);padding:0.2rem 0.5rem;border-radius:2px;margin-left:0.5rem;vertical-align:middle}
+.feature-def .formula{font-family:'JetBrains Mono',monospace;font-size:0.74rem;color:var(--gold-3);background:var(--teal-1);padding:0.5rem 0.7rem;border:1px solid color-mix(in srgb,var(--gold) 30%, transparent);border-radius:2px;line-height:1.4}
+.feature-def .desc{font-size:0.86rem;line-height:1.5;color:var(--paper);opacity:0.9}
+.feature-def .ccc-mini{display:flex;align-items:baseline;gap:0.5rem;padding-top:0.4rem;border-top:1px solid color-mix(in srgb,var(--gold) 25%, transparent);margin-top:auto}
+.feature-def .ccc-mini .v{font-family:'Anton',sans-serif;font-size:1.4rem;line-height:0.9;color:var(--gold);letter-spacing:0.005em}
+.feature-def .ccc-mini .l{font-family:'JetBrains Mono',monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold-3)}
+@media (max-width:1000px){.feature-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.feature-grid{grid-template-columns:1fr}}
+
+/* Toggle */
+.metric-toggle{display:inline-flex;gap:0;border:1.5px solid var(--gold);border-radius:3px;overflow:hidden}
+.metric-toggle button{font-family:'JetBrains Mono',monospace;font-size:0.66rem;font-weight:600;text-transform:uppercase;letter-spacing:0.14em;padding:0.5rem 0.95rem;border:none;background:transparent;color:var(--paper);cursor:pointer;transition:all 0.2s;border-right:1.5px solid var(--gold)}
+.metric-toggle button:last-child{border-right:none}
+.metric-toggle button.active{background:var(--gold);color:var(--teal-1)}
+.metric-toggle button:not(.active):hover{background:rgba(199,160,92,0.18)}
+
+.chart-host{height:340px;position:relative}
+
+.verdict{background:var(--teal-1);border-left:4px solid var(--gold);padding:0.85rem 1rem;border-radius:2px;font-family:'Instrument Serif',serif;font-style:italic;font-size:1.1rem;color:var(--gold-3);margin-top:0.4rem;line-height:1.5}
+.verdict .small{display:block;font-family:'JetBrains Mono',monospace;font-style:normal;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted-2);margin-top:0.5rem}
+
+.stack-row{background:var(--teal-3);border:1.5px solid var(--gold);border-radius:4px;padding:1.4rem 1.8rem;margin-bottom:1.6rem;display:flex;align-items:baseline;gap:1.4rem;flex-wrap:wrap;box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-3),inset 0 0 0 7px rgba(199,160,92,0.3)}
+.stack-row .lbl{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:1.3rem;color:var(--paper);flex-shrink:0}
+.stack-row .lbl .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold)}
+.stack-chips{display:flex;gap:0.5rem;flex-wrap:wrap}
+.chip{font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:500;text-transform:uppercase;letter-spacing:0.14em;padding:0.45rem 0.85rem;border:1.5px solid var(--gold);border-radius:3px;background:transparent;color:var(--paper)}
+.chip.gold{background:var(--gold);color:var(--teal-1);border-color:var(--gold);font-weight:600}
+
+.big-cta{background:var(--teal-1);border:1.5px solid var(--gold);border-radius:4px;padding:2rem 2.4rem;margin-bottom:1.4rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2),inset 0 0 0 6px var(--teal-1),inset 0 0 0 7px rgba(199,160,92,0.3)}
+.big-cta::before{content:"";position:absolute;left:-90px;bottom:-90px;width:320px;height:320px;background:radial-gradient(circle,var(--gold) 0%,var(--gold-2) 70%,transparent 100%);border-radius:50%;opacity:0.55;z-index:0}
+.big-cta h3{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:clamp(1.6rem,2.8vw,2.2rem);line-height:1;letter-spacing:0.005em;color:var(--paper);position:relative;z-index:1}
+.big-cta h3 .it{font-family:'Instrument Serif',serif;font-style:italic;text-transform:none;font-weight:400;color:var(--gold-3)}
+.big-cta .links{display:flex;gap:0.55rem;flex-wrap:wrap;position:relative;z-index:1}
+
+footer{text-align:center;padding-top:1.8rem;border-top:1px solid color-mix(in srgb,var(--gold) 30%,transparent);margin-top:1.6rem;font-family:'JetBrains Mono',monospace;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--gold-3)}
+footer a{color:inherit;border-bottom:1px solid currentColor;padding-bottom:1px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-block">
+    <div class="brand-photo"><img src="proffoto.png" alt=""></div>
+    <span class="brand-name">DJAMEL ZAIR<span class="dot">·</span><span class="role">Data Analyst · FEC</span></span>
+  </div>
+  <nav class="top">
+    <a href="index.html">Works</a>
+    <a href="index.html#about">About</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+  <a class="cta" href="CV_C1_Portrait_v2.pdf" target="_blank">CV (PDF)</a>
+  <a class="cta primary" href="index.html#contact">Hire me</a>
+</header>
+
+<main>
+  <a class="back" href="cll_thesis.html">← Back to CLL thesis</a>
+
+  <nav class="rq-tabs">
+    <a href="cll_segmentation.html">Theme 01<span class="label">Outlines</span></a>
+    <a href="cll_morphology.html" class="active">Theme 02<span class="label">Shape numbers</span></a>
+    <a href="cll_cpm_inference.html">Theme 03<span class="label">Simulation</span></a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-meta">
+        <span>Theme 02</span><span class="dot">·</span><span>Measuring the shapes</span><span class="dot">·</span><span>radiomics reproducibility framework</span>
+      </div>
+      <h1 class="display">Six numbers, <span class="gold">eight models</span>, <span class="it">one</span> reliable answer</h1>
+      <p class="lede">Two metrics, two stories. Only one of them is right for this pipeline.</p>
+      <p class="summary">Each cell cluster gets six shape numbers. The audit asks the only question that matters for the next step: <strong>do the AI-derived numbers agree with the human-derived numbers, well enough to trust them downstream?</strong> Using the radiomics-standard reproducibility framework (the published standard for medical imaging biomarkers), only one of eight models crosses the reliability bar, and only on two of the six numbers.</p>
+    </div>
+  </section>
+
+  <!-- Real spheroid trajectories first (lead with the picture) -->
+  <section class="card" style="background:var(--teal-3); border:1.5px solid var(--gold); border-radius:4px; margin-bottom:1.6rem; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(199,160,92,0.2), inset 0 0 0 6px var(--teal-3), inset 0 0 0 7px rgba(199,160,92,0.3);">
+    <div style="line-height:0; border-bottom:2px solid var(--gold);"><img src="assets/cll/figures/morphology/feature_trajectories.png" alt="Six panels showing how shape numbers evolve over 5 days under three drug conditions" style="width:100%; height:auto; display:block;"></div>
+    <p style="padding:1.1rem 1.6rem 1.4rem; font-size:0.94rem; line-height:1.6; color:var(--paper); opacity:0.92;">What this audit ultimately enables: each panel is one shape number, plotted over 5 days for three drug treatments. Every dot is automatically extracted from one microscopy frame by the AI segmenter. <strong>High-dose trametinib</strong> (cherry) collapses area; <strong>low-dose trametinib</strong> (gold) leaves the spheroid intact; <strong>PD098060</strong> (teal) compacts rather than fragments. No human re-annotation is involved.</p>
+  </section>
+
+  <section class="kpi-strip">
+    <div class="kpi"><div class="lbl">Shape numbers</div><div class="num numeric"><span class="counter" data-target="6">0</span></div><div class="desc">Area, diameter, elongation, solidity, perimeter, roundness.</div></div>
+    <div class="kpi gold"><div class="lbl">Reliability bar</div><div class="num">≥ 0.85</div><div class="desc">Concordance score threshold from the radiomics standard.</div></div>
+    <div class="kpi"><div class="lbl">Cells passing</div><div class="num numeric"><span class="counter" data-target="2">0</span></div><div class="desc">Out of 48 model × shape-number combinations. Both from the same model.</div></div>
+    <div class="kpi gold"><div class="lbl">Models compared</div><div class="num numeric"><span class="counter" data-target="8">0</span></div><div class="desc">Same eight as the outlines page, on the same 45-image test set.</div></div>
+  </section>
+
+  <!-- Two metrics explained in plain English -->
+  <div class="sec-h"><h2 class="display">Two metrics, <span class="it">two stories</span></h2><span class="right">why agreement beats overlap</span></div>
+  <section class="why-grid">
+    <div class="why-card">
+      <span class="tag">★ The metric that matters</span>
+      <h3>Shape-number <span class="it">agreement</span></h3>
+      <p>Take the predicted outline of a cell cluster, measure its area; take the human-annotated outline, measure its area; do those two areas agree across all 45 test images? Repeat for the other five shape numbers. <strong>This is what the simulation actually consumes</strong>, so this is what reliability needs to be measured against.</p>
+      <div class="formula">technical name: Lin's concordance score (CCC)</div>
+      <p style="font-size:0.88rem; opacity:0.9;">A model can have nearly-perfect pixel overlap and still consistently overestimate area by 30%. Pixel overlap won't catch that bias; agreement will.</p>
+    </div>
+    <div class="why-card bad">
+      <span class="tag">The conventional metric</span>
+      <h3>Pixel <span class="it">overlap</span></h3>
+      <p>Take the predicted outline and the human outline, count how many pixels they share. This is the default metric in the AI segmentation literature, and it is the metric the deep-learning models are trained to optimise.</p>
+      <div class="formula">technical name: Dice coefficient</div>
+      <p style="font-size:0.88rem; opacity:0.9;">High pixel overlap does not guarantee that the shape numbers extracted from the mask match the shape numbers extracted from the human annotation. That mismatch is what this audit measures.</p>
+    </div>
+  </section>
+
+  <!-- Big interactive heatmap -->
+  <div class="sec-h"><h2 class="display">Reliability <span class="it">scoreboard</span></h2><span class="right">eight models × six shape numbers · hover for value</span></div>
+  <section class="card">
+    <div class="card-h"><span class="ttl">Shape-number agreement, model by model</span><span class="sub">cells crossing the reliability bar (≥ 0.85) are gold-outlined</span></div>
+    <div class="heatmap-wrap">
+      <div class="heatmap-rowlabels" id="hmRowLabels"></div>
+      <div class="heatmap-grid">
+        <div class="heatmap-collabels">
+          <div class="col-label">area</div>
+          <div class="col-label">diameter</div>
+          <div class="col-label">elongation</div>
+          <div class="col-label">solidity</div>
+          <div class="col-label">perimeter</div>
+          <div class="col-label">roundness</div>
+        </div>
+        <div class="heatmap-rows" id="hmRows"></div>
+      </div>
+    </div>
+    <div class="heatmap-legend">
+      <div class="scale">
+        <span>Agreement score</span>
+        <div>
+          <div class="grad"></div>
+          <div class="ends"><span>0.0</span><span>0.5</span><span>1.0</span></div>
+        </div>
+      </div>
+      <div class="threshold"><span class="swatch"></span><span>Reliable (agreement ≥ 0.85)</span></div>
+    </div>
+    <div class="verdict">
+      Out of 48 combinations, only 2 cross the reliability bar: the <strong>U-Net (heavy augmentation) on area</strong> and on <strong>diameter</strong>. No other model-feature pair is reproducible at the published standard.
+      <span class="small">Yu et al. 2024 (J Nucl Med) · Carre et al. 2022 (Sci Rep) · Zwanenburg et al. 2020 (IBSI / Radiology)</span>
+    </div>
+  </section>
+
+  <!-- Pixel Dice vs Mean CCC dual ranking comparison -->
+  <div class="sec-h"><h2 class="display">Two rankings, <span class="it">opposite</span> orders</h2><span class="right">Switch metric to see how the leaderboard flips</span></div>
+  <section class="card">
+    <div class="card-h">
+      <span class="ttl">Models ranked by <span id="dualTitle">shape-number agreement</span></span>
+      <div class="metric-toggle" id="dualToggle">
+        <button class="active" data-metric="ccc">Shape-number agreement ★</button>
+        <button data-metric="dice">Pixel overlap</button>
+      </div>
+    </div>
+    <div class="chart-host"><canvas id="chartDual"></canvas></div>
+  </section>
+
+  <!-- 6 features explained, plain English -->
+  <div class="sec-h"><h2 class="display">The six <span class="it">shape numbers</span></h2><span class="right">extracted automatically from each outline</span></div>
+  <section class="feature-grid">
+    <div class="feature-def crosses">
+      <div class="name">Area<span class="crosses-tag">★ reliable</span></div>
+      <div class="formula">number of pixels inside the outline</div>
+      <div class="desc">How big is the cell cluster. The most informative single number for tracking drug response; size collapses under high-dose drug.</div>
+      <div class="ccc-mini"><span class="v">0.94</span><span class="l">agreement score</span></div>
+    </div>
+    <div class="feature-def crosses">
+      <div class="name">Diameter<span class="crosses-tag">★ reliable</span></div>
+      <div class="formula">diameter of the equivalent circle</div>
+      <div class="desc">Same information as area but in linear units. Linear scaling makes it intuitive for plotting drug dose-response curves.</div>
+      <div class="ccc-mini"><span class="v">0.94</span><span class="l">agreement score</span></div>
+    </div>
+    <div class="feature-def">
+      <div class="name">Elongation</div>
+      <div class="formula">how stretched, 0 = round, 1 = line</div>
+      <div class="desc">Captures asymmetry under stress. In practice this number is dominated by which fragments survived the segmentation step, so it is too noisy to trust here.</div>
+      <div class="ccc-mini"><span class="v">0.65</span><span class="l">agreement score</span></div>
+    </div>
+    <div class="feature-def">
+      <div class="name">Solidity</div>
+      <div class="formula">how "filled in" the outline is</div>
+      <div class="desc">Drops when the cluster fragments into pieces (gaps appear); rises when the cluster compacts into a tight ball. Different drug classes produce opposite signatures.</div>
+      <div class="ccc-mini"><span class="v">0.55</span><span class="l">agreement score</span></div>
+    </div>
+    <div class="feature-def">
+      <div class="name">Perimeter</div>
+      <div class="formula">total boundary length</div>
+      <div class="desc">Length of the cluster's outer edge. Sensitive to small wiggles in the outline. Reliable from the chosen U-Net; not from any other model.</div>
+      <div class="ccc-mini"><span class="v">0.78</span><span class="l">agreement score</span></div>
+    </div>
+    <div class="feature-def">
+      <div class="name">Roundness</div>
+      <div class="formula">1 = perfect circle, lower = irregular</div>
+      <div class="desc">Combines area and perimeter into a single ratio. Very sensitive to small perimeter wiggles, so unreliable across all models on this dataset.</div>
+      <div class="ccc-mini"><span class="v">0.24</span><span class="l">agreement score</span></div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section class="stack-row">
+    <div class="lbl"><span class="it">Tools</span> · Theme 02</div>
+    <div class="stack-chips">
+      <span class="chip gold">Reproducibility statistics (pingouin)</span>
+      <span class="chip">scipy.stats</span>
+      <span class="chip">scikit-image</span>
+      <span class="chip">Noise-to-signal ratio analysis</span>
+      <span class="chip">Radiomics standard (IBSI 2020)</span>
+      <span class="chip">Pandas · NumPy</span>
+      <span class="chip">Matplotlib</span>
+    </div>
+  </section>
+
+  <section class="big-cta">
+    <h3>Next: <span class="it">estimating drug effect</span>.</h3>
+    <div class="links">
+      <a class="cta primary" href="cll_cpm_inference.html">Theme 03 · Simulation →</a>
+      <a class="cta" href="cll_segmentation.html">← Theme 01 · Outlines</a>
+      <a class="cta" href="cll_thesis.html">Back to overview</a>
+    </div>
+  </section>
+
+  <footer>© 2026 Djamel Zair · Amsterdam · <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a> · <a href="https://linkedin.com/in/djamelzair" target="_blank" rel="noopener">LinkedIn</a></footer>
+</main>
+
+<script>
+const TEAL_1='#052e36', TEAL_3='#0d5963', GOLD='#c8a05c', GOLD_2='#a37432', GOLD_3='#e7c98a', PAPER='#f3ecd6', MUTED='#8a9b9f';
+
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+function animateCounter(el){
+    const target = parseFloat(el.dataset.target);
+    const decimals = parseInt(el.dataset.decimals || '0');
+    const start = performance.now();
+    function step(now){
+        const t = Math.min(1, (now - start) / 1200);
+        const v = target * easeOutCubic(t);
+        el.textContent = decimals ? v.toFixed(decimals) : Math.round(v).toLocaleString();
+        if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ animateCounter(e.target); obs.unobserve(e.target); } }), { threshold: 0.4 });
+document.querySelectorAll('.counter').forEach(el => obs.observe(el));
+
+const modelData = [
+    { id:'unet_heavy',  label:'U-Net (heavy augmentation)',         dice:0.829, ccc:0.683, winner:true,
+      features:{ total_area:0.94, equivalent_diameter:0.94, eccentricity:0.65, solidity:0.55, perimeter:0.78, circularity:0.24 } },
+    { id:'classical',   label:'Rule-based baseline',                dice:0.760, ccc:0.378,
+      features:{ total_area:0.55, equivalent_diameter:0.50, eccentricity:0.32, solidity:0.35, perimeter:0.42, circularity:0.13 } },
+    { id:'pseudolabel', label:'Pseudo-label pretrain + fine-tune',  dice:0.811, ccc:0.464,
+      features:{ total_area:0.62, equivalent_diameter:0.60, eccentricity:0.48, solidity:0.40, perimeter:0.55, circularity:0.13 } },
+    { id:'sam2_gray',   label:'SAM2 (grayscale fine-tune)',         dice:0.787, ccc:0.473,
+      features:{ total_area:0.71, equivalent_diameter:0.66, eccentricity:0.42, solidity:0.39, perimeter:0.54, circularity:0.12 } },
+    { id:'sam2_mc',     label:'SAM2 (multi-channel fine-tune)',     dice:0.768, ccc:0.434,
+      features:{ total_area:0.66, equivalent_diameter:0.62, eccentricity:0.38, solidity:0.36, perimeter:0.48, circularity:0.10 } },
+    { id:'nnunet',      label:'nnU-Net (default config)',           dice:0.757, ccc:0.305,
+      features:{ total_area:0.45, equivalent_diameter:0.42, eccentricity:0.28, solidity:0.30, perimeter:0.34, circularity:0.04 } },
+    { id:'nnunet_pp',   label:'nnU-Net + cleanup',                  dice:0.799, ccc:0.285,
+      features:{ total_area:0.42, equivalent_diameter:0.40, eccentricity:0.24, solidity:0.28, perimeter:0.30, circularity:0.05 } },
+    { id:'nnunet_mc',   label:'nnU-Net (multi-channel)',            dice:0.755, ccc:0.270,
+      features:{ total_area:0.40, equivalent_diameter:0.38, eccentricity:0.22, solidity:0.27, perimeter:0.27, circularity:0.08 } },
+];
+
+/* Heatmap */
+const featureKeys = ['total_area','equivalent_diameter','eccentricity','solidity','perimeter','circularity'];
+function cccColor(v){
+    const stops = [{p:0.0,c:[26,48,56]},{p:0.25,c:[45,79,94]},{p:0.5,c:[74,120,137]},{p:0.75,c:[200,160,92]},{p:1.0,c:[243,219,160]}];
+    const cap = Math.max(0, Math.min(1, v));
+    let lo = stops[0], hi = stops[stops.length-1];
+    for (let i=0; i<stops.length-1; i++){ if (cap >= stops[i].p && cap <= stops[i+1].p){ lo = stops[i]; hi = stops[i+1]; break; } }
+    const t = (cap - lo.p) / (hi.p - lo.p || 1);
+    return 'rgb(' + Math.round(lo.c[0]+(hi.c[0]-lo.c[0])*t) + ',' + Math.round(lo.c[1]+(hi.c[1]-lo.c[1])*t) + ',' + Math.round(lo.c[2]+(hi.c[2]-lo.c[2])*t) + ')';
+}
+function txtColor(v){ return v >= 0.55 ? TEAL_1 : PAPER; }
+
+const rowsEl = document.getElementById('hmRows');
+const labelsEl = document.getElementById('hmRowLabels');
+modelData.forEach(m => {
+    const lbl = document.createElement('div');
+    lbl.className = 'row-label' + (m.winner ? ' winner' : '');
+    lbl.textContent = m.label;
+    labelsEl.appendChild(lbl);
+    const row = document.createElement('div');
+    row.className = 'heatmap-row';
+    featureKeys.forEach(k => {
+        const v = m.features[k];
+        const cell = document.createElement('div');
+        cell.className = 'hm-cell' + (v >= 0.85 ? ' crosses' : '');
+        cell.style.background = cccColor(v);
+        cell.style.color = txtColor(v);
+        cell.textContent = v.toFixed(2);
+        const tt = document.createElement('span');
+        tt.className = 'tt';
+        tt.textContent = m.label + ' · ' + k.replace(/_/g,' ') + ' · CCC ' + v.toFixed(2);
+        cell.appendChild(tt);
+        row.appendChild(cell);
+    });
+    rowsEl.appendChild(row);
+});
+
+/* Dual leaderboard with toggle */
+let currentMetric = 'ccc';
+let chart;
+function renderDual(){
+    const sorted = [...modelData].sort((a,b) => b[currentMetric] - a[currentMetric]);
+    const labels = sorted.map(d => d.label);
+    const values = sorted.map(d => d[currentMetric]);
+    const colors = sorted.map(d => d.winner ? GOLD : (d[currentMetric] >= (currentMetric==='ccc' ? 0.5 : 0.79) ? GOLD_2 : 'rgba(168,181,184,0.55)'));
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById('chartDual'), {
+        type:'bar',
+        data:{ labels, datasets:[{ data:values, backgroundColor:colors, borderColor:TEAL_1, borderWidth:1.5 }] },
+        options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
+            animation:{ duration:900, easing:'easeOutCubic' },
+            plugins:{ legend:{display:false},
+                      tooltip:{backgroundColor:TEAL_1, titleColor:PAPER, bodyColor:PAPER, padding:9, cornerRadius:2, displayColors:false, borderColor:GOLD, borderWidth:1,
+                               callbacks:{ label: c => (currentMetric === 'ccc' ? 'CCC ' : 'Dice ') + c.parsed.x.toFixed(3) } } },
+            scales:{ x:{ ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}, callback: v => v.toFixed(2)},
+                          grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false},
+                          min: currentMetric === 'ccc' ? 0 : 0.7, max: currentMetric === 'ccc' ? 1 : 0.85 },
+                     y:{ ticks:{color:PAPER, font:{family:'JetBrains Mono', size:10}}, grid:{color:'rgba(199,160,92,0.12)'}, border:{display:false} } }
+        }
+    });
+    document.getElementById('dualTitle').textContent = currentMetric === 'ccc' ? "Lin's CCC" : 'Pixel Dice';
+}
+renderDual();
+document.querySelectorAll('#dualToggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (btn.classList.contains('active')) return;
+        document.querySelectorAll('#dualToggle button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMetric = btn.dataset.metric;
+        renderDual();
+    });
+});
+</script>
+</body>
+</html>
