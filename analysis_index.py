@@ -95,7 +95,7 @@ INDEX = {
         ["Drug-class lookup", "23 drugs by mechanism class with targets and expected effects",
          "app:drug_classes / tab:drug_lookup", "BTKi, Syk, PI3K, JAK, CXCR4, MEK, NF-kB, ..."],
         ["Drug-panel delta J_cc", "Per-drug J_cc shift, by class, bootstrap CI; tau vs end-state matcher",
-         "app:drug_panel_jcc / fig:h33_drug_panel_appendix", "Value under revision"],
+         "app:drug_panel_jcc / fig:h33_drug_panel_appendix", "tau -1.4 CI [-3.0, +0.2] weak; end-state +4.6 CI [+2.1, +7.0] significant"],
     ],
 }
 

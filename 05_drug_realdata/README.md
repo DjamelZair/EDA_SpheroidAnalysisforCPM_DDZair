@@ -10,7 +10,7 @@ Real spheroid trajectories from reference wells across seven patients and a pane
 |---|---|---|
 | Patients | 7 | Reference wells inverted across 7 patients. |
 | Read as | shifts | Relative change on the weakly identifiable axes, not absolutes. |
-| Drug-panel shift | weak | Panel-wide BCR-axis J_cc shift is small with a bootstrap interval including zero; magnitude under revision. |
+| Drug-panel BCR shift | weak | Tau (primary): J_cc shift -1.4, CI [-3.0, +0.2], spans zero. End-state: +4.6, CI [+2.1, +7.0], significant; the signal is in the settled morphology. |
 | Reported axes | 3 | the three weakly identifiable axes (width, J_cc, J_cm). |
 
 ## What the drugs do to morphology  (three dose conditions)
@@ -21,7 +21,7 @@ Real spheroid trajectories from reference wells across seven patients and a pane
 
 **What it shows.** The cluster loses cohesion and breaks apart over the time course.
 
-**What it motivated (Relative shift on the contact axes).** An end-state shift in the inferred contact parameters; magnitude under revision.
+**What it motivated (Relative shift on the contact axes).** An end-state shift in the inferred contact parameters.
 
 ### PD098060 compacts the cluster - MEK pathway, 100 uM
 
@@ -59,6 +59,6 @@ Real spheroid trajectories from reference wells across seven patients and a pane
 | Stimulation reproducibility | Per-parameter, how many of 7 patients shift the same way under stimulation | sec:res_rq3_1 / fig:rq3_1_stability | J_cm & J_cc 7/7 agree, width 3/7 |
 | Expected vs observed shift | Baseline vs stimulated medians vs a priori biological prediction | sec:res_rq3_2 / tab:rq3_2_expected | J_cm -30% (7/7), J_cc -7% (7/7) match |
 | Drug-class lookup | 23 drugs by mechanism class with targets and expected effects | app:drug_classes / tab:drug_lookup | BTKi, Syk, PI3K, JAK, CXCR4, MEK, NF-kB, ... |
-| Drug-panel delta J_cc | Per-drug J_cc shift, by class, bootstrap CI; tau vs end-state matcher | app:drug_panel_jcc / fig:h33_drug_panel_appendix | Value under revision |
+| Drug-panel delta J_cc | Per-drug J_cc shift, by class, bootstrap CI; tau vs end-state matcher | app:drug_panel_jcc / fig:h33_drug_panel_appendix | tau -1.4 CI [-3.0, +0.2] weak; end-state +4.6 CI [+2.1, +7.0] significant |
 
 **Sources / tools:** real_data_inference_report.ipynb, drug panel, tau-registration matcher, bootstrap CIs, 7 patients

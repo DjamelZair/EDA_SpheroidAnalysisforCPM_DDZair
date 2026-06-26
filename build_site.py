@@ -464,7 +464,7 @@ THEME5 = [
     dict(type="kpis", items=[
         dict(lbl="Patients", num="7", desc="Reference wells inverted across 7 patients.", numeric=True),
         dict(lbl="Read as", num="shifts", desc="Relative change on the weakly identifiable axes, not absolutes.", gold=True),
-        dict(lbl="Drug-panel shift", num="weak", desc="Panel-wide BCR-axis J_cc shift is small with a bootstrap interval including zero; magnitude under revision."),
+        dict(lbl="Drug-panel BCR shift", num="weak", desc="Tau (primary): J_cc shift -1.4, CI [-3.0, +0.2], spans zero. End-state: +4.6, CI [+2.1, +7.0], significant; the signal is in the settled morphology."),
         dict(lbl="Reported axes", num="3", desc="the three weakly identifiable axes (width, J_cc, J_cm).", numeric=True),
     ]),
     dict(type="section", title='What the <span class="it">drugs</span> do to morphology',
@@ -473,7 +473,7 @@ THEME5 = [
          ttl="High-dose trametinib collapses the cluster", sub="MEK inhibitor, 50 uM",
          alt="time strip of a high-dose-treated spheroid disintegrating",
          shows="The cluster loses cohesion and breaks apart over the time course.",
-         informs="An end-state shift in the inferred contact parameters; magnitude under revision.",
+         informs="An end-state shift in the inferred contact parameters.",
          informs_tag="Relative shift on the contact axes"),
     dict(type="figure", img=CLLF + "morphology/drug_strip_pd098060.png",
          ttl="PD098060 compacts the cluster", sub="MEK pathway, 100 uM",
