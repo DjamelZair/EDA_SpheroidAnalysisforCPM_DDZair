@@ -34,6 +34,7 @@ def _load(name): return _json.loads((_D / name).read_text())
 
 GOLD = "#c8a05c"; GOLD_2 = "#a37432"; GOLD_3 = "#e7c98a"
 CLL = "../assets/cll/figures/"   # on-brand dark figures, from a theme page (rel ../)
+FIG1 = "../assets/cll/figures/01_image_eda/"   # on-brand white-bg thesis figures (multiply-blended)
 
 _tc = _load("theme1_timecourse.json")
 _TC_ORDER = ["total_area", "equivalent_diameter", "circularity", "solidity", "perimeter", "eccentricity"]
@@ -88,6 +89,26 @@ THEME1 = [
          informs="Fixes the unit of analysis: the segmenter is judged on whether these shape numbers "
                  "are trustworthy, not on raw pixel overlap.",
          informs_tag="Frames the whole pipeline"),
+    dict(type="figure", img=FIG1 + "fig01_dataset_composition.png", light=True,
+         ttl="Dataset composition", sub="annotated split &middot; real set by class &middot; sampling depth",
+         alt="stacked bars of labelled images by split, real frames by treatment class, and timepoints per well",
+         shows="The 51 ground-truth frames expand to about 255 augmented pairs across the "
+               "train/val/test split; the ~12k-frame inference corpus is dominated by "
+               "CXCR4-antagonist and control wells, each sampled at a median of 20 timepoints over "
+               "roughly 5.5 days.",
+         informs="The label scarcity and the class imbalance together drive the plate-stratified "
+                 "split and the two-stage training that pretrains on pseudo-labels before fine-tuning "
+                 "on the 51 masks.",
+         informs_tag="Cohort & the defining constraint"),
+    dict(type="figure", img=FIG1 + "fig06_augmentation_coverage.png", light=True,
+         ttl="Does augmentation cover the real regimes?", sub="real vs augmented vs 51 originals",
+         alt="contrast, mean-intensity and focus distributions for real, augmented and original frames",
+         shows="Augmentation spans 100% of the real contrast range and 91% of the focus "
+               "(Laplacian-variance) range, but only 18% of the mean-intensity range — brightness "
+               "is the axis it covers least.",
+         informs="Confirms the heavy-augmentation U-Net is trained across the contrast and focus "
+                 "regimes it will meet at inference; the intensity gap is the one residual exposure.",
+         informs_tag="Validates heavy augmentation"),
 
     dict(type="section", title='B. What does the raw <span class="it">signal</span> look like?',
          right="why a learned segmenter, not thresholding"),
@@ -112,6 +133,43 @@ THEME1 = [
                  "perimeter and circularity features the CPM inference relies on, so inversion is "
                  "restricted to features that survive segmentation noise.",
          informs_tag="Decision: restrict inversion features"),
+    dict(type="figure", img=FIG1 + "fig02_intensity_dynamic_range.png", light=True,
+         ttl="Intensity and dynamic range", sub="pooled pixels &middot; frame brightness &middot; 8-bit usage",
+         alt="pooled pixel-intensity histogram, per-frame brightness, dynamic-range usage and black/white points",
+         shows="Pooled pixel intensity is bimodal — a dark spheroid on a bright field — per-frame "
+               "brightness clusters near mid-range, and frames use a median of 86% of the available "
+               "8-bit range.",
+         informs="The two intensity modes overlap once debris is present, so a single global "
+                 "threshold cannot separate object from background — a learned segmenter is needed.",
+         informs_tag="Decision: learned segmenter"),
+    dict(type="figure", img=FIG1 + "fig03_contrast.png", light=True,
+         ttl="Contrast: level, polarity, drift, batch", sub="Michelson contrast across the corpus",
+         alt="contrast histogram, polarity, contrast drift over time and batch variation",
+         shows="Michelson contrast centres near 0.55 with only 0.6% of frames inverted (dark-on-light "
+               "dominates), climbs over the time course (about 0.55 to 0.71), and varies between "
+               "experiment batches.",
+         informs="Contrast is wide, regime-dependent and drifting, which is why the classical "
+                 "baseline needs contrast-conditional preprocessing and the production segmenter is "
+                 "learned.",
+         informs_tag="Decision: contrast-conditional preprocessing"),
+    dict(type="figure", img=FIG1 + "fig04a_sharpness.png", light=True,
+         ttl="Focus is bimodal and metric-agnostic", sub="Laplacian variance, log scale",
+         alt="focus-measure histogram, agreement between two focus metrics, sharpness over time",
+         shows="Focus splits into a sharp main cluster and a blurred tail on a log scale, and two "
+               "independent focus measures (Laplacian variance and Tenengrad) agree — the spread is "
+               "real, not an artefact of one metric.",
+         informs="Out-of-focus frames blur the boundary-derived perimeter and circularity features, "
+                 "reinforcing the restriction of inversion to features that survive segmentation noise.",
+         informs_tag="Decision: restrict inversion features"),
+    dict(type="figure", img=FIG1 + "fig05_illumination.png", light=True,
+         ttl="Illumination is uneven and worsens over time", sub="background coefficient of variation",
+         alt="background-CV histogram, illumination drift over time, and an uneven-illumination exemplar",
+         shows="Background illumination is uneven (CV about 0.2 to 0.25) and grows worse over the "
+               "time course; the exemplar shows the bright-centre, dark-edge falloff typical of these "
+               "wells.",
+         informs="Uneven background biases any intensity-based boundary, another reason the inversion "
+                 "leans on shape features that tolerate illumination drift.",
+         informs_tag="Decision: restrict inversion features"),
 
     dict(type="section", title='C. What is the object <span class="it">structure</span>?',
          right="the segmentation criterion: feature preservation"),
@@ -126,6 +184,16 @@ THEME1 = [
          informs="Standard Dice is dominated by the largest component and is blind to small "
                  "fragments, so CC-Dice (equal weight per component) is the right metric, and "
                  "post-processing keeps the largest connected component.",
+         informs_tag="Decision: CC-Dice + largest component"),
+    dict(type="figure", img=FIG1 + "fig07_fragmentation_structure.png", light=True,
+         ttl="Fragment structure of the masks", sub="counts &middot; area concentration &middot; over time",
+         alt="fragment-count histogram, largest-component area fraction, GT-vs-model components, disintegration over time",
+         shows="Only about 20% of frames are a single cohesive object; most carry a long tail of "
+               "fragments while the largest component still holds nearly all the area, and "
+               "disintegration increases over the time course.",
+         informs="Because masks are multi-object but area-dominated, ordinary Dice would ignore the "
+                 "small fragments — CC-Dice scores every component, and post-processing keeps the "
+                 "largest one.",
          informs_tag="Decision: CC-Dice + largest component"),
 
     dict(type="section", title='D. Fragmentation vs <span class="it">treatment</span>',
@@ -142,6 +210,16 @@ THEME1 = [
                  "most drug-responsive classes are hardest to segment, so feature preservation is the "
                  "right criterion.",
          informs_tag="Preview: RQ3 mechanism, associative only"),
+    dict(type="figure", img=FIG1 + "fig08_fragmentation_vs_treatment.png", light=True,
+         ttl="Which mechanism classes fragment most", sub="by class &middot; effect vs control &middot; trajectory",
+         alt="fragmentation by mechanism class, effect size vs control, and disintegration trajectory over time",
+         shows="Syk-inhibitor and CXCR4-antagonist wells fragment most relative to control and the "
+               "gap widens over the time course; per-class differences are significant but, with "
+               "plate-level metadata, are read as associations.",
+         informs="The most drug-responsive classes are also the hardest to segment cleanly, which is "
+                 "exactly why the segmenter is chosen on feature preservation rather than pixel "
+                 "overlap.",
+         informs_tag="Preview: RQ3 mechanism, associative only"),
 
     dict(type="section", title='E. Drug response, measured <span class="it">automatically</span>',
          right="the payoff: morphology to mechanism"),
@@ -156,6 +234,19 @@ THEME1 = [
          informs="This is the observable the inference consumes: a per-condition shape trajectory "
                  "that the CPM matcher compares against the synthetic library.",
          informs_tag="Feeds RQ2 / RQ3 inference"),
+
+    dict(type="section", title='F. From image quality to library <span class="it">coverage</span>',
+         right="why the thesis reports relative shifts"),
+    dict(type="figure", img=FIG1 + "fig09_quality_coverage_link.png", light=True,
+         ttl="Image quality predicts distance from the library", sub="real to nearest-synthetic distance",
+         alt="real-to-synthetic NN distance against fragmentation, contrast and focus",
+         shows="How far a real well sits from its nearest synthetic spheroid grows with fragmentation "
+               "(r=0.30) and focus (r=0.43) but not with contrast (r=0.05) — the qualities hardest to "
+               "segment are also the least covered by the simulation library.",
+         informs="This is the mechanism behind the ~90% of real wells that fall outside the synthetic "
+                 "library, and the reason the inference is reported as relative shifts rather than "
+                 "absolute parameter values.",
+         informs_tag="Why relative shifts, not absolutes"),
 
     dict(type="prose", title="Sources (canonical, executable)",
          text="This reader consolidates and re-orders the data EDA into the thesis's decision "
