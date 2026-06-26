@@ -551,7 +551,12 @@ def main():
     for i, t in enumerate(LANDING_THEMES):
         tdir = NAV[i]["href"].split("/")[0]
         if i in THEME_SPECS:
+            import analysis_index as ai
             title, blocks = THEME_SPECS[i]
+            # insert the complete-analysis index just before the tools block, so every
+            # thesis analysis in this theme is present, not only the interactive highlights
+            ti = next((j for j, b in enumerate(blocks) if b["type"] == "tools"), len(blocks))
+            blocks = blocks[:ti] + ai.index_blocks(i) + blocks[ti:]
             (ROOT / tdir).mkdir(exist_ok=True)
             ru.render_theme_html(title=title, blocks=blocks, rel_root="../",
                                  prev_next=nav_for(i), out_path=ROOT / tdir / "index.html")

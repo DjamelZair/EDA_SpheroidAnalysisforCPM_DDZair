@@ -67,4 +67,22 @@ Eight segmenters were compared on the same 45-image test set: a rule-based basel
 
 **What it motivated (Bounds the hardest case).** Confirms F3 is a genuine ceiling, not a tuning artefact.
 
+## Complete analysis index  (every thesis analysis in this theme)
+
+### Each analysis, what it shows, its thesis label, and the result
+
+| Analysis | What it shows | Thesis label | Key result / status |
+|---|---|---|---|
+| Classical baseline | ROI extraction + multi-Otsu vs simpler alternatives, per-stage justification | app:classical_justification | Justifies ROI + 3-class Otsu |
+| Segmentation candidates | 8 models on the fixed 216/45/45 split | app:baselines_table / tab:baselines | Classical, U-Net x2, nnU-Net x3, SAM2 x2 |
+| Training configuration | Encoder, loss, augmentation, schedule, plate-level CV per model | app:experimental_setup / tab:hyperparams | ResNet34, BCE+Dice |
+| U-Net feature CCC | Per-feature CCC and ICC(3,1) of U-Net vs manual masks (45-image test) | sec:res_rq1_1 / tab:rq1_1_features | Diameter 0.95, area 0.94, eccentricity 0.10 lost |
+| Dice vs CCC ranking | All 8 models ranked by pixel Dice vs mean feature CCC | sec:res_rq1_2 / tab:rq1_2_fidelity | U-Net ties Dice 0.83, wins CCC 0.68 vs 0.31 (shown above) |
+| U-Net config ablation | Test Dice across 13 U-Net variants during selection | app:aug_ablation / fig:aug_ablation | Heavy-aug config selected |
+| ICC / CCC heatmaps | Full ICC and CCC matrices, 8 models x 6 features | app:segmentation_heatmaps | Shown above (heatmap) |
+| Post-processing sweep | Change in mean feature CCC under 11 strategies, all 8 segmenters | app:ccc_postproc / fig:ccc_postproc_sweep | Cleanup is cosmetic for fidelity (shown above) |
+| Residual-refiner | Two-stage classical + learned correction | app:refiner_failure / tab:refiner | Negative result: collapses to identity |
+| F3 time series | Most fragmented test frame across 4 days at 4 h cadence | app:f3_timeseries / fig:f3_timeseries | Shown above (hardest case) |
+| Metric formulas | CCC, ICC(3,1), nRMSE, Dice, CC-Dice, component-count error | app:metric_formulas | Definitions |
+
 **Sources / tools:** 05_feature_validation.ipynb, ICC(3,1) + Lin's CCC, per_feature_error.csv, seg_postproc.json, seg_f3.json, U-Net / SAM2 / nnU-Net

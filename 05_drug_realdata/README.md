@@ -47,4 +47,18 @@ Real spheroid trajectories from 152 control wells and a panel of drug conditions
 
 **What it motivated (Closes the loop with RQ1).** Confirms the real-data features used for inversion are the reliable ones.
 
+## Complete analysis index  (every thesis analysis in this theme)
+
+### Each analysis, what it shows, its thesis label, and the result
+
+| Analysis | What it shows | Thesis label | Key result / status |
+|---|---|---|---|
+| Tau-registered matcher | Phase-axis tau, z-scored features, Sobol-weighted MAD, k=20, empirical posterior | sec:setup_matching | Primary matcher |
+| Worked example (VID1797 F1) | One well: observed trajectory to empirical posterior intervals | app:worked_real_inference / fig:example_inversion_appendix | Shows how data narrows each parameter |
+| Boundary & coverage | Neighbours at sweep endpoints; real-to-library NN distance | app:boundary_coverage / fig:boundary_saturation_appendix | ~90% of real spheroids extrapolated |
+| Stimulation reproducibility | Per-parameter, how many of 7 patients shift the same way under stimulation | sec:res_rq3_1 / fig:rq3_1_stability | J_cm & J_cc 7/7 agree, width 3/7 |
+| Expected vs observed shift | Baseline vs stimulated medians vs a priori biological prediction | sec:res_rq3_2 / tab:rq3_2_expected | J_cm -30% (7/7), J_cc -7% (7/7) match |
+| Drug-class lookup | 23 drugs by mechanism class with targets and expected effects | app:drug_classes / tab:drug_lookup | BTKi, Syk, PI3K, JAK, CXCR4, MEK, NF-kB, ... |
+| Drug-panel delta J_cc | Per-drug J_cc shift, by class, bootstrap CI; tau vs end-state matcher | app:drug_panel_jcc / fig:h33_drug_panel_appendix | End-state BCR axis +9.7 CI [7.2,11.9] |
+
 **Sources / tools:** real_data_inference_report.ipynb, drug panel, tau-registration matcher, bootstrap CIs, 152 control wells

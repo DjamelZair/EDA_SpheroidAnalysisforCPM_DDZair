@@ -41,4 +41,17 @@ A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion
 
 **What it motivated (Defines the reference library).** The usable 1,105-run library is the single reference set for all matching and identifiability analysis.
 
+## Complete analysis index  (every thesis analysis in this theme)
+
+### Each analysis, what it shows, its thesis label, and the result
+
+| Analysis | What it shows | Thesis label | Key result / status |
+|---|---|---|---|
+| CPM configuration | 1536x1152 lattice, blob r=250 px, 1000 MCS, 100 frames, 9 (OAT) / 3 (Saltelli) seeds | app:cpm_sim_settings / tab:sim_settings | CompuCell3D 4.5.0 |
+| OAT sweep grid | Per-parameter levels for the one-at-a-time sweep | app:oat_sweep_grid / tab:sweeps | 76,500 snapshots, shown above |
+| Saltelli design & yield | Saltelli N=128, d=7, 1152 runs; degenerate dropped | sec:setup_sim_data | 1,105 viable, 47 dropped (shown above) |
+| VTK feature extraction | CC3D lattice to binary mask to 6 features via skimage.regionprops | app:cpm:vtk | Reproducibility note (Appendix C) |
+| Sobol estimators | Jansen first- and total-order estimators, paired sampling design | app:sobol_estimators | Schematic + equations |
+| Reproducibility | GPU A100, Python 3.10, PyTorch 2.3.1, CC3D 4.5.0, seed 42, AI-tool disclosure | app:reproducibility / tab:reproducibility | Fixed seeds, full environment |
+
 **Sources / tools:** cpm_sweeps.json, CompuCell3D, Saltelli design, VTK feature extraction, 1,105-run library

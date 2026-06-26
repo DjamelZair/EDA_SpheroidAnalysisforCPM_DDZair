@@ -87,4 +87,14 @@ This reader consolidates and re-orders the data EDA into the thesis's decision o
 
 An earlier broad notebook, `data/cll_spheroid_eda_complete.ipynb`, is catalogued as a referenced orphan in `_provenance_notes.md`.
 
+## Complete analysis index  (every thesis analysis in this theme)
+
+### Each analysis, what it shows, its thesis label, and the result
+
+| Analysis | What it shows | Thesis label | Key result / status |
+|---|---|---|---|
+| Full data EDA | Intensity, contrast, focus, fragmentation, cohort over 51 annotated frames | appendix:data:eda | Shown interactively above |
+| Data augmentation | 11 geometric + photometric ops, 51 originals to 255 augmented pairs | app:aug / tab:aug_ops | 5 augmentations per original |
+| Patient mapping & split | Train/val/test 216/45/45 images (37/9/8 spheroids), plate-level stratification | app:patient_mapping / tab:patient_mapping | P1043 noted in train and test |
+
 **Sources / tools:** 01_data_eda.ipynb, imaging_data_eda.ipynb, labelled_qc.csv, frame_qc.csv, timecourse_full_features.csv, Chart.js + scikit-image
