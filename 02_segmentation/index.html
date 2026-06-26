@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Segmentation &amp;amp; feature fidelity - CLL CPM thesis</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"></head><body><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script><script>
+const C={TEAL_1:'#052e36',TEAL_3:'#0d5963',GOLD:'#c8a05c',GOLD_2:'#a37432',GOLD_3:'#e7c98a',
+  PAPER:'#f3ecd6',MUTED:'rgba(168,181,184,0.65)',CLAY:'#c44a30',ICE:'#7CFEF0',GREEN:'#6dd9a1'};
+const GRID='rgba(199,160,92,0.12)', MF={family:'JetBrains Mono',size:10};
+function ax(label,opts){return Object.assign({ticks:{color:C.PAPER,font:MF},grid:{color:GRID},
+  border:{display:false},title:label?{display:true,text:label,color:C.GOLD_3,font:{family:'JetBrains Mono',size:11}}:{display:false}},opts||{});}
+function tip(){return {backgroundColor:C.TEAL_1,titleColor:C.PAPER,bodyColor:C.PAPER,borderColor:C.GOLD,borderWidth:1,padding:9,cornerRadius:2,displayColors:false};}
+function leg(show){return {display:show,position:'top',align:'end',labels:{color:C.PAPER,font:{family:'JetBrains Mono',size:10,weight:'500'},boxWidth:14,boxHeight:14}};}
+function base(showLeg){return {responsive:true,maintainAspectRatio:false,animation:{duration:850,easing:'easeOutCubic'},
+  plugins:{legend:leg(showLeg),tooltip:tip()}};}
+
+function barH(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(d.datasets.length>1);o.indexAxis='y';
+  o.scales={x:ax(d.xlabel,{min:d.min||0,max:d.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toLocaleString(undefined,{maximumFractionDigits:d.dec??2})}}),y:ax()};
+  if(d.logx){o.scales.x.type='logarithmic';delete o.scales.x.min;delete o.scales.x.max;}
+  new Chart(el,{type:'bar',data:{labels:d.labels,datasets:d.datasets.map(s=>({label:s.label,data:s.data,backgroundColor:s.color,borderColor:C.TEAL_1,borderWidth:1.2}))},options:o});}
+
+function barV(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(d.datasets.length>1);
+  o.scales={x:ax(d.xlabel),y:ax(d.ylabel,{min:d.min||0,max:d.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toFixed(d.dec??2)}})};
+  new Chart(el,{type:'bar',data:{labels:d.labels,datasets:d.datasets.map(s=>({label:s.label,data:s.data,backgroundColor:s.color,borderColor:C.TEAL_1,borderWidth:1.2}))},options:o});}
+
+function scatter(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(false);o.plugins.tooltip.callbacks={label:c=>d.xlabel+' '+c.parsed.x.toFixed(2)+'  '+d.ylabel+' '+c.parsed.y};
+  o.scales={x:ax(d.xlabel),y:ax(d.ylabel,{min:0})};
+  new Chart(el,{type:'scatter',data:{datasets:[{data:d.points,backgroundColor:C.GOLD,borderColor:C.TEAL_1,borderWidth:1,radius:5,hoverRadius:7}]},options:o});}
+
+/* parameter sweep line with a parameter toggle (cluster area vs level) */
+function sweepline(id,d){const el=document.getElementById(id);if(!el)return;
+  let p=d.order[0]; let chart;
+  function draw(){const o=base(false);o.parsing=false;
+    o.plugins.tooltip.callbacks={title:i=>d.nice[p]+' = '+i[0].parsed.x,label:c=>'cluster area '+(+c.parsed.y).toLocaleString()+' px'};
+    o.scales={x:ax(d.nice[p]),y:ax('cluster area (px)')};
+    const pts=d.levels[p].map((x,i)=>({x:x,y:d.area[p][i]}));
+    if(chart)chart.destroy();
+    chart=new Chart(el,{type:'line',data:{datasets:[{data:pts,borderColor:C.GOLD,
+      backgroundColor:'rgba(199,160,92,0.15)',pointRadius:3,pointHoverRadius:5,borderWidth:2,tension:.25,fill:true}]},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');p=b.dataset.metric;draw();}));}
+
+/* model leaderboard, horizontal bar with a metric toggle, winner in gold */
+function lbboard(id,d){const el=document.getElementById(id);if(!el)return;
+  let metric=d.metrics[0].key; let chart;
+  function draw(){const m=d.metrics.find(x=>x.key===metric);
+    const sorted=[...d.models].sort((a,b)=>b[metric]-a[metric]);
+    const labels=sorted.map(x=>x.label), vals=sorted.map(x=>x[metric]);
+    const cols=sorted.map(x=>x.winner?C.GOLD:(x[metric]>=m.mid?C.GOLD_2:'rgba(168,181,184,0.55)'));
+    const o=base(false);o.indexAxis='y';
+    o.plugins.tooltip.callbacks={label:c=>m.label+' '+c.parsed.x.toFixed(3)};
+    o.scales={x:ax(m.label,{min:m.min||0,max:m.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toFixed(2)}}),y:ax()};
+    if(chart)chart.destroy();
+    chart=new Chart(el,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:cols,borderColor:C.TEAL_1,borderWidth:1.2}]},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');metric=b.dataset.metric;draw();}));}
+
+/* multi-feature drug timecourse with a feature toggle */
+function timecourse(id,d){const el=document.getElementById(id);if(!el)return;
+  const COLORS=[C.ICE,C.CLAY,C.GOLD,C.GREEN,C.GOLD_3]; let metric=d.order[0]; let chart;
+  function draw(){const sets=d.series.map((s,i)=>({label:s.label,data:d.features[metric][s.key],
+      borderColor:COLORS[i%COLORS.length],backgroundColor:COLORS[i%COLORS.length],
+      pointRadius:2.5,pointHoverRadius:5,borderWidth:2,tension:0.25}));
+    const o=base(true);o.parsing=false;
+    o.plugins.tooltip.callbacks={title:items=>'day '+items[0].parsed.x.toFixed(2),label:c=>c.dataset.label+': '+(+c.parsed.y).toLocaleString()};
+    o.scales={x:ax('time (days)',{type:'linear',min:0}),y:ax(d.nice[metric])};
+    if(chart)chart.destroy(); chart=new Chart(el,{type:'line',data:{datasets:sets},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');metric=b.dataset.metric;draw();}));}
+</script><header>
+  <a class="brand-block" href="../index.html">
+    <span class="brand-name">CLL <span class="dot">&rarr;</span> CPM<span class="role">Analysis appendix &middot; MSc thesis</span></span>
+  </a>
+  <nav class="top">
+    <a href="../index.html">Themes</a>
+    <a href="../THESIS_CITE_MAP.md">Cite map</a>
+    <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header><main><a class="back" href="../index.html">&larr; All analysis themes</a><nav class="rq-tabs"><a href="../01_image_intensity_eda/index.html" class="">Theme 01<span class="label">Image EDA</span></a><a href="../02_segmentation/index.html" class="active">Theme 02<span class="label">Segmentation</span></a><a href="../03_simulation_library/index.html" class="">Theme 03<span class="label">Sim library</span></a><a href="../04_separability_identifiability/index.html" class="">Theme 04<span class="label">Identifiability</span></a><a href="../05_drug_realdata/index.html" class="">Theme 05<span class="label">Drug / real data</span></a></nav><section class="bhero"><div class="bg" style="background-image:url('../assets/hero_spheroid_overlay.png')"></div><div class="radial"></div><div class="scrim"></div><div class="inner"><div class="meta"><span>Theme 02</span><span class="dot">&middot;</span><span>Segmentation & feature fidelity</span><span class="dot">&middot;</span><span>Appendix B</span></div><h1 class="display">Eight <span class="gold">candidates</span>, one <span class="it">winner</span>.</h1><p class="lede">Pixel overlap cannot tell the candidates apart. The metric that matters for the downstream pipeline can, and it exposes a structural failure mode in three of them.</p><p class="summary">Eight segmenters were compared on the same 45-image test set: a rule-based baseline, three nnU-Net variants, two SAM2 variants, a heavy-augmentation U-Net, and a pseudo-label pretrain. The winner is chosen on the metric the next stage consumes: <strong>do the AI-derived shape numbers agree with the human-annotated ones?</strong> By that measure the heavy-augmentation U-Net wins by a wide margin, even though three models edge it on pixel overlap.</p></div><div class="cap">VID3201 F3 &middot; U-Net (heavy aug.) outline in cherry</div></section><section class="kpi-strip"><div class="kpi gold"><div class="lbl">Chosen model</div><div class="num">U-Net</div><div class="desc">Heavy augmentation; only model crossing the reliability bar.</div></div><div class="kpi"><div class="lbl">Models compared</div><div class="num numeric">8</div><div class="desc">All on the same 45-image test set.</div></div><div class="kpi gold"><div class="lbl">Best pixel Dice</div><div class="num numeric">0.829</div><div class="desc">U-Net; nnU-Net essentially tied at 0.831.</div></div><div class="kpi"><div class="lbl">Reliability bar</div><div class="num numeric">&ge; 0.85</div><div class="desc">Concordance threshold from the radiomics standard (IBSI).</div></div></section><section class="card" style="padding:0;overflow:hidden"><div class="figwrap"><img src="fig/overlay_dark.png" alt="real microscopy with the AI segmentation outline in gold"></div><div style="padding:1.2rem 1.7rem 1.5rem"><div class="card-h"><span class="ttl">What the chosen segmenter produces</span><span class="sub">real frames, three drug conditions, three days</span></div><p>The gold outline is the U-Net's call on frames it never saw in training; the boxes show the shape numbers (area, circularity, solidity) extracted from each.</p><div class="verdict">The unit of evaluation is these extracted numbers, not the pixel mask.<span class="small">Why feature fidelity, not pixels</span></div></div></section><div class="sec-h"><h2 class="display">Model <span class="it">leaderboard</span></h2><span class="right">switch the metric</span></div><section class="card"><div class="card-h"><span class="ttl">Ranking flips with the metric</span><div class="metric-toggle"><button class="active" data-metric="ccc">Shape-number agreement</button><button class="" data-metric="dice">Pixel overlap</button><button class="" data-metric="cc_dice">Component-aware</button></div><span class="sub">click to switch</span></div><div class="chart-host" style="height:420px"><canvas id="t2_lb"></canvas></div><p style="margin-top:.9rem;font-size:.94rem;line-height:1.6;color:var(--paper);opacity:.92">Pixel overlap is nearly flat (0.755 to 0.829) and picks the U-Net by a hair. Shape-number agreement ranks the U-Net first by a wide margin and is the only metric that reflects what the next stage consumes.</p><div class="verdict">The segmenter is selected on shape-number agreement (Lin's CCC against the six CPM features), not pixel Dice. The heavy-aug U-Net is the only model above the 0.85 bar.<span class="small">Decision: rank by feature fidelity</span></div></section><script>lbboard("t2_lb",{"metrics": [{"key": "ccc", "label": "Shape-number agreement (CCC)", "min": 0, "max": 1.0, "mid": 0.5}, {"key": "dice", "label": "Pixel overlap (Dice)", "min": 0.7, "max": 0.85, "mid": 0.79}, {"key": "cc_dice", "label": "Component-aware overlap (CC-Dice)", "min": 0, "max": 0.25, "mid": 0.15}], "models": [{"label": "U-Net (heavy aug.)", "dice": 0.829, "cc_dice": 0.18, "ccc": 0.683, "winner": true}, {"label": "Pseudo-label + fine-tune", "dice": 0.811, "cc_dice": 0.157, "ccc": 0.464}, {"label": "SAM2 (grayscale)", "dice": 0.787, "cc_dice": 0.116, "ccc": 0.473}, {"label": "SAM2 (multi-channel)", "dice": 0.768, "cc_dice": 0.081, "ccc": 0.434}, {"label": "Rule-based baseline", "dice": 0.76, "cc_dice": 0.04, "ccc": 0.378}, {"label": "nnU-Net (default)", "dice": 0.757, "cc_dice": 0.172, "ccc": 0.305}, {"label": "nnU-Net + cleanup", "dice": 0.799, "cc_dice": 0.204, "ccc": 0.285}, {"label": "nnU-Net (multi-channel)", "dice": 0.755, "cc_dice": 0.167, "ccc": 0.27}]});</script><section class="card" style="padding:0;overflow:hidden"><div class="figwrap"><img src="../assets/cll/figures/segmentation/icc_ccc_heatmap.png" alt="heatmap of agreement scores across models and features"></div><div style="padding:1.2rem 1.7rem 1.5rem"><div class="card-h"><span class="ttl">Per-feature reliability scoreboard</span><span class="sub">8 models x 6 shape numbers</span></div><p>Each cell is the agreement between AI-derived and human-derived value of one shape number. Gold-outlined cells cross the 0.85 bar. Only the U-Net crosses, on area and diameter; roundness and elongation are unreliable for almost every model.</p><div class="verdict">Sets the operational feature set for RQ3: area, diameter, solidity, perimeter, circularity; eccentricity is dropped, perimeter is U-Net-only.<span class="small">Decision: operational feature set</span></div></div></section><div class="sec-h"><h2 class="display">Cleanup <span class="it">impact</span></h2><span class="right">overlap recovers, agreement does not</span></div><section class="card"><div class="card-h"><span class="ttl">Pixel overlap with vs without cleanup</span><span class="sub">a small post-processing step</span></div><div class="chart-host" style="height:360px"><canvas id="t2_pp"></canvas></div><p style="margin-top:.9rem;font-size:.94rem;line-height:1.6;color:var(--paper);opacity:.92">The chosen U-Net (heavy aug.) is shown for reference: its masks need no cleanup, so the two bars are identical at 0.829. A morphological cleanup lifts nnU-Net pixel overlap by up to +0.044; the rule-based baseline barely benefits because its masks are already sparse.</p><div class="verdict">On the metric that matters for the next stage this cleanup does not move the needle: it rescues pixel overlap, not shape-number reliability.<span class="small">Negative result: cleanup is cosmetic for fidelity</span></div></section><script>barV("t2_pp",{"labels": ["U-Net (heavy aug.)", "classical", "nnunet gray", "nnunet mc", "sam2 gray", "sam2 mc"], "datasets": [{"label": "without cleanup", "data": [0.829, 0.8025, 0.7569, 0.7548, 0.7865, 0.7682], "color": "#a8b5b8"}, {"label": "with best cleanup", "data": [0.829, 0.8054, 0.7995, 0.7984, 0.8292, 0.8097], "color": "#c8a05c"}], "ylabel": "pixel Dice", "min": 0.7, "max": 0.85, "dec": 2});</script><div class="sec-h"><h2 class="display">Hardest <span class="it">case</span></h2><span class="right">a fully fragmented spheroid</span></div><section class="card" style="padding:0;overflow:hidden"><div class="figwrap"><img src="fig/hardest_dark.png" alt="a heavily fragmented spheroid time-lapse, day 0 to day 4"></div><div style="padding:1.2rem 1.7rem 1.5rem"><div class="card-h"><span class="ttl">When the spheroid disintegrates</span><span class="sub">VID3201 F3, trametinib 50 uM, full time-lapse</span></div><p>Under high-dose drug the spheroid breaks into many pieces. Pixel overlap drops for every model; area and diameter stay reliable while roundness and elongation collapse.</p><div class="verdict">This split is the entire reason the audit was needed, and why F3 is reported separately rather than excluded.<span class="small">Validates the feature-fidelity audit</span></div></div></section><section class="card"><div class="card-h"><span class="ttl">Classical pipeline on the hardest frame</span><span class="sub">top 10 of the classical preproc / segmenter sweep</span></div><div class="chart-host" style="height:360px"><canvas id="t2_f3"></canvas></div><p style="margin-top:.9rem;font-size:.94rem;line-height:1.6;color:var(--paper);opacity:.92">This is the classical-pipeline sweep (the deep models, including the heavy-aug U-Net, are in the showcase above). Even the best classical combination reaches only about 0.45 Dice on this frame; no configuration rescues it.</p><div class="verdict">Confirms F3 is a genuine ceiling, not a tuning artefact.<span class="small">Bounds the hardest case</span></div></section><script>barH("t2_f3",{"labels": ["invert / multi3_high", "gamma_0_5 / hmin_watershed", "gamma_0_5 / chanvese", "invert / otsu", "invert / iso", "invert / chanvese", "raw / chanvese", "median_3 / chanvese", "gamma_0_5 / kmeans_3", "unsharp / chanvese"], "datasets": [{"label": "Dice on F3", "data": [0.2766, 0.2368, 0.1997, 0.1877, 0.1877, 0.1846, 0.1846, 0.1828, 0.1827, 0.1824], "color": "#a37432"}], "xlabel": "Dice on the hardest frame", "min": 0, "max": 0.5, "dec": 2});</script><section class="stack-row"><div class="lbl"><span class="it">Sources</span> &middot; Theme 02</div><div class="stack-chips"><span class="chip gold">05_feature_validation.ipynb</span><span class="chip">ICC(3,1) + Lin's CCC</span><span class="chip">per_feature_error.csv</span><span class="chip">seg_postproc.json</span><span class="chip">seg_f3.json</span><span class="chip">U-Net / SAM2 / nnU-Net</span></div></section><section class="big-cta"><h3>Next: the <span class="it">synthetic library</span>.</h3><div class="links"><a class="cta primary" href="../03_simulation_library/index.html">Theme 03 &middot; Simulation library &rarr;</a><a class="cta" href="../index.html">Back to index</a></div></section><footer>&copy; 2026 Djamel Zair &middot; Amsterdam &middot; <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a></footer></main></body></html>

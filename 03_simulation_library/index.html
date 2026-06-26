@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Simulation library - CLL CPM thesis</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"></head><body><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script><script>
+const C={TEAL_1:'#052e36',TEAL_3:'#0d5963',GOLD:'#c8a05c',GOLD_2:'#a37432',GOLD_3:'#e7c98a',
+  PAPER:'#f3ecd6',MUTED:'rgba(168,181,184,0.65)',CLAY:'#c44a30',ICE:'#7CFEF0',GREEN:'#6dd9a1'};
+const GRID='rgba(199,160,92,0.12)', MF={family:'JetBrains Mono',size:10};
+function ax(label,opts){return Object.assign({ticks:{color:C.PAPER,font:MF},grid:{color:GRID},
+  border:{display:false},title:label?{display:true,text:label,color:C.GOLD_3,font:{family:'JetBrains Mono',size:11}}:{display:false}},opts||{});}
+function tip(){return {backgroundColor:C.TEAL_1,titleColor:C.PAPER,bodyColor:C.PAPER,borderColor:C.GOLD,borderWidth:1,padding:9,cornerRadius:2,displayColors:false};}
+function leg(show){return {display:show,position:'top',align:'end',labels:{color:C.PAPER,font:{family:'JetBrains Mono',size:10,weight:'500'},boxWidth:14,boxHeight:14}};}
+function base(showLeg){return {responsive:true,maintainAspectRatio:false,animation:{duration:850,easing:'easeOutCubic'},
+  plugins:{legend:leg(showLeg),tooltip:tip()}};}
+
+function barH(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(d.datasets.length>1);o.indexAxis='y';
+  o.scales={x:ax(d.xlabel,{min:d.min||0,max:d.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toLocaleString(undefined,{maximumFractionDigits:d.dec??2})}}),y:ax()};
+  if(d.logx){o.scales.x.type='logarithmic';delete o.scales.x.min;delete o.scales.x.max;}
+  new Chart(el,{type:'bar',data:{labels:d.labels,datasets:d.datasets.map(s=>({label:s.label,data:s.data,backgroundColor:s.color,borderColor:C.TEAL_1,borderWidth:1.2}))},options:o});}
+
+function barV(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(d.datasets.length>1);
+  o.scales={x:ax(d.xlabel),y:ax(d.ylabel,{min:d.min||0,max:d.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toFixed(d.dec??2)}})};
+  new Chart(el,{type:'bar',data:{labels:d.labels,datasets:d.datasets.map(s=>({label:s.label,data:s.data,backgroundColor:s.color,borderColor:C.TEAL_1,borderWidth:1.2}))},options:o});}
+
+function scatter(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(false);o.plugins.tooltip.callbacks={label:c=>d.xlabel+' '+c.parsed.x.toFixed(2)+'  '+d.ylabel+' '+c.parsed.y};
+  o.scales={x:ax(d.xlabel),y:ax(d.ylabel,{min:0})};
+  new Chart(el,{type:'scatter',data:{datasets:[{data:d.points,backgroundColor:C.GOLD,borderColor:C.TEAL_1,borderWidth:1,radius:5,hoverRadius:7}]},options:o});}
+
+/* parameter sweep line with a parameter toggle (cluster area vs level) */
+function sweepline(id,d){const el=document.getElementById(id);if(!el)return;
+  let p=d.order[0]; let chart;
+  function draw(){const o=base(false);o.parsing=false;
+    o.plugins.tooltip.callbacks={title:i=>d.nice[p]+' = '+i[0].parsed.x,label:c=>'cluster area '+(+c.parsed.y).toLocaleString()+' px'};
+    o.scales={x:ax(d.nice[p]),y:ax('cluster area (px)')};
+    const pts=d.levels[p].map((x,i)=>({x:x,y:d.area[p][i]}));
+    if(chart)chart.destroy();
+    chart=new Chart(el,{type:'line',data:{datasets:[{data:pts,borderColor:C.GOLD,
+      backgroundColor:'rgba(199,160,92,0.15)',pointRadius:3,pointHoverRadius:5,borderWidth:2,tension:.25,fill:true}]},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');p=b.dataset.metric;draw();}));}
+
+/* model leaderboard, horizontal bar with a metric toggle, winner in gold */
+function lbboard(id,d){const el=document.getElementById(id);if(!el)return;
+  let metric=d.metrics[0].key; let chart;
+  function draw(){const m=d.metrics.find(x=>x.key===metric);
+    const sorted=[...d.models].sort((a,b)=>b[metric]-a[metric]);
+    const labels=sorted.map(x=>x.label), vals=sorted.map(x=>x[metric]);
+    const cols=sorted.map(x=>x.winner?C.GOLD:(x[metric]>=m.mid?C.GOLD_2:'rgba(168,181,184,0.55)'));
+    const o=base(false);o.indexAxis='y';
+    o.plugins.tooltip.callbacks={label:c=>m.label+' '+c.parsed.x.toFixed(3)};
+    o.scales={x:ax(m.label,{min:m.min||0,max:m.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toFixed(2)}}),y:ax()};
+    if(chart)chart.destroy();
+    chart=new Chart(el,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:cols,borderColor:C.TEAL_1,borderWidth:1.2}]},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');metric=b.dataset.metric;draw();}));}
+
+/* multi-feature drug timecourse with a feature toggle */
+function timecourse(id,d){const el=document.getElementById(id);if(!el)return;
+  const COLORS=[C.ICE,C.CLAY,C.GOLD,C.GREEN,C.GOLD_3]; let metric=d.order[0]; let chart;
+  function draw(){const sets=d.series.map((s,i)=>({label:s.label,data:d.features[metric][s.key],
+      borderColor:COLORS[i%COLORS.length],backgroundColor:COLORS[i%COLORS.length],
+      pointRadius:2.5,pointHoverRadius:5,borderWidth:2,tension:0.25}));
+    const o=base(true);o.parsing=false;
+    o.plugins.tooltip.callbacks={title:items=>'day '+items[0].parsed.x.toFixed(2),label:c=>c.dataset.label+': '+(+c.parsed.y).toLocaleString()};
+    o.scales={x:ax('time (days)',{type:'linear',min:0}),y:ax(d.nice[metric])};
+    if(chart)chart.destroy(); chart=new Chart(el,{type:'line',data:{datasets:sets},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');metric=b.dataset.metric;draw();}));}
+</script><header>
+  <a class="brand-block" href="../index.html">
+    <span class="brand-name">CLL <span class="dot">&rarr;</span> CPM<span class="role">Analysis appendix &middot; MSc thesis</span></span>
+  </a>
+  <nav class="top">
+    <a href="../index.html">Themes</a>
+    <a href="../THESIS_CITE_MAP.md">Cite map</a>
+    <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header><main><a class="back" href="../index.html">&larr; All analysis themes</a><nav class="rq-tabs"><a href="../01_image_intensity_eda/index.html" class="">Theme 01<span class="label">Image EDA</span></a><a href="../02_segmentation/index.html" class="">Theme 02<span class="label">Segmentation</span></a><a href="../03_simulation_library/index.html" class="active">Theme 03<span class="label">Sim library</span></a><a href="../04_separability_identifiability/index.html" class="">Theme 04<span class="label">Identifiability</span></a><a href="../05_drug_realdata/index.html" class="">Theme 05<span class="label">Drug / real data</span></a></nav><section class="bhero"><div class="bg" style="background-image:url('../assets/hero_spheroid_healthy.png')"></div><div class="radial"></div><div class="scrim"></div><div class="inner"><div class="meta"><span>Theme 03</span><span class="dot">&middot;</span><span>Synthetic CPM library</span><span class="dot">&middot;</span><span>Appendix C & F</span></div><h1 class="display">The <span class="gold">simulator</span>, <span class="it">characterised</span>.</h1><p class="lede">Seven mechanistic knobs, swept one at a time and jointly, build the synthetic library the real spheroids are matched against.</p><p class="summary">A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion, contact range, neighbour order, volume elasticity, target volume, and motility) is sampled to build a reference library of morphology trajectories. This theme shows how each knob changes the simulated cluster, and accounts for which runs were usable.</p></div><div class="cap">Cellular Potts Model spheroid, synthetic lattice</div></section><section class="kpi-strip"><div class="kpi"><div class="lbl">CPM parameters</div><div class="num numeric">7</div><div class="desc">Swept one-at-a-time and jointly (Saltelli).</div></div><div class="kpi"><div class="lbl">Sampled vectors</div><div class="num numeric">1,152</div><div class="desc">Saltelli design over the 7 parameters.</div></div><div class="kpi gold"><div class="lbl">Usable runs</div><div class="num numeric">1,105</div><div class="desc">After dropping degenerate masks.</div></div><div class="kpi"><div class="lbl">Dropped</div><div class="num numeric">47</div><div class="desc">Empty or single-pixel masks, removed.</div></div></section><div class="sec-h"><h2 class="display">How each <span class="it">knob</span> changes morphology</h2><span class="right">one-at-a-time sweeps</span></div><section class="card"><div class="card-h"><span class="ttl">Cluster area vs parameter level</span><div class="metric-toggle"><button class="active" data-metric="width">target volume (width)</button><button class="" data-metric="contact">cell-cell adhesion</button><button class="" data-metric="contact_no">contact range</button><button class="" data-metric="neighbor">neighbour order</button><button class="" data-metric="lambda">volume elasticity</button><button class="" data-metric="temp">motility (temperature)</button></div><span class="sub">switch the parameter</span></div><div class="chart-host" style="height:400px"><canvas id="t3_sweep"></canvas></div><p style="margin-top:.9rem;font-size:.94rem;line-height:1.6;color:var(--paper);opacity:.92">Target volume (width) and cell-cell adhesion move cluster area the most; neighbour order and motility barely move it on their own.</p><div class="verdict">Identifies which knobs leave a size signature in morphology, the precondition for being recoverable later.<span class="small">Sets up the identifiability question</span></div></section><script>sweepline("t3_sweep",{"order": ["width", "contact", "contact_no", "neighbor", "lambda", "temp"], "nice": {"width": "target volume (width)", "contact": "cell-cell adhesion", "contact_no": "contact range", "neighbor": "neighbour order", "lambda": "volume elasticity", "temp": "motility (temperature)"}, "levels": {"width": [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30], "contact": [1.0, 2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0], "contact_no": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0], "neighbor": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0], "lambda": [0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 10.0, 15.0, 20.0], "temp": [2.0, 6.0, 10.0, 14.0, 18.0, 22.0, 25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0]}, "area": {"width": [89146.4767, 184833.5778, 189884.6233, 191946.8233, 193214.9256, 193938.5678, 195553.8689, 194772.2189, 195310.1289, 196455.7, 196002.0978, 197061.7589, 198868.9378, 195983.9189], "contact": [195377.9122, 195119.8922, 194627.2711, 194132.9744, 193669.7367, 193252.8267, 192250.3256, 191454.7567, 189107.5878, 184786.4789, 181191.7733, 178670.5989, 177016.9356, 175670.96], "contact_no": [195588.3567, 195157.1411, 194546.3289, 193230.2678, 192476.1956, 191699.5489, 190070.4133, 188156.4733], "neighbor": [193370.7522, 193240.7511, 193148.2344, 193028.7244, 192962.1511, 192881.0722, 192788.5367], "lambda": [178203.9178, 185269.9989, 188808.4722, 190343.4322, 191350.3778, 192549.1222, 193257.0256, 193687.1156, 194032.4711, 194492.4378, 194745.7822, 195348.7133, 195553.7689, 195660.6111], "temp": [195627.3778, 194142.5944, 193376.1011, 193283.8667, 193260.1233, 193243.4156, 193240.2033, 193234.2344, 193227.5056, 193267.2522, 193262.27, 193224.7589, 193278.8244, 193289.85]}});</script><div class="sec-h"><h2 class="display">Which knobs <span class="it">drive</span> cluster size?</h2><span class="right">Sobol indices, direct vs total effect</span></div><section class="card" style="padding:0;overflow:hidden"><div class="figwrap"><img src="../assets/cll/figures/cpm/sobol_S1_vs_ST.png" alt="Sobol S1 and ST bars per parameter"></div><div style="padding:1.2rem 1.7rem 1.5rem"><div class="card-h"><span class="ttl">Sobol first-order vs total effect</span><span class="sub">share of variance in cluster area</span></div><p>Direct effect (S1) is how much a knob alone moves area; total effect (ST) adds its interactions with the other knobs. A large gap means the knob is entangled.</p><div class="verdict">Target volume dominates; cell-cell and cell-medium adhesion carry sizeable interaction effects. Entanglement is what limits how cleanly a single knob can be read back from morphology.<span class="small">Entanglement bounds identifiability</span></div></div></section><section class="card"><div class="card-h"><span class="ttl">Library yield</span><span class="sub">sampled to usable</span></div><div class="chart-host" style="height:240px"><canvas id="t3_yield"></canvas></div><p style="margin-top:.9rem;font-size:.94rem;line-height:1.6;color:var(--paper);opacity:.92">Of 1,152 sampled parameter vectors, 1,105 produced usable masks; 47 were dropped as empty or single-pixel (degenerate) spheroids.</p><div class="verdict">The usable 1,105-run library is the single reference set for all matching and identifiability analysis.<span class="small">Defines the reference library</span></div></section><script>barH("t3_yield",{"labels": ["Sampled (Saltelli)", "Usable", "Dropped (degenerate)"], "datasets": [{"label": "runs", "data": [1152, 1105, 47], "color": ["#a8b5b8", "#c8a05c", "#c44a30"]}], "xlabel": "number of runs", "dec": 0});</script><section class="stack-row"><div class="lbl"><span class="it">Sources</span> &middot; Theme 03</div><div class="stack-chips"><span class="chip gold">cpm_sweeps.json</span><span class="chip">CompuCell3D</span><span class="chip">Saltelli design</span><span class="chip">VTK feature extraction</span><span class="chip">1,105-run library</span></div></section><section class="big-cta"><h3>Next: which knobs are <span class="it">recoverable</span>?</h3><div class="links"><a class="cta primary" href="../04_separability_identifiability/index.html">Theme 04 &middot; Identifiability &rarr;</a><a class="cta" href="../index.html">Back to index</a></div></section><footer>&copy; 2026 Djamel Zair &middot; Amsterdam &middot; <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a></footer></main></body></html>

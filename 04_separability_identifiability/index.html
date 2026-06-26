@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Separability &amp;amp; identifiability - CLL CPM thesis</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"></head><body><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script><script>
+const C={TEAL_1:'#052e36',TEAL_3:'#0d5963',GOLD:'#c8a05c',GOLD_2:'#a37432',GOLD_3:'#e7c98a',
+  PAPER:'#f3ecd6',MUTED:'rgba(168,181,184,0.65)',CLAY:'#c44a30',ICE:'#7CFEF0',GREEN:'#6dd9a1'};
+const GRID='rgba(199,160,92,0.12)', MF={family:'JetBrains Mono',size:10};
+function ax(label,opts){return Object.assign({ticks:{color:C.PAPER,font:MF},grid:{color:GRID},
+  border:{display:false},title:label?{display:true,text:label,color:C.GOLD_3,font:{family:'JetBrains Mono',size:11}}:{display:false}},opts||{});}
+function tip(){return {backgroundColor:C.TEAL_1,titleColor:C.PAPER,bodyColor:C.PAPER,borderColor:C.GOLD,borderWidth:1,padding:9,cornerRadius:2,displayColors:false};}
+function leg(show){return {display:show,position:'top',align:'end',labels:{color:C.PAPER,font:{family:'JetBrains Mono',size:10,weight:'500'},boxWidth:14,boxHeight:14}};}
+function base(showLeg){return {responsive:true,maintainAspectRatio:false,animation:{duration:850,easing:'easeOutCubic'},
+  plugins:{legend:leg(showLeg),tooltip:tip()}};}
+
+function barH(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(d.datasets.length>1);o.indexAxis='y';
+  o.scales={x:ax(d.xlabel,{min:d.min||0,max:d.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toLocaleString(undefined,{maximumFractionDigits:d.dec??2})}}),y:ax()};
+  if(d.logx){o.scales.x.type='logarithmic';delete o.scales.x.min;delete o.scales.x.max;}
+  new Chart(el,{type:'bar',data:{labels:d.labels,datasets:d.datasets.map(s=>({label:s.label,data:s.data,backgroundColor:s.color,borderColor:C.TEAL_1,borderWidth:1.2}))},options:o});}
+
+function barV(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(d.datasets.length>1);
+  o.scales={x:ax(d.xlabel),y:ax(d.ylabel,{min:d.min||0,max:d.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toFixed(d.dec??2)}})};
+  new Chart(el,{type:'bar',data:{labels:d.labels,datasets:d.datasets.map(s=>({label:s.label,data:s.data,backgroundColor:s.color,borderColor:C.TEAL_1,borderWidth:1.2}))},options:o});}
+
+function scatter(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(false);o.plugins.tooltip.callbacks={label:c=>d.xlabel+' '+c.parsed.x.toFixed(2)+'  '+d.ylabel+' '+c.parsed.y};
+  o.scales={x:ax(d.xlabel),y:ax(d.ylabel,{min:0})};
+  new Chart(el,{type:'scatter',data:{datasets:[{data:d.points,backgroundColor:C.GOLD,borderColor:C.TEAL_1,borderWidth:1,radius:5,hoverRadius:7}]},options:o});}
+
+/* parameter sweep line with a parameter toggle (cluster area vs level) */
+function sweepline(id,d){const el=document.getElementById(id);if(!el)return;
+  let p=d.order[0]; let chart;
+  function draw(){const o=base(false);o.parsing=false;
+    o.plugins.tooltip.callbacks={title:i=>d.nice[p]+' = '+i[0].parsed.x,label:c=>'cluster area '+(+c.parsed.y).toLocaleString()+' px'};
+    o.scales={x:ax(d.nice[p]),y:ax('cluster area (px)')};
+    const pts=d.levels[p].map((x,i)=>({x:x,y:d.area[p][i]}));
+    if(chart)chart.destroy();
+    chart=new Chart(el,{type:'line',data:{datasets:[{data:pts,borderColor:C.GOLD,
+      backgroundColor:'rgba(199,160,92,0.15)',pointRadius:3,pointHoverRadius:5,borderWidth:2,tension:.25,fill:true}]},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');p=b.dataset.metric;draw();}));}
+
+/* model leaderboard, horizontal bar with a metric toggle, winner in gold */
+function lbboard(id,d){const el=document.getElementById(id);if(!el)return;
+  let metric=d.metrics[0].key; let chart;
+  function draw(){const m=d.metrics.find(x=>x.key===metric);
+    const sorted=[...d.models].sort((a,b)=>b[metric]-a[metric]);
+    const labels=sorted.map(x=>x.label), vals=sorted.map(x=>x[metric]);
+    const cols=sorted.map(x=>x.winner?C.GOLD:(x[metric]>=m.mid?C.GOLD_2:'rgba(168,181,184,0.55)'));
+    const o=base(false);o.indexAxis='y';
+    o.plugins.tooltip.callbacks={label:c=>m.label+' '+c.parsed.x.toFixed(3)};
+    o.scales={x:ax(m.label,{min:m.min||0,max:m.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toFixed(2)}}),y:ax()};
+    if(chart)chart.destroy();
+    chart=new Chart(el,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:cols,borderColor:C.TEAL_1,borderWidth:1.2}]},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');metric=b.dataset.metric;draw();}));}
+
+/* multi-feature drug timecourse with a feature toggle */
+function timecourse(id,d){const el=document.getElementById(id);if(!el)return;
+  const COLORS=[C.ICE,C.CLAY,C.GOLD,C.GREEN,C.GOLD_3]; let metric=d.order[0]; let chart;
+  function draw(){const sets=d.series.map((s,i)=>({label:s.label,data:d.features[metric][s.key],
+      borderColor:COLORS[i%COLORS.length],backgroundColor:COLORS[i%COLORS.length],
+      pointRadius:2.5,pointHoverRadius:5,borderWidth:2,tension:0.25}));
+    const o=base(true);o.parsing=false;
+    o.plugins.tooltip.callbacks={title:items=>'day '+items[0].parsed.x.toFixed(2),label:c=>c.dataset.label+': '+(+c.parsed.y).toLocaleString()};
+    o.scales={x:ax('time (days)',{type:'linear',min:0}),y:ax(d.nice[metric])};
+    if(chart)chart.destroy(); chart=new Chart(el,{type:'line',data:{datasets:sets},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');metric=b.dataset.metric;draw();}));}
+</script><header>
+  <a class="brand-block" href="../index.html">
+    <span class="brand-name">CLL <span class="dot">&rarr;</span> CPM<span class="role">Analysis appendix &middot; MSc thesis</span></span>
+  </a>
+  <nav class="top">
+    <a href="../index.html">Themes</a>
+    <a href="../THESIS_CITE_MAP.md">Cite map</a>
+    <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header><main><a class="back" href="../index.html">&larr; All analysis themes</a><nav class="rq-tabs"><a href="../01_image_intensity_eda/index.html" class="">Theme 01<span class="label">Image EDA</span></a><a href="../02_segmentation/index.html" class="">Theme 02<span class="label">Segmentation</span></a><a href="../03_simulation_library/index.html" class="">Theme 03<span class="label">Sim library</span></a><a href="../04_separability_identifiability/index.html" class="active">Theme 04<span class="label">Identifiability</span></a><a href="../05_drug_realdata/index.html" class="">Theme 05<span class="label">Drug / real data</span></a></nav><section class="bhero"><div class="bg" style="background-image:url('../assets/hero_spheroid_healthy.png')"></div><div class="radial"></div><div class="scrim"></div><div class="inner"><div class="meta"><span>Theme 04</span><span class="dot">&middot;</span><span>Separability & identifiability</span><span class="dot">&middot;</span><span>Appendix D to H</span></div><h1 class="display">Which knobs can we <span class="it">read back</span>?</h1><p class="lede">Only three of the seven parameters can be recovered from morphology. The rest are entangled, and the analysis says so honestly.</p><p class="summary">Leave-one-out inversion on the 1,105-run library measures how well each CPM parameter is recovered from morphology (R squared of recovered vs true). Cell-medium adhesion, target volume and cell-cell adhesion are recoverable; the others are not. These are the verified numbers from the canonical benchmark, not the optimistic error metric used elsewhere.</p></div><div class="cap">Leave-one-out inversion on the 1,105-run library</div></section><section class="kpi-strip"><div class="kpi gold"><div class="lbl">Recoverable</div><div class="num">3 of 7</div><div class="desc">J_cm, width, J_cc cross the R2 0.30 line.</div></div><div class="kpi gold"><div class="lbl">Best recovery</div><div class="num numeric">0.62</div><div class="desc">Cell-medium adhesion (J_cm), LOO R2.</div></div><div class="kpi"><div class="lbl">Library size</div><div class="num numeric">1,105</div><div class="desc">Saltelli runs used for the benchmark.</div></div><div class="kpi"><div class="lbl">Unidentifiable</div><div class="num numeric">4</div><div class="desc">lambda, temperature, contact range, neighbour order.</div></div></section><div class="sec-h"><h2 class="display">How well each parameter is <span class="it">recovered</span></h2><span class="right">leave-one-out R squared, verified</span></div><section class="card"><div class="card-h"><span class="ttl">Leave-one-out recovery (R squared)</span><span class="sub">gold = recoverable (R2 &gt;= 0.30)</span></div><div class="chart-host" style="height:360px"><canvas id="t4_r2"></canvas></div><p style="margin-top:.9rem;font-size:.94rem;line-height:1.6;color:var(--paper);opacity:.92">Cell-medium adhesion (0.62), target volume (0.54) and cell-cell adhesion (0.38) are recoverable; volume elasticity, temperature, contact range and neighbour order sit below the line. Neighbour order is effectively zero.</p><div class="verdict">The pipeline reports estimates and uncertainty only for the three recoverable axes, and reports the rest as unidentified rather than guessing.<span class="small">Decision: report only identifiable axes</span></div></section><script>barH("t4_r2",{"labels": ["cell-medium adhesion (J_cm)", "target volume (width)", "cell-cell adhesion (J_cc)", "volume elasticity (lambda)", "motility (temperature)", "contact range", "neighbour order"], "datasets": [{"label": "LOO R2", "data": [0.615, 0.544, 0.384, 0.177, 0.166, 0.136, -0.069], "color": ["#c8a05c", "#c8a05c", "#c8a05c", "rgba(168,181,184,0.55)", "rgba(168,181,184,0.55)", "rgba(168,181,184,0.55)", "rgba(168,181,184,0.55)"]}], "xlabel": "R squared (recovered vs true)", "min": -0.1, "max": 0.8, "dec": 2});</script><div class="sec-h"><h2 class="display">Why some features <span class="it">separate</span> better</h2><span class="right">signal-to-noise per feature</span></div><section class="card"><div class="card-h"><span class="ttl">Discriminability by morphology feature</span><span class="sub">signal-to-noise ratio</span></div><div class="chart-host" style="height:320px"><canvas id="t4_snr"></canvas></div><p style="margin-top:.9rem;font-size:.94rem;line-height:1.6;color:var(--paper);opacity:.92">Area and diameter carry the strongest signal across the parameter sweeps; circularity and perimeter are the noisiest, which matches their lower segmentation fidelity.</p><div class="verdict">Size features anchor the inversion; shape features add little once size is fixed, consistent with the segmentation audit in Theme 02.<span class="small">Connects back to feature fidelity</span></div></section><script>barH("t4_snr",{"labels": ["total area", "equivalent diameter", "eccentricity", "solidity", "perimeter", "circularity"], "datasets": [{"label": "SNR", "data": [4.75, 4.74, 3.44, 1.72, 0.82, 0.53], "color": "#c8a05c"}], "xlabel": "signal-to-noise ratio", "dec": 2});</script><section class="stack-row"><div class="lbl"><span class="it">Sources</span> &middot; Theme 04</div><div class="stack-chips"><span class="chip gold">identifiability_loo.csv</span><span class="chip">cpm_discriminability.json</span><span class="chip">leave-one-out inversion</span><span class="chip">XGBoost surrogate</span><span class="chip">tau-registration matcher</span></div></section><section class="big-cta"><h3>Next: the real <span class="it">drug data</span>.</h3><div class="links"><a class="cta primary" href="../05_drug_realdata/index.html">Theme 05 &middot; Drug & real data &rarr;</a><a class="cta" href="../index.html">Back to index</a></div></section><footer>&copy; 2026 Djamel Zair &middot; Amsterdam &middot; <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a></footer></main></body></html>
