@@ -1,0 +1,342 @@
+{
+  "n_combos": 352,
+  "top": [
+    {
+      "combo": "invert__multi3_high",
+      "preproc": "invert",
+      "seg": "multi3_high",
+      "dice": 0.2766,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 464.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gamma_0_5__hmin_watershed",
+      "preproc": "gamma_0_5",
+      "seg": "hmin_watershed",
+      "dice": 0.2368,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 523.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gamma_0_5__chanvese",
+      "preproc": "gamma_0_5",
+      "seg": "chanvese",
+      "dice": 0.1997,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 429.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "invert__otsu",
+      "preproc": "invert",
+      "seg": "otsu",
+      "dice": 0.1877,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 681.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "invert__iso",
+      "preproc": "invert",
+      "seg": "iso",
+      "dice": 0.1877,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 681.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "invert__chanvese",
+      "preproc": "invert",
+      "seg": "chanvese",
+      "dice": 0.1846,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 557.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "raw__chanvese",
+      "preproc": "raw",
+      "seg": "chanvese",
+      "dice": 0.1846,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 557.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "median_3__chanvese",
+      "preproc": "median_3",
+      "seg": "chanvese",
+      "dice": 0.1828,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 392.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gamma_0_5__kmeans_3",
+      "preproc": "gamma_0_5",
+      "seg": "kmeans_3",
+      "dice": 0.1827,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 693.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "unsharp__chanvese",
+      "preproc": "unsharp",
+      "seg": "chanvese",
+      "dice": 0.1824,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 820.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gaussian_1__chanvese",
+      "preproc": "gaussian_1",
+      "seg": "chanvese",
+      "dice": 0.1777,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 426.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "median_3__hmin_watershed",
+      "preproc": "median_3",
+      "seg": "hmin_watershed",
+      "dice": 0.1754,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 518.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "bilateral__chanvese",
+      "preproc": "bilateral",
+      "seg": "chanvese",
+      "dice": 0.1721,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 361.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gaussian_1__hmin_watershed",
+      "preproc": "gaussian_1",
+      "seg": "hmin_watershed",
+      "dice": 0.169,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 658.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "raw__hmin_watershed",
+      "preproc": "raw",
+      "seg": "hmin_watershed",
+      "dice": 0.1689,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 721.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "bilateral__hmin_watershed",
+      "preproc": "bilateral",
+      "seg": "hmin_watershed",
+      "dice": 0.1673,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 566.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gaussian_2__chanvese",
+      "preproc": "gaussian_2",
+      "seg": "chanvese",
+      "dice": 0.1667,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 299.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gaussian_2__hmin_watershed",
+      "preproc": "gaussian_2",
+      "seg": "hmin_watershed",
+      "dice": 0.1648,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 483.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "unsharp__hmin_watershed",
+      "preproc": "unsharp",
+      "seg": "hmin_watershed",
+      "dice": 0.1647,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 876.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "median_3__log_blobs",
+      "preproc": "median_3",
+      "seg": "log_blobs",
+      "dice": 0.1613,
+      "cc_dice": 0.0035,
+      "n_gt": 43.0,
+      "n_pred": 1860.0,
+      "recall": 0.2093,
+      "precision": 0.0048
+    },
+    {
+      "combo": "invert__local_mean_51",
+      "preproc": "invert",
+      "seg": "local_mean_51",
+      "dice": 0.159,
+      "cc_dice": 0.0007,
+      "n_gt": 43.0,
+      "n_pred": 1088.0,
+      "recall": 0.0233,
+      "precision": 0.0009
+    },
+    {
+      "combo": "unsharp__kmeans_3",
+      "preproc": "unsharp",
+      "seg": "kmeans_3",
+      "dice": 0.1571,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 838.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gamma_2_0__chanvese",
+      "preproc": "gamma_2_0",
+      "seg": "chanvese",
+      "dice": 0.157,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 623.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "gaussian_2__log_blobs",
+      "preproc": "gaussian_2",
+      "seg": "log_blobs",
+      "dice": 0.1546,
+      "cc_dice": 0.0032,
+      "n_gt": 43.0,
+      "n_pred": 2094.0,
+      "recall": 0.2093,
+      "precision": 0.0043
+    },
+    {
+      "combo": "invert__local_gauss_51",
+      "preproc": "invert",
+      "seg": "local_gauss_51",
+      "dice": 0.1494,
+      "cc_dice": 0.0018,
+      "n_gt": 43.0,
+      "n_pred": 1228.0,
+      "recall": 0.0698,
+      "precision": 0.0024
+    },
+    {
+      "combo": "invert__multi3_low",
+      "preproc": "invert",
+      "seg": "multi3_low",
+      "dice": 0.1467,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 660.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "raw__kmeans_3",
+      "preproc": "raw",
+      "seg": "kmeans_3",
+      "dice": 0.1467,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 660.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "median_3__kmeans_3",
+      "preproc": "median_3",
+      "seg": "kmeans_3",
+      "dice": 0.1438,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 413.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "clahe__hmin_watershed",
+      "preproc": "clahe",
+      "seg": "hmin_watershed",
+      "dice": 0.1437,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 601.0,
+      "recall": 0.0,
+      "precision": 0.0
+    },
+    {
+      "combo": "clahe__chanvese",
+      "preproc": "clahe",
+      "seg": "chanvese",
+      "dice": 0.1428,
+      "cc_dice": 0.0,
+      "n_gt": 43.0,
+      "n_pred": 459.0,
+      "recall": 0.0,
+      "precision": 0.0
+    }
+  ],
+  "stats": {
+    "max_dice": 0.2766,
+    "min_dice": 0.0,
+    "median_dice": 0.0159,
+    "n_above_05": 0,
+    "n_above_06": 0
+  }
+}

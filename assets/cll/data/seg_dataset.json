@@ -1,0 +1,13 @@
+{
+  "n_total": 306,
+  "by_split": {
+    "test": 45,
+    "train": 216,
+    "val": 45
+  },
+  "artifact_count": 0,
+  "rgba_upstream_count": 51,
+  "n_test": 45,
+  "n_val": 45,
+  "n_train": 216
+}

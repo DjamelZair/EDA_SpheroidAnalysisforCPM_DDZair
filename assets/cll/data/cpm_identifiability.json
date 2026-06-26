@@ -1,0 +1,47 @@
+[
+  {
+    "param": "width",
+    "n": 513,
+    "mean_abs_err": 0.4199,
+    "median_abs_err": 0.0,
+    "p90_abs_err": 1.6,
+    "param_range": 26.0,
+    "mean_norm_err": 0.0161
+  },
+  {
+    "param": "temp",
+    "n": 513,
+    "mean_abs_err": 1.2501,
+    "median_abs_err": 0.0,
+    "p90_abs_err": 3.94,
+    "param_range": 73.0,
+    "mean_norm_err": 0.0171
+  },
+  {
+    "param": "contact",
+    "n": 513,
+    "mean_abs_err": 0.2789,
+    "median_abs_err": 0.0,
+    "p90_abs_err": 1.0,
+    "param_range": 49.0,
+    "mean_norm_err": 0.0057
+  },
+  {
+    "param": "neighbor",
+    "n": 513,
+    "mean_abs_err": 0.1181,
+    "median_abs_err": 0.0,
+    "p90_abs_err": 0.5,
+    "param_range": 6.0,
+    "mean_norm_err": 0.0197
+  },
+  {
+    "param": "contact_no",
+    "n": 513,
+    "mean_abs_err": 0.0655,
+    "median_abs_err": 0.0,
+    "p90_abs_err": 0.28,
+    "param_range": 7.0,
+    "mean_norm_err": 0.0094
+  }
+]

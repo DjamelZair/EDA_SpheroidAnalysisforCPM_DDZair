@@ -1,0 +1,74 @@
+[
+  {
+    "feature": "total_area",
+    "snr": 4.7517,
+    "w1_norm": 2.0147,
+    "cohens_d": 2.9114,
+    "pearson_r": 0.8595,
+    "w1_raw": 7009.19,
+    "low_mean": 189969.9875,
+    "high_mean": 196979.1783,
+    "between_std": 3478.7426,
+    "mean_within_std": 732.1066
+  },
+  {
+    "feature": "equivalent_diameter",
+    "snr": 4.7364,
+    "w1_norm": 2.0084,
+    "cohens_d": 2.8849,
+    "pearson_r": 0.8574,
+    "w1_raw": 9.02,
+    "low_mean": 491.7826,
+    "high_mean": 500.7988,
+    "between_std": 4.4889,
+    "mean_within_std": 0.9478
+  },
+  {
+    "feature": "eccentricity",
+    "snr": 3.4367,
+    "w1_norm": 1.2532,
+    "cohens_d": 1.3464,
+    "pearson_r": 0.6248,
+    "w1_raw": 0.06,
+    "low_mean": 0.0569,
+    "high_mean": 0.1192,
+    "between_std": 0.0488,
+    "mean_within_std": 0.0142
+  },
+  {
+    "feature": "solidity",
+    "snr": 1.7247,
+    "w1_norm": 2.3504,
+    "cohens_d": 9.459,
+    "pearson_r": -0.9774,
+    "w1_raw": 0.01,
+    "low_mean": 0.9824,
+    "high_mean": 0.9682,
+    "between_std": 0.006,
+    "mean_within_std": 0.0035
+  },
+  {
+    "feature": "perimeter",
+    "snr": 0.8158,
+    "w1_norm": 2.2689,
+    "cohens_d": 4.9999,
+    "pearson_r": 0.9649,
+    "w1_raw": 82.78,
+    "low_mean": 1879.0854,
+    "high_mean": 1961.8663,
+    "between_std": 35.9282,
+    "mean_within_std": 44.0386
+  },
+  {
+    "feature": "circularity",
+    "snr": 0.5254,
+    "w1_norm": 2.241,
+    "cohens_d": 5.4466,
+    "pearson_r": -0.9727,
+    "w1_raw": 0.03,
+    "low_mean": 0.6764,
+    "high_mean": 0.6448,
+    "between_std": 0.0134,
+    "mean_within_std": 0.0256
+  }
+]

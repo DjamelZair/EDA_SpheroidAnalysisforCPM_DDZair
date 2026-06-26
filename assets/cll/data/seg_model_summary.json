@@ -1,0 +1,57 @@
+[
+  {
+    "method": "nnunet_grayscale",
+    "n": 45,
+    "mean_dice": 0.7569,
+    "median_dice": 0.8686,
+    "mean_cc_dice": 0.1718,
+    "mean_n_pred": 9.6889,
+    "mean_n_gt": 18.0,
+    "mean_recall": 0.4034,
+    "mean_precision": 0.4538
+  },
+  {
+    "method": "nnunet_multichannel",
+    "n": 45,
+    "mean_dice": 0.7548,
+    "median_dice": 0.8812,
+    "mean_cc_dice": 0.1667,
+    "mean_n_pred": 8.8,
+    "mean_n_gt": 18.0,
+    "mean_recall": 0.3625,
+    "mean_precision": 0.491
+  },
+  {
+    "method": "sam2_grayscale",
+    "n": 45,
+    "mean_dice": 0.7865,
+    "median_dice": 0.8987,
+    "mean_cc_dice": 0.116,
+    "mean_n_pred": 28.6889,
+    "mean_n_gt": 18.0,
+    "mean_recall": 0.3358,
+    "mean_precision": 0.267
+  },
+  {
+    "method": "sam2_multichannel",
+    "n": 45,
+    "mean_dice": 0.7682,
+    "median_dice": 0.8798,
+    "mean_cc_dice": 0.0812,
+    "mean_n_pred": 26.9111,
+    "mean_n_gt": 18.0,
+    "mean_recall": 0.2577,
+    "mean_precision": 0.175
+  },
+  {
+    "method": "classical_eda2",
+    "n": 45,
+    "mean_dice": 0.7604,
+    "median_dice": 0.799,
+    "mean_cc_dice": 0.0401,
+    "mean_n_pred": 25.6222,
+    "mean_n_gt": 18.0,
+    "mean_recall": 0.123,
+    "mean_precision": 0.1359
+  }
+]

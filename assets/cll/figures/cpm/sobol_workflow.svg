@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2100 600" width="2100" height="600">
+  <defs>
+    <style type="text/css"><![CDATA[
+      .letter  { font: 700 56px "Helvetica Neue","Arial","DejaVu Sans",sans-serif; fill: #0E6B6B; }
+      .title   { font: 700 52px "Helvetica Neue","Arial","DejaVu Sans",sans-serif; fill: #1A1A1A; letter-spacing: 0.01em; }
+      .step    { font: 700 48px "Helvetica Neue","Arial","DejaVu Sans",sans-serif; fill: #0E6B6B; letter-spacing: 0.14em; }
+      .node    { font: 700 48px "Helvetica Neue","Arial","DejaVu Sans",sans-serif; fill: #1A1A1A; }
+      .node-on { font: 700 48px "Helvetica Neue","Arial","DejaVu Sans",sans-serif; fill: #FFFFFF; }
+      .sub     { font: 400 48px "Helvetica Neue","Arial","DejaVu Sans",sans-serif; fill: #4B5563; }
+      .sub-on  { font: 400 48px "Helvetica Neue","Arial","DejaVu Sans",sans-serif; fill: #D6E8E6; }
+      .caption { font: italic 400 48px "Helvetica Neue","Arial","DejaVu Sans",sans-serif; fill: #4B5563; }
+    ]]></style>
+    <marker id="tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0E6B6B"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="2100" height="600" fill="#FFFFFF"/>
+  <text x="60" y="55" class="letter">A</text>
+  <text x="110" y="55" class="title">Saltelli sampling workflow</text>
+  <line x1="60" y1="75" x2="2040" y2="75" stroke="#E5E7EB" stroke-width="1.2"/>
+  <rect x="15" y="155" width="390" height="210" rx="14" ry="14" fill="#FFFFFF" stroke="#0E6B6B" stroke-width="2.0"/>
+  <text x="210" y="254" text-anchor="middle" class="node">Priors</text>
+  <text x="210" y="302" text-anchor="middle" class="sub">parameter ranges</text>
+  <text x="210" y="137" text-anchor="middle" class="step">STEP 1</text>
+  <rect x="435" y="155" width="390" height="210" rx="14" ry="14" fill="#FFFFFF" stroke="#0E6B6B" stroke-width="2.0"/>
+  <text x="630" y="254" text-anchor="middle" class="node">Saltelli</text>
+  <text x="630" y="302" text-anchor="middle" class="sub">sample matrices</text>
+  <text x="630" y="137" text-anchor="middle" class="step">STEP 2</text>
+  <rect x="855" y="155" width="390" height="210" rx="14" ry="14" fill="#FFFFFF" stroke="#0E6B6B" stroke-width="2.0"/>
+  <text x="1050" y="254" text-anchor="middle" class="node">Run CPM</text>
+  <text x="1050" y="302" text-anchor="middle" class="sub">N(k+2) sims</text>
+  <text x="1050" y="137" text-anchor="middle" class="step">STEP 3</text>
+  <rect x="1275" y="155" width="390" height="210" rx="14" ry="14" fill="#FFFFFF" stroke="#0E6B6B" stroke-width="2.0"/>
+  <text x="1470" y="254" text-anchor="middle" class="node">Features</text>
+  <text x="1470" y="302" text-anchor="middle" class="sub">at final MCS</text>
+  <text x="1470" y="137" text-anchor="middle" class="step">STEP 4</text>
+  <rect x="1695" y="155" width="390" height="210" rx="14" ry="14" fill="#0E6B6B" stroke="#063E3E" stroke-width="2.0"/>
+  <text x="1890" y="254" text-anchor="middle" class="node-on">Indices</text>
+  <text x="1890" y="302" text-anchor="middle" class="sub-on">S₁, Sₜ</text>
+  <text x="1890" y="137" text-anchor="middle" class="step">STEP 5</text>
+  <line x1="409" y1="260" x2="431" y2="260" stroke="#0E6B6B" stroke-width="2.2" marker-end="url(#tip)"/>
+  <line x1="829" y1="260" x2="851" y2="260" stroke="#0E6B6B" stroke-width="2.2" marker-end="url(#tip)"/>
+  <line x1="1249" y1="260" x2="1271" y2="260" stroke="#0E6B6B" stroke-width="2.2" marker-end="url(#tip)"/>
+  <line x1="1669" y1="260" x2="1691" y2="260" stroke="#0E6B6B" stroke-width="2.2" marker-end="url(#tip)"/>
+  <text x="1050" y="530" text-anchor="middle" class="caption">k = 6 parameters (width, temp, contact, neighbor, contact_no, λ)</text>
+  <text x="1050" y="570" text-anchor="middle" class="caption">N = 128, so N(k+2) = 1024 base simulations, replicated for noise averaging</text>
+</svg>

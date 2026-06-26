@@ -1,0 +1,66 @@
+{
+  "folds": [
+    {
+      "fold": 0,
+      "n": 66,
+      "model_dice": 0.7988,
+      "classical_dice": 0.8296,
+      "model_cc": 0.1593,
+      "classical_cc": 0.1292,
+      "delta": -0.0308,
+      "improves_n": 35,
+      "worse_n": 31
+    },
+    {
+      "fold": 1,
+      "n": 60,
+      "model_dice": 0.8603,
+      "classical_dice": 0.8183,
+      "model_cc": 0.204,
+      "classical_cc": 0.1603,
+      "delta": 0.042,
+      "improves_n": 42,
+      "worse_n": 18
+    },
+    {
+      "fold": 2,
+      "n": 60,
+      "model_dice": 0.8044,
+      "classical_dice": 0.8065,
+      "model_cc": 0.0774,
+      "classical_cc": 0.0913,
+      "delta": -0.002,
+      "improves_n": 36,
+      "worse_n": 24
+    },
+    {
+      "fold": 3,
+      "n": 60,
+      "model_dice": 0.7515,
+      "classical_dice": 0.7982,
+      "model_cc": 0.1285,
+      "classical_cc": 0.1014,
+      "delta": -0.0467,
+      "improves_n": 24,
+      "worse_n": 36
+    },
+    {
+      "fold": 4,
+      "n": 60,
+      "model_dice": 0.8382,
+      "classical_dice": 0.8761,
+      "model_cc": 0.1574,
+      "classical_cc": 0.1662,
+      "delta": -0.0379,
+      "improves_n": 28,
+      "worse_n": 32
+    }
+  ],
+  "means": {
+    "model_dice": 0.8107,
+    "classical_dice": 0.8257,
+    "model_cc": 0.1453,
+    "classical_cc": 0.1297,
+    "n_folds_better": 1
+  }
+}
