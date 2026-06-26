@@ -53,6 +53,25 @@ def regen(src, dst, crop_top=0.0, p_lo=2.0, p_hi=98.0):
           f"stretch=[{plo:.2f},{phi:.2f}]")
 
 
+def regen_bg(src, dst):
+    """For COLOURED figures (e.g. multicolour cell lattices): replace the near-white
+    background with teal so the colours pop on the dark site, and lift dark text/borders
+    to cream for legibility. Colours of the cells are preserved."""
+    im = Image.open(src).convert("RGB")
+    a = np.asarray(im).astype(np.float32)
+    R, G, B = a[..., 0], a[..., 1], a[..., 2]
+    mn = np.minimum(np.minimum(R, G), B)
+    mx = np.maximum(np.maximum(R, G), B)
+    white = mn > 225                       # near-white background and gutters
+    dark = (mx < 80)                       # title/labels and thin cell borders
+    out = a.copy()
+    out[white] = np.array([13, 89, 99])    # teal-3 card colour
+    out[dark] = CREAM                       # legible text on teal
+    out = np.clip(out, 0, 255).astype(np.uint8)
+    Image.fromarray(out).save(dst)
+    print(f"{dst}: {out.shape} white->teal={int(white.sum())} dark->cream={int(dark.sum())}")
+
+
 if __name__ == "__main__":
     PORT = "/media/djameldino/Expansion/CLL_data/html portfolio/assets/cll/figures/"
     here = sys.argv[1] if len(sys.argv) > 1 else "."
@@ -60,3 +79,9 @@ if __name__ == "__main__":
           here + "/02_segmentation/fig/overlay_dark.png", crop_top=0.105)
     regen(PORT + "segmentation/hardest_case_showcase.png",
           here + "/02_segmentation/fig/hardest_dark.png")
+    # Theme 3: Saltelli VTK library gallery (coloured cell lattices) -> teal background
+    import os
+    os.makedirs(here + "/03_simulation_library/fig", exist_ok=True)
+    regen_bg("/media/djameldino/Expansion/CLL_data/rq3_inference/vtk_plots_saltelli /"
+             "saltelli_gallery_n16_seed0.png",
+             here + "/03_simulation_library/fig/saltelli_gallery.png")

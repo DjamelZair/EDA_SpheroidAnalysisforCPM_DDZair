@@ -2,7 +2,7 @@
 
 **Thesis target:** Theme 03 / Synthetic CPM library / Appendix C & F.
 
-> Seven mechanistic knobs, swept one at a time and jointly, build the synthetic library the real spheroids are matched against.
+> Seven simulation knobs, swept one at a time and jointly, build the synthetic library the real spheroids are matched against.
 
 A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion, contact range, neighbour order, volume elasticity, target volume, and motility) is sampled to build a reference library of morphology trajectories. This theme shows how each knob changes the simulated cluster, and accounts for which runs were usable.
 
@@ -21,7 +21,17 @@ A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion
 
 **What it shows.** Target volume (width) and cell-cell adhesion move cluster area the most; neighbour order and motility barely move it on their own.
 
-**What it motivated (Sets up the identifiability question).** Identifies which knobs leave a size signature in morphology, the precondition for being recoverable later.
+**What it motivated (Sets up the identifiability question).** Identifies which knobs leave a size signature in morphology, the precondition for being identifiable later.
+
+## What the library looks like  (16 random samples at the final step)
+
+### Sixteen synthetic spheroids from the simulation library - final MCS, one replicate
+
+![](fig/saltelli_gallery.png)
+
+**What it shows.** Each panel is one sampled parameter vector rendered at the final simulation step, with cells coloured individually. The samples span compact, loosely packed, and fully dispersed morphologies.
+
+**What it motivated (Shows the library's morphological spread).** Confirms visually that the sampled parameter space produces a wide morphological range, the diversity the inversion relies on.
 
 ## Which knobs drive cluster size?  (Sobol indices, direct vs total effect)
 
@@ -29,9 +39,9 @@ A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion
 
 ![](../assets/cll/figures/cpm/sobol_S1_vs_ST.png)
 
-**What it shows.** Direct effect (S1) is how much a knob alone moves area; total effect (ST) adds its interactions with the other knobs. A large gap means the knob is entangled.
+**What it shows.** Direct effect (S1) is how much a knob alone moves area; total effect (ST) adds its interactions with the other knobs. A large gap means the knob acts mostly through those interactions.
 
-**What it motivated (Entanglement bounds identifiability).** Target volume dominates; cell-cell and cell-medium adhesion carry sizeable interaction effects. Entanglement is what limits how cleanly a single knob can be read back from morphology.
+**What it motivated (Interactions bound identifiability).** Target volume dominates; cell-cell and cell-medium adhesion carry sizeable interaction effects. These interactions limit how cleanly a single knob can be read back from morphology.
 
 ### Library yield - sampled to usable
 

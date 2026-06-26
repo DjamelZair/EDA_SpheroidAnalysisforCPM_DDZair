@@ -17,7 +17,7 @@ INDEX = {
         ["Patient mapping & split", "Train/val/test 216/45/45 images (37/9/8 spheroids), plate-level stratification",
          "app:patient_mapping / tab:patient_mapping", "P1043 noted in train and test"],
     ],
-    1: [  # Theme 2 - segmentation & feature fidelity
+    1: [  # Theme 2 - segmentation & feature preservation
         ["Classical baseline", "ROI extraction + multi-Otsu vs simpler alternatives, per-stage justification",
          "app:classical_justification", "Justifies ROI + 3-class Otsu"],
         ["Segmentation candidates", "8 models on the fixed 216/45/45 split",
@@ -33,7 +33,7 @@ INDEX = {
         ["ICC / CCC heatmaps", "Full ICC and CCC matrices, 8 models x 6 features",
          "app:segmentation_heatmaps", "Shown above (heatmap)"],
         ["Post-processing sweep", "Change in mean feature CCC under 11 strategies, all 8 segmenters",
-         "app:ccc_postproc / fig:ccc_postproc_sweep", "Cleanup is cosmetic for fidelity (shown above)"],
+         "app:ccc_postproc / fig:ccc_postproc_sweep", "Cleanup is cosmetic for preservation (shown above)"],
         ["Residual-refiner", "Two-stage classical + learned correction",
          "app:refiner_failure / tab:refiner", "Negative result: collapses to identity"],
         ["F3 time series", "Most fragmented test frame across 4 days at 4 h cadence",
@@ -69,7 +69,7 @@ INDEX = {
         ["SA baseline comparison", "Parameter rank under 6 measures (Spearman, SRC, XGB, Morris, PAWN, Sobol)",
          "app:sa_baselines / tab:sa_baselines", "Rank consistent: w~1, J_cm~2, J_cc~3"],
         ["LOO recovery R2", "Per-parameter recovered vs true over 1,105 runs, with identifiability tiers",
-         "sec:res_rq2_1 / tab:rq2_1_identifiability", "J_cm 0.62, w 0.54, J_cc 0.38 (shown above)"],
+         "sec:res_rq2_1 / tab:rq2_1_identifiability", "w 0.64, J_cm 0.61, J_cc 0.34 (weakly identifiable; shown above)"],
         ["Synthetic inversion diagnostics", "Distance-metric, posterior coverage, Wasserstein, k-sensitivity",
          "app:synthetic_diagnostics", "Robustness checks"],
         ["LOO scatter", "Recovered vs true scatter, one panel per parameter, R2 inset",
@@ -95,7 +95,7 @@ INDEX = {
         ["Drug-class lookup", "23 drugs by mechanism class with targets and expected effects",
          "app:drug_classes / tab:drug_lookup", "BTKi, Syk, PI3K, JAK, CXCR4, MEK, NF-kB, ..."],
         ["Drug-panel delta J_cc", "Per-drug J_cc shift, by class, bootstrap CI; tau vs end-state matcher",
-         "app:drug_panel_jcc / fig:h33_drug_panel_appendix", "End-state BCR axis +9.7 CI [7.2,11.9]"],
+         "app:drug_panel_jcc / fig:h33_drug_panel_appendix", "Value under revision"],
     ],
 }
 

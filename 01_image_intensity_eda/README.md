@@ -49,7 +49,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 **What it motivated (Decision: restrict inversion features).** Both inject noise into boundary-derived shape features, the exact perimeter and circularity features the CPM inference relies on, so inversion is restricted to features that survive segmentation noise.
 
-## C. What is the object structure?  (the segmentation criterion: feature fidelity)
+## C. What is the object structure?  (the segmentation criterion: feature preservation)
 
 ### Components per annotated image - how multi-object the masks are
 
@@ -67,7 +67,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 **What it shows.** Syk-inhibitor and CXCR4-antagonist wells are the most fragmented; BTK, NF-kB and MALT1 inhibitors sit lowest. Counts are large and unequal and metadata are plate-level, so this is read as an association.
 
-**What it motivated (Preview: RQ3 mechanism, associative only).** Previews the RQ3 mechanism story (drug class changes cohesion), and shows the most drug-responsive classes are hardest to segment, so feature fidelity is the right criterion.
+**What it motivated (Preview: RQ3 mechanism, associative only).** Previews the RQ3 drug-response story (drug class changes cohesion), and shows the most drug-responsive classes are hardest to segment, so feature preservation is the right criterion.
 
 ## E. Drug response, measured automatically  (the payoff: morphology to mechanism)
 

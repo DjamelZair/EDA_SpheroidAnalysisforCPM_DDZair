@@ -114,7 +114,7 @@ THEME1 = [
          informs_tag="Decision: restrict inversion features"),
 
     dict(type="section", title='C. What is the object <span class="it">structure</span>?',
-         right="the segmentation criterion: feature fidelity"),
+         right="the segmentation criterion: feature preservation"),
     dict(type="chart", id="t1_ncomp", fn="barV", height=340,
          title="Components per annotated image", sub="how multi-object the masks are",
          data=dict(labels=_nc["labels"],
@@ -138,8 +138,8 @@ THEME1 = [
          note="Syk-inhibitor and CXCR4-antagonist wells are the most fragmented; BTK, NF-kB and "
               "MALT1 inhibitors sit lowest. Counts are large and unequal and metadata are "
               "plate-level, so this is read as an association.",
-         informs="Previews the RQ3 mechanism story (drug class changes cohesion), and shows the "
-                 "most drug-responsive classes are hardest to segment, so feature fidelity is the "
+         informs="Previews the RQ3 drug-response story (drug class changes cohesion), and shows the "
+                 "most drug-responsive classes are hardest to segment, so feature preservation is the "
                  "right criterion.",
          informs_tag="Preview: RQ3 mechanism, associative only"),
 
@@ -179,7 +179,7 @@ THEME1 = [
 
 
 
-# ============================ THEME 2 - SEGMENTATION & FEATURE FIDELITY =================
+# ============================ THEME 2 - SEGMENTATION & FEATURE PRESERVATION ==============
 _CD = ROOT / "assets/cll/data"
 def _loadc(name): return _json.loads((_CD / name).read_text())
 
@@ -220,7 +220,7 @@ _F3 = dict(labels=[f'{t["preproc"]} / {t["seg"]}' for t in _f3],
 
 THEME2 = [
     dict(type="hero", bg="assets/hero_spheroid_overlay.png",
-         meta=["Theme 02", "Segmentation & feature fidelity", "Appendix B"],
+         meta=["Theme 02", "Segmentation & feature preservation", "Appendix B"],
          title='Eight <span class="gold">candidates</span>, one <span class="it">winner</span>.',
          caption="VID3201 F3 &middot; U-Net (heavy aug.) outline in cherry",
          lede="Pixel overlap cannot tell the candidates apart. The metric that matters for the "
@@ -244,7 +244,7 @@ THEME2 = [
          shows="The gold outline is the U-Net's call on frames it never saw in training; the boxes "
                "show the shape numbers (area, circularity, solidity) extracted from each.",
          informs="The unit of evaluation is these extracted numbers, not the pixel mask.",
-         informs_tag="Why feature fidelity, not pixels"),
+         informs_tag="Why feature preservation, not pixels"),
 
     dict(type="section", title='Model <span class="it">leaderboard</span>', right="switch the metric"),
     dict(type="chart", id="t2_lb", fn="lbboard", height=420,
@@ -256,7 +256,7 @@ THEME2 = [
               "that reflects what the next stage consumes.",
          informs="The segmenter is selected on shape-number agreement (Lin's CCC against the six CPM "
                  "features), not pixel Dice. The heavy-aug U-Net is the only model above the 0.85 bar.",
-         informs_tag="Decision: rank by feature fidelity"),
+         informs_tag="Decision: rank by feature preservation"),
 
     dict(type="figure", img=CLL2 + "segmentation/icc_ccc_heatmap.png",
          ttl="Per-feature reliability scoreboard", sub="8 models x 6 shape numbers",
@@ -279,7 +279,7 @@ THEME2 = [
               "are already sparse.",
          informs="On the metric that matters for the next stage this cleanup does not move the "
                  "needle: it rescues pixel overlap, not shape-number reliability.",
-         informs_tag="Negative result: cleanup is cosmetic for fidelity"),
+         informs_tag="Negative result: cleanup is cosmetic for feature preservation"),
 
     dict(type="section", title='Hardest <span class="it">case</span>', right="a fully fragmented spheroid"),
     dict(type="figure", img="fig/hardest_dark.png",
@@ -289,7 +289,7 @@ THEME2 = [
                "every model; area and diameter stay reliable while roundness and elongation collapse.",
          informs="This split is the entire reason the audit was needed, and why F3 is reported "
                  "separately rather than excluded.",
-         informs_tag="Validates the feature-fidelity audit"),
+         informs_tag="Validates the feature-preservation audit"),
     dict(type="chart", id="t2_f3", fn="barH", height=360,
          title="Classical pipeline on the hardest frame", sub="top 10 of the classical preproc / segmenter sweep",
          data=_F3,
@@ -323,9 +323,9 @@ _SWEEP = dict(order=_SW_ORDER, nice=_sw_nice,
               area={k: _sw[k]["features"]["total_area"] for k in _SW_ORDER})
 
 # ---- Theme 4 data: verified leave-one-out R2 (canonical identifiability_loo.csv) ----
-_R2 = [("cell-medium adhesion (J_cm)", 0.615), ("target volume (width)", 0.544),
-       ("cell-cell adhesion (J_cc)", 0.384), ("volume elasticity (lambda)", 0.177),
-       ("motility (temperature)", 0.166), ("contact range", 0.136),
+_R2 = [("target volume (width)", 0.635), ("cell-medium adhesion (J_cm)", 0.615),
+       ("cell-cell adhesion (J_cc)", 0.344), ("contact range", 0.167),
+       ("motility (temperature)", 0.164), ("volume elasticity (lambda)", 0.126),
        ("neighbour order", -0.069)]
 _R2_COL = [("#c8a05c" if v >= 0.30 else MUT) for _, v in _R2]
 _DISC = sorted(_loadc("cpm_discriminability.json"), key=lambda x: -x["snr"])
@@ -335,7 +335,7 @@ THEME3 = [
          meta=["Theme 03", "Synthetic CPM library", "Appendix C & F"],
          title='The <span class="gold">simulator</span>, <span class="it">characterised</span>.',
          caption="Cellular Potts Model spheroid, synthetic lattice",
-         lede="Seven mechanistic knobs, swept one at a time and jointly, build the synthetic "
+         lede="Seven simulation knobs, swept one at a time and jointly, build the synthetic "
               "library the real spheroids are matched against.",
          summary="A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion, "
                  "contact range, neighbour order, volume elasticity, target volume, and motility) is "
@@ -356,19 +356,30 @@ THEME3 = [
          note="Target volume (width) and cell-cell adhesion move cluster area the most; neighbour "
               "order and motility barely move it on their own.",
          informs="Identifies which knobs leave a size signature in morphology, the precondition "
-                 "for being recoverable later.",
+                 "for being identifiable later.",
          informs_tag="Sets up the identifiability question"),
+    dict(type="section", title='What the <span class="it">library</span> looks like',
+         right="16 random samples at the final step"),
+    dict(type="figure", img="fig/saltelli_gallery.png",
+         ttl="Sixteen synthetic spheroids from the simulation library", sub="final MCS, one replicate",
+         alt="gallery of 16 simulated CPM spheroids spanning the parameter space",
+         shows="Each panel is one sampled parameter vector rendered at the final simulation step, "
+               "with cells coloured individually. The samples span compact, loosely packed, and "
+               "fully dispersed morphologies.",
+         informs="Confirms visually that the sampled parameter space produces a wide morphological "
+                 "range, the diversity the inversion relies on.",
+         informs_tag="Shows the library's morphological spread"),
     dict(type="section", title='Which knobs <span class="it">drive</span> cluster size?',
          right="Sobol indices, direct vs total effect"),
     dict(type="figure", img=CLLF + "cpm/sobol_S1_vs_ST.png",
          ttl="Sobol first-order vs total effect", sub="share of variance in cluster area",
          alt="Sobol S1 and ST bars per parameter",
          shows="Direct effect (S1) is how much a knob alone moves area; total effect (ST) adds its "
-               "interactions with the other knobs. A large gap means the knob is entangled.",
+               "interactions with the other knobs. A large gap means the knob acts mostly through those interactions.",
          informs="Target volume dominates; cell-cell and cell-medium adhesion carry sizeable "
-                 "interaction effects. Entanglement is what limits how cleanly a single knob can be "
+                 "interaction effects. These interactions limit how cleanly a single knob can be "
                  "read back from morphology.",
-         informs_tag="Entanglement bounds identifiability"),
+         informs_tag="Interactions bound identifiability"),
     dict(type="chart", id="t3_yield", fn="barH", height=240,
          title="Library yield", sub="sampled to usable",
          data=dict(labels=["Sampled (Saltelli)", "Usable", "Dropped (degenerate)"],
@@ -383,7 +394,7 @@ THEME3 = [
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 03', chips=[
         dict(t="cpm_sweeps.json", gold=True), dict(t="CompuCell3D"), dict(t="Saltelli design"),
         dict(t="VTK feature extraction"), dict(t="1,105-run library")]),
-    dict(type="bigcta", title='Next: which knobs are <span class="it">recoverable</span>?',
+    dict(type="bigcta", title='Next: which knobs are <span class="it">identifiable</span>?',
          links=[dict(t="Theme 04 &middot; Identifiability &rarr;", href="04_separability_identifiability/index.html", primary=True),
                 dict(t="Back to index", href="index.html")]),
 ]
@@ -393,32 +404,32 @@ THEME4 = [
          meta=["Theme 04", "Separability & identifiability", "Appendix D to H"],
          title='Which knobs can we <span class="it">read back</span>?',
          caption="Leave-one-out inversion on the 1,105-run library",
-         lede="Only three of the seven parameters can be recovered from morphology. The rest are "
-              "entangled, and the analysis says so honestly.",
+         lede="None of the seven parameters reach the identifiable band. Three are weakly identifiable "
+              "and the other four are non-identifiable, and the analysis says so honestly.",
          summary="Leave-one-out inversion on the 1,105-run library measures how well each CPM "
                  "parameter is recovered from morphology (R squared of recovered vs true). Cell-medium "
-                 "adhesion, target volume and cell-cell adhesion are recoverable; the others are not. "
-                 "These are the verified numbers from the canonical benchmark, not the optimistic "
+                 "width, cell-medium adhesion and cell-cell adhesion are weakly identifiable; the other four are non-identifiable. "
+                 "These are the verified numbers from the recovery benchmark, not the optimistic "
                  "error metric used elsewhere."),
     dict(type="kpis", items=[
-        dict(lbl="Recoverable", num="3 of 7", desc="J_cm, width, J_cc cross the R2 0.30 line.", gold=True),
-        dict(lbl="Best recovery", num="0.62", desc="Cell-medium adhesion (J_cm), LOO R2.", gold=True, numeric=True),
+        dict(lbl="Weakly identifiable", num="3 of 7", desc="width, J_cm, J_cc clear the R2 0.30 weak bar; none reach identifiable.", gold=True),
+        dict(lbl="Best recovery", num="0.64", desc="Cell width, LOO R2 (weakly identifiable).", gold=True, numeric=True),
         dict(lbl="Library size", num="1,105", desc="Saltelli runs used for the benchmark.", numeric=True),
-        dict(lbl="Unidentifiable", num="4", desc="lambda, temperature, contact range, neighbour order.", numeric=True),
+        dict(lbl="Non-identifiable", num="4", desc="lambda, temperature, contact range, neighbour order.", numeric=True),
     ]),
     dict(type="section", title='How well each parameter is <span class="it">recovered</span>',
          right="leave-one-out R squared, verified"),
     dict(type="chart", id="t4_r2", fn="barH", height=360,
-         title="Leave-one-out recovery (R squared)", sub="gold = recoverable (R2 >= 0.30)",
+         title="Leave-one-out recovery (R squared)", sub="gold = weakly identifiable (R2 >= 0.30)",
          data=dict(labels=[n for n, _ in _R2],
                    datasets=[dict(label="LOO R2", data=[v for _, v in _R2], color=_R2_COL)],
                    xlabel="R squared (recovered vs true)", min=-0.1, max=0.8, dec=2),
-         note="Cell-medium adhesion (0.62), target volume (0.54) and cell-cell adhesion (0.38) are "
-              "recoverable; volume elasticity, temperature, contact range and neighbour order sit "
-              "below the line. Neighbour order is effectively zero.",
-         informs="The pipeline reports estimates and uncertainty only for the three recoverable "
-                 "axes, and reports the rest as unidentified rather than guessing.",
-         informs_tag="Decision: report only identifiable axes"),
+         note="Cell width (0.64), cell-medium adhesion (0.61) and cell-cell adhesion (0.34) are the "
+              "three weakly identifiable parameters; volume elasticity, temperature, contact range and "
+              "neighbour order are non-identifiable. Neighbour order is effectively zero.",
+         informs="The pipeline reports estimates and uncertainty only for the three weakly identifiable "
+                 "axes, and reports the rest as non-identifiable rather than guessing.",
+         informs_tag="Decision: report only the weakly identifiable axes"),
     dict(type="section", title='Why some features <span class="it">separate</span> better',
          right="signal-to-noise per feature"),
     dict(type="chart", id="t4_snr", fn="barH", height=320,
@@ -427,12 +438,12 @@ THEME4 = [
                    datasets=[dict(label="SNR", data=[round(d["snr"], 2) for d in _DISC], color="#c8a05c")],
                    xlabel="signal-to-noise ratio", dec=2),
          note="Area and diameter carry the strongest signal across the parameter sweeps; circularity "
-              "and perimeter are the noisiest, which matches their lower segmentation fidelity.",
+              "and perimeter are the noisiest, which matches their lower feature preservation.",
          informs="Size features anchor the inversion; shape features add little once size is fixed, "
                  "consistent with the segmentation audit in Theme 02.",
-         informs_tag="Connects back to feature fidelity"),
+         informs_tag="Connects back to feature preservation"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 04', chips=[
-        dict(t="identifiability_loo.csv", gold=True), dict(t="cpm_discriminability.json"),
+        dict(t="tab:rq2_1_identifiability (tau)", gold=True), dict(t="cpm_discriminability.json"),
         dict(t="leave-one-out inversion"), dict(t="XGBoost surrogate"), dict(t="tau-registration matcher")]),
     dict(type="bigcta", title='Next: the real <span class="it">drug data</span>.',
          links=[dict(t="Theme 05 &middot; Drug & real data &rarr;", href="05_drug_realdata/index.html", primary=True),
@@ -442,19 +453,19 @@ THEME4 = [
 THEME5 = [
     dict(type="hero",
          meta=["Theme 05", "Drug panel & real-data inference", "Appendix I & J"],
-         title='From real spheroids to <span class="it">mechanism</span>.',
+         title='Real spheroids, <span class="it">relative shifts</span>.',
          caption="Patient-derived spheroids under drug treatment",
-         lede="The pipeline inverts real morphology to CPM parameters, and the inferred shifts track "
-              "stimulation and drug class across patients.",
-         summary="Real spheroid trajectories from 152 control wells and a panel of drug conditions are "
-                 "inverted to CPM parameters on the three recoverable axes. The inferred shifts are "
-                 "read as relative changes, not absolute values, and the drug-class pattern is "
-                 "consistent with the known biology."),
+         lede="The pipeline inverts real morphology to CPM parameters; the inferred shifts on the "
+              "weakly identifiable axes are read as relative changes, not biophysical effects.",
+         summary="Real spheroid trajectories from reference wells across seven patients and a panel of "
+                 "drug conditions are inverted to CPM parameters on the three weakly identifiable axes. "
+                 "The inferred shifts are read as relative, simulation-derived changes, not absolute or "
+                 "biophysical values."),
     dict(type="kpis", items=[
-        dict(lbl="Control wells", num="152", desc="Reference distribution across patients.", numeric=True),
-        dict(lbl="Read as", num="shifts", desc="Relative change on identifiable axes, not absolutes.", gold=True),
-        dict(lbl="Strongest rescue", num="BTKi", desc="Significant J_cc shift; CXCR4 and JAK none.", gold=True),
-        dict(lbl="Reported axes", num="3", desc="width, J_cc, J_cm only.", numeric=True),
+        dict(lbl="Patients", num="7", desc="Reference wells inverted across 7 patients.", numeric=True),
+        dict(lbl="Read as", num="shifts", desc="Relative change on the weakly identifiable axes, not absolutes.", gold=True),
+        dict(lbl="Drug-panel shift", num="weak", desc="Panel-wide BCR-axis J_cc shift is small with a bootstrap interval including zero; magnitude under revision."),
+        dict(lbl="Reported axes", num="3", desc="the three weakly identifiable axes (width, J_cc, J_cm).", numeric=True),
     ]),
     dict(type="section", title='What the <span class="it">drugs</span> do to morphology',
          right="three dose conditions"),
@@ -462,8 +473,8 @@ THEME5 = [
          ttl="High-dose trametinib collapses the cluster", sub="MEK inhibitor, 50 uM",
          alt="time strip of a high-dose-treated spheroid disintegrating",
          shows="The cluster loses cohesion and breaks apart over the time course.",
-         informs="A large, end-state-specific shift in the inferred contact parameters.",
-         informs_tag="Drug effect is mechanistic, not just size"),
+         informs="An end-state shift in the inferred contact parameters; magnitude under revision.",
+         informs_tag="Relative shift on the contact axes"),
     dict(type="figure", img=CLLF + "morphology/drug_strip_pd098060.png",
          ttl="PD098060 compacts the cluster", sub="MEK pathway, 100 uM",
          alt="time strip of a PD098060-treated spheroid compacting",
@@ -488,14 +499,14 @@ THEME5 = [
          informs_tag="Closes the loop with RQ1"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 05', chips=[
         dict(t="real_data_inference_report.ipynb", gold=True), dict(t="drug panel"),
-        dict(t="tau-registration matcher"), dict(t="bootstrap CIs"), dict(t="152 control wells")]),
+        dict(t="tau-registration matcher"), dict(t="bootstrap CIs"), dict(t="7 patients")]),
     dict(type="bigcta", title='Back to the <span class="it">overview</span>.',
          links=[dict(t="All analysis themes &rarr;", href="index.html", primary=True)]),
 ]
 
 
 THEME_SPECS = {0: ("Image &amp; intensity EDA - CLL CPM thesis", THEME1),
-               1: ("Segmentation &amp; feature fidelity - CLL CPM thesis", THEME2),
+               1: ("Segmentation &amp; feature preservation - CLL CPM thesis", THEME2),
                2: ("Simulation library - CLL CPM thesis", THEME3),
                3: ("Separability &amp; identifiability - CLL CPM thesis", THEME4),
                4: ("Drug panel &amp; real-data inference - CLL CPM thesis", THEME5)}
@@ -508,21 +519,21 @@ LANDING_THEMES = [
               "raw brightfield data, and how the dataset composes. Every figure states the method "
               "choice it motivated.",
          metric="Appendix A.1 &middot; RQ1", href="01_image_intensity_eda/index.html", ready=True),
-    dict(num="Theme 02", name='Segmentation &amp; feature <span class="it">fidelity</span>',
+    dict(num="Theme 02", name='Segmentation &amp; feature <span class="it">preservation</span>',
          lede="Eight segmenters compared on the metric the pipeline consumes - do AI-derived shape "
               "numbers agree with human ones? Only the heavy-aug U-Net clears the 0.85 reliability bar.",
          metric="Appendix B &middot; RQ1", href="02_segmentation/index.html", ready=True),
-    dict(num="Theme 03", name='Simulation library &amp; <span class="it">benchmark</span>',
+    dict(num="Theme 03", name='Simulation <span class="it">library</span>',
          lede="The synthetic CPM library: how each parameter changes morphology, how the runs "
               "distribute, and how 1,152 sampled vectors became 1,105 usable.",
          metric="Appendix C, F &middot; RQ2", href="03_simulation_library/index.html", ready=True),
     dict(num="Theme 04", name='Separability &amp; <span class="it">identifiability</span>',
-         lede="Which CPM parameters are recoverable from morphology - SNR discriminability, Sobol "
-              "sensitivity, leave-one-out inversion. Only width, J_cc and J_cm reach any identifiability.",
+         lede="Which CPM parameters are identifiable from morphology - SNR discriminability, Sobol "
+              "sensitivity, leave-one-out recovery. None reach the identifiable band; width, J_cc and J_cm are weakly identifiable.",
          metric="Appendix D-H &middot; RQ2", href="04_separability_identifiability/index.html", ready=True),
     dict(num="Theme 05 &middot; Headline", name='Drug panel &amp; real-data <span class="it">inference</span>',
          lede="Inverting real spheroid morphology to CPM parameters, and whether inferred shifts track "
-              "stimulation, drug class and patient across 152 control wells and the drug panel.",
+              "stimulation and drug class across seven patients and the drug panel.",
          metric="Appendix I, J &middot; RQ3", href="05_drug_realdata/index.html", ready=True, featured=True),
 ]
 
@@ -530,8 +541,8 @@ LANDING_TAPE = [
     "Image EDA", "99k frames, 51 hand-annotated",
     "Reproducibility audited", "only U-Net (heavy aug.) crosses the 0.85 reliability bar",
     "Cellular Potts simulation", "1,152 sampled, 1,105 usable runs",
-    "Identifiability", "width, J_cc and J_cm recoverable; the rest entangled",
-    "Real-data inference", "152 control wells + drug panel, relative shifts on identifiable axes",
+    "Identifiability", "width, J_cc and J_cm weakly identifiable; the rest non-identifiable",
+    "Real-data inference", "reference wells across 7 patients + drug panel, relative shifts on the weakly identifiable axes",
 ]
 
 LANDING_HERO = dict(
