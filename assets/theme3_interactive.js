@@ -152,6 +152,8 @@
     var selX = dropdown(fopts, ax1), selY = dropdown(fopts, ay1), selC = dropdown(popts, colorBy);
     field("x", selX); field("y", selY); field("colour", selC);
     var exBtn = chip("highlight extremes", false); bar.appendChild(exBtn);
+    var exRow = el("div", "iact-seg"); exRow.style.flexBasis = "100%"; exRow.style.marginTop = "0.2rem"; bar.appendChild(exRow);
+    var EXLAB = { max_area: "max area", min_area: "min area", max_circularity: "max circularity", min_circularity: "min circularity" };
 
     var grid = el("div", "iact-2col"); mount.appendChild(grid);
     var cwrap = el("div"); grid.appendChild(cwrap);
@@ -197,7 +199,18 @@
       if (best) { sel = best; showCard(best); draw(); }
     });
     selX.onchange = selY.onchange = selC.onchange = draw;
-    exBtn.onclick = function () { showEx = !showEx; exBtn.classList.toggle("on", showEx); draw(); };
+    exBtn.onclick = function () {
+      showEx = !showEx; exBtn.classList.toggle("on", showEx); exRow.innerHTML = "";
+      if (showEx && d.extremes) {
+        Object.keys(d.extremes).forEach(function (k) {
+          var id = typeof d.extremes[k] === "object" ? d.extremes[k].sample_id : d.extremes[k];
+          var b = chip((EXLAB[k] || k.replace(/_/g, " ")) + " #" + id, false);
+          b.onclick = function () { var p = pts.filter(function (q) { return q.sample_id === id; })[0]; if (p) { sel = p; showCard(p); draw(); } };
+          exRow.appendChild(b);
+        });
+      }
+      draw();
+    };
     if (d.meta.extremes_image) { var ei = el("img", "iact-extimg"); ei.src = d.meta.extremes_image; ei.alt = "morphology extremes"; mount.appendChild(ei); }
     draw();
   }
