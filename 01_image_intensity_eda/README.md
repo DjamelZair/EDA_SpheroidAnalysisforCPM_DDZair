@@ -93,7 +93,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 ![](../assets/cll/figures/01_image_eda/fig05_illumination.png)
 
-**What it shows.** Background illumination is uneven (CV about 0.2 to 0.25) and grows worse over the time course; the exemplar shows the bright-centre, dark-edge falloff typical of these wells.
+**What it shows.** Background illumination is uneven (CV about 0.2 to 0.25) and grows worse over the time course; the exemplar shows the shading and debris across the field (the dark disc at the centre is the spheroid itself).
 
 **What it motivated (Decision: restrict inversion features).** Uneven background biases any intensity-based boundary, another reason the inversion leans on shape features that tolerate illumination drift.
 

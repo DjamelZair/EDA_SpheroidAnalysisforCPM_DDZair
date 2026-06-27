@@ -140,3 +140,5 @@ footer a{color:inherit;border-bottom:1px solid currentColor;padding-bottom:1px}
 .figwrap{line-height:0;border-bottom:2px solid var(--gold)}
 .figwrap.light{background:var(--teal-3);padding:6px}
 .figwrap.light img{mix-blend-mode:multiply;opacity:.96}
+/* native figures are rendered transparent for the teal card: no blend, just breathing room */
+.figwrap.native{background:transparent;padding:1.1rem 1.3rem 0.5rem;border-bottom:1px solid color-mix(in srgb,var(--gold) 35%,transparent)}

@@ -111,9 +111,14 @@ def _figure(b, rel_root):
     # figures are theme-local (figures/x.png), so they are NOT prefixed with rel_root
     img_html = "".join(f'<img src="{src}" alt="{_html.escape(b.get("alt",""))}">'
                        for src in imgs)
-    # light-background matplotlib figures get a multiply blend so their white tints into the
-    # teal and reads as a mounted plate instead of a jarring white block.
-    wrap_cls = "figwrap light" if b.get("light") else "figwrap"
+    # native = transparent figure built for the teal card (no blend). light = white-bg
+    # matplotlib figure multiply-blended so its white tints into the teal.
+    if b.get("native"):
+        wrap_cls = "figwrap native"
+    elif b.get("light"):
+        wrap_cls = "figwrap light"
+    else:
+        wrap_cls = "figwrap"
     return (f'<section class="card" style="padding:0;overflow:hidden">'
             f'<div class="{wrap_cls}">{img_html}</div>'
             f'<div style="padding:1.2rem 1.7rem 1.5rem">{head}{shows}{informs}</div></section>')
