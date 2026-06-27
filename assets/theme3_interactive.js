@@ -186,7 +186,9 @@
     }
     function showCard(p) {
       var ph = "<div class='iact-cardh'>Sample #" + p.sample_id + (exIds.indexOf(p.sample_id) >= 0 ? " <span class='iact-badge'>extreme</span>" : "") + "</div>";
-      if (exImg[p.sample_id]) ph += "<img class='iact-spheroid' style='margin-bottom:0.7rem' src='" + exImg[p.sample_id] + "' alt='rendered spheroid for sample " + p.sample_id + "'>";
+      var imgsrc = exImg[p.sample_id];
+      if (!imgsrc && d.meta.spheroids) { var S = d.meta.spheroids; if (p.sample_id >= S.min && p.sample_id <= S.max) imgsrc = S.path.replace("{id}", p.sample_id); }
+      if (imgsrc) ph += "<img class='iact-spheroid' style='margin-bottom:0.7rem' src='" + imgsrc + "' onerror=\"this.style.display='none'\" alt='rendered spheroid for sample " + p.sample_id + "'>";
       var rows = "<div class='iact-kv'><div class='iact-kvg'>CPM parameters</div>";
       pLabels.forEach(function (k) { rows += "<div><span>" + k.replace(/_/g, " ") + "</span><b>" + fmt(p[k], 2) + "</b></div>"; });
       rows += "</div><div class='iact-kv'><div class='iact-kvg'>resulting morphology</div>";
