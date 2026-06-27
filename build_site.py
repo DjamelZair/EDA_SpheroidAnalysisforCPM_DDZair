@@ -587,9 +587,12 @@ THEME4 = [
     dict(type="section", title='Which knobs are <span class="it">identifiable</span>?',
          right="leave-one-out recovery"),
     dict(type="interactive", widget="idbars", json="theme4_identifiability.json",
-         intro="Per-parameter recovery R-squared from the inversion benchmark. Toggle the matcher "
-               "variant and click a bar for its Pearson correlation, sample count and error.",
-         informs="Sorts the seven knobs into identifiable, weakly identifiable and non-identifiable, "
+         intro="Per-parameter recovery R-squared from the inversion benchmark, under the tau-registered "
+               "matcher (primary) or the end-state matcher (secondary). The dashed line is the "
+               "identifiable bar at R-squared 0.75; click a bar for its Pearson correlation, sample "
+               "count and error.",
+         informs="No parameter reaches the 0.75 identifiable bar: cell-medium adhesion, target volume "
+                 "and contact are only weakly identifiable, and the rest are non-identifiable. This is "
                  "the spine of RQ2.",
          informs_tag="Beyond the thesis: interactive identifiability"),
     dict(type="section", title='Feature to parameter <span class="it">importance</span>',

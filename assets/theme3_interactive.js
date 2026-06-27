@@ -350,8 +350,15 @@
       var h = "<div class='iact-cardh'>" + p.label + (p.winner ? " <span class='iact-badge' style='background:var(--green);color:var(--teal-1)'>chosen</span>" : "") + "</div>";
       var kv = "<div class='iact-kv'><div class='iact-kvg'>overall</div><div><span>Dice (pixel)</span><b>" + fmt(p.dice, 3) + "</b></div><div><span>CC-Dice</span><b>" + fmt(p.cc_dice, 3) + "</b></div><div><span>CCC (shape)</span><b>" + fmt(p.ccc, 3) + "</b></div></div>";
       kv += "<div class='iact-kv'><div class='iact-kvg'>per-feature agreement (CCC)</div>";
-      d.meta.features.forEach(function (f) { var v = (p.features_ccc || {})[f]; if (v == null) return; var w = Math.round(Math.max(0, v) * 100); kv += "<div><span>" + f.replace(/_/g, " ") + "</span><b style='color:" + (v >= 0.85 ? C.green : v >= 0.5 ? C.gold : C.clay) + "'>" + fmt(v, 3) + "</b></div>"; });
-      kv += "</div>"; card.innerHTML = h + kv;
+      d.meta.features.forEach(function (f) { var v = (p.features_ccc || {})[f]; if (v == null) return; kv += "<div><span>" + f.replace(/_/g, " ") + "</span><b style='color:" + (v >= 0.85 ? C.green : v >= 0.5 ? C.gold : C.clay) + "'>" + fmt(v, 3) + "</b></div>"; });
+      kv += "</div>";
+      if (p.config && Object.keys(p.config).length) {
+        kv += "<div class='iact-kv'><div class='iact-kvg'>training config</div>";
+        Object.keys(p.config).forEach(function (k) { kv += "<div><span>" + k.replace(/_/g, " ") + "</span><b>" + p.config[k] + "</b></div>"; });
+        kv += "</div>";
+      }
+      if (p.config_note) kv += "<div class='iact-readout' style='margin-top:0'>" + p.config_note + "</div>";
+      card.innerHTML = h + kv;
     }
     canvas.addEventListener("click", function (e) { var r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, best = null, bd = 1600; screen.forEach(function (s) { var dd = (s.X - mx) * (s.X - mx) + (s.Y - my) * (s.Y - my); if (dd < bd) { bd = dd; best = s.p; } }); if (best) { sel = best; show(best); draw(); } });
     draw();
@@ -384,7 +391,7 @@
   function idbars(mount, d) {
     header(mount, "Which knobs can we recover?", "leave-one-out recovery R-squared per parameter");
     var TIER = { identifiable: C.green, weak: C.gold, "non-identifiable": C.muted };
-    var vkeys = Object.keys(d.variants), cur = vkeys.indexOf("default") >= 0 ? "default" : vkeys[0];
+    var vkeys = Object.keys(d.variants), cur = vkeys.indexOf("tau") >= 0 ? "tau" : vkeys[0];
     var seg = el("div", "iact-seg"); mount.appendChild(seg);
     var leg = el("div", "iact-readout"); leg.innerHTML = "<span style='color:" + C.green + "'>&#9632; identifiable</span> &nbsp; <span style='color:" + C.gold + "'>&#9632; weakly</span> &nbsp; <span style='color:" + C.muted + "'>&#9632; non-identifiable</span>"; mount.appendChild(leg);
     var cwrap = el("div"); mount.appendChild(cwrap);
@@ -402,6 +409,10 @@
           x.fillStyle = C.cream; x.font = "12px 'DM Sans'"; x.textAlign = "right"; x.fillText(b.param.replace(/_/g, " "), padL - 8, y + bh * 0.5);
           x.textAlign = "left"; x.fillStyle = C.goldL; x.fillText("R² " + b.r2.toFixed(2), padL + w + 6, y + bh * 0.5);
         });
+        var thr = d.meta && d.meta.identifiable_threshold != null ? d.meta.identifiable_threshold : 0.75;
+        var tx = padL + (W - padL - padR) * thr;
+        x.setLineDash([5, 4]); x.strokeStyle = C.green; x.lineWidth = 1.5; x.beginPath(); x.moveTo(tx, 14); x.lineTo(tx, H - 4); x.stroke(); x.setLineDash([]);
+        x.fillStyle = C.green; x.font = "10px 'JetBrains Mono'"; x.textAlign = "center"; x.fillText("identifiable " + thr, tx, 9);
         canvas._draw = draw;
       }; draw();
       canvas.onclick = function (e) { var r = canvas.getBoundingClientRect(), my = e.clientY - r.top, hit = geom.filter(function (gg) { return my >= gg.y && my <= gg.y + gg.bh; })[0]; if (hit) { var b = hit.b; det.innerHTML = "<b>" + b.param.replace(/_/g, " ") + "</b>: tier <b style='color:" + (TIER[b.tier]) + "'>" + b.tier + "</b>, R² " + b.r2.toFixed(3) + ", Pearson " + b.pearson.toFixed(3) + ", n " + b.n + (b.mean_abs_err != null ? ", MAE " + b.mean_abs_err.toFixed(3) : ""); } };
