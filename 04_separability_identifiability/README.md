@@ -33,6 +33,10 @@ Leave-one-out inversion on the 1,105-run library measures how well each CPM para
 
 **What it motivated (Connects back to feature preservation).** Size features anchor the inversion; shape features add little once size is fixed, consistent with the segmentation audit in Theme 02.
 
+## Which knobs are identifiable?  (leave-one-out recovery)
+
+## Feature to parameter importance  (discriminability heatmap)
+
 ## Complete analysis index  (every thesis analysis in this theme)
 
 ### Each analysis, what it shows, its thesis label, and the result

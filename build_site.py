@@ -259,6 +259,13 @@ THEME1 = [
               "**`imaging_eda/imaging_data_eda.ipynb`**.\n\n"
               "An earlier broad notebook, `data/cll_spheroid_eda_complete.ipynb`, is catalogued as "
               "a referenced orphan in `_provenance_notes.md`."),
+    dict(type="section", title='Set your own <span class="it">quality bar</span>',
+         right="interactive, beyond the thesis"),
+    dict(type="interactive", widget="qcthreshold", json="theme1_qc_threshold.json",
+         intro="The thesis fixes quality thresholds once. Here you pick a quality metric and drag the "
+               "bar to see exactly how many of the 12,480 frames survive.",
+         informs="Turns the fixed QC cutoffs into something you can interrogate across the whole corpus.",
+         informs_tag="Beyond the thesis: live QC"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 01', chips=[
         dict(t="01_data_eda.ipynb", gold=True), dict(t="imaging_data_eda.ipynb", gold=True),
         dict(t="labelled_qc.csv"), dict(t="frame_qc.csv"), dict(t="timecourse_full_features.csv"),
@@ -390,6 +397,14 @@ THEME2 = [
          informs="Confirms F3 is a genuine ceiling, not a tuning artefact.",
          informs_tag="Bounds the hardest case"),
 
+    dict(type="section", title='Explore the <span class="it">leaderboard</span>',
+         right="pixel overlap vs feature preservation"),
+    dict(type="interactive", widget="modelscatter", json="theme2_model_explorer.json",
+         intro="Every segmenter plotted by pixel overlap (Dice) against shape-number agreement (CCC). "
+               "Click one to see its per-feature reliability and why the ranking flips.",
+         informs="Makes the central finding tangible: the best-overlap model is not the most "
+                 "trustworthy for shape numbers.",
+         informs_tag="Beyond the thesis: navigable leaderboard"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 02', chips=[
         dict(t="05_feature_validation.ipynb", gold=True), dict(t="ICC(3,1) + Lin's CCC"),
         dict(t="per_feature_error.csv"), dict(t="seg_postproc.json"), dict(t="seg_f3.json"),
@@ -569,6 +584,21 @@ THEME4 = [
          informs="Size features anchor the inversion; shape features add little once size is fixed, "
                  "consistent with the segmentation audit in Theme 02.",
          informs_tag="Connects back to feature preservation"),
+    dict(type="section", title='Which knobs are <span class="it">identifiable</span>?',
+         right="leave-one-out recovery"),
+    dict(type="interactive", widget="idbars", json="theme4_identifiability.json",
+         intro="Per-parameter recovery R-squared from the inversion benchmark. Toggle the matcher "
+               "variant and click a bar for its Pearson correlation, sample count and error.",
+         informs="Sorts the seven knobs into identifiable, weakly identifiable and non-identifiable, "
+                 "the spine of RQ2.",
+         informs_tag="Beyond the thesis: interactive identifiability"),
+    dict(type="section", title='Feature to parameter <span class="it">importance</span>',
+         right="discriminability heatmap"),
+    dict(type="interactive", widget="heatmap", json="theme4_discriminability_heatmap.json",
+         intro="Which shape number carries information about which CPM knob. Click any cell to read "
+               "its importance value.",
+         informs="Shows at a glance that area and circularity carry most of the identifiable signal.",
+         informs_tag="Beyond the thesis: clickable matrix"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 04', chips=[
         dict(t="tab:rq2_1_identifiability (tau)", gold=True), dict(t="cpm_discriminability.json"),
         dict(t="leave-one-out inversion"), dict(t="XGBoost surrogate"), dict(t="tau-registration matcher")]),
@@ -624,6 +654,14 @@ THEME5 = [
                "same reliability check applied in Theme 02.",
          informs="Confirms the real-data features used for inversion are the reliable ones.",
          informs_tag="Closes the loop with RQ1"),
+    dict(type="section", title='Drug panel, <span class="it">drug by drug</span>',
+         right="inferred delta J_cc with intervals"),
+    dict(type="interactive", widget="forest", json="theme5_drug_forest.json",
+         intro="Every drug's inferred cell-cell adhesion shift with its bootstrap interval, grouped by "
+               "mechanism class. Click a drug to see the wells behind it. The pooled BCR-axis shift is "
+               "weak under tau (-1.4, interval crosses zero) and significant only at end-state (+4.6).",
+         informs="Reads the whole panel at once and ties each estimate back to its underlying wells.",
+         informs_tag="Beyond the thesis: drug-by-drug detail"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 05', chips=[
         dict(t="real_data_inference_report.ipynb", gold=True), dict(t="drug panel"),
         dict(t="tau-registration matcher"), dict(t="bootstrap CIs"), dict(t="7 patients")]),

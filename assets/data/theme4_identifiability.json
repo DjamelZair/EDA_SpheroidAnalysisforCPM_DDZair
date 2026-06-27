@@ -1,0 +1,200 @@
+{
+  "meta": {
+    "tiers": [
+      {
+        "name": "identifiable",
+        "min": 0.5,
+        "color": "#2ecc71"
+      },
+      {
+        "name": "weak",
+        "min": 0.2,
+        "color": "#f39c12"
+      },
+      {
+        "name": "non-identifiable",
+        "min": -1,
+        "color": "#e74c3c"
+      }
+    ]
+  },
+  "variants": {
+    "default": {
+      "label": "Default matcher",
+      "bars": [
+        {
+          "param": "cm_adhesion",
+          "r2": 0.6131,
+          "pearson": 0.7889,
+          "n": 1105,
+          "tier": "identifiable"
+        },
+        {
+          "param": "width",
+          "r2": 0.4665,
+          "pearson": 0.6859,
+          "n": 1105,
+          "tier": "weak",
+          "mean_abs_err": 0.4199
+        },
+        {
+          "param": "contact",
+          "r2": 0.31,
+          "pearson": 0.5724,
+          "n": 1105,
+          "tier": "weak",
+          "mean_abs_err": 0.2789
+        },
+        {
+          "param": "temp",
+          "r2": 0.1337,
+          "pearson": 0.411,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 1.2501
+        },
+        {
+          "param": "contact_no",
+          "r2": 0.1268,
+          "pearson": 0.4434,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 0.0655
+        },
+        {
+          "param": "lambda",
+          "r2": 0.0417,
+          "pearson": 0.357,
+          "n": 1105,
+          "tier": "non-identifiable"
+        },
+        {
+          "param": "neighbor",
+          "r2": -0.09,
+          "pearson": 0.1096,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 0.1181
+        }
+      ]
+    },
+    "tau": {
+      "label": "Tau matcher",
+      "bars": [
+        {
+          "param": "cm_adhesion",
+          "r2": 0.6155,
+          "pearson": 0.79,
+          "n": 1105,
+          "tier": "identifiable"
+        },
+        {
+          "param": "width",
+          "r2": 0.5441,
+          "pearson": 0.7397,
+          "n": 1105,
+          "tier": "identifiable",
+          "mean_abs_err": 0.4199
+        },
+        {
+          "param": "contact",
+          "r2": 0.3835,
+          "pearson": 0.627,
+          "n": 1105,
+          "tier": "weak",
+          "mean_abs_err": 0.2789
+        },
+        {
+          "param": "lambda",
+          "r2": 0.1771,
+          "pearson": 0.4872,
+          "n": 1105,
+          "tier": "non-identifiable"
+        },
+        {
+          "param": "temp",
+          "r2": 0.1656,
+          "pearson": 0.4298,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 1.2501
+        },
+        {
+          "param": "contact_no",
+          "r2": 0.1355,
+          "pearson": 0.4461,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 0.0655
+        },
+        {
+          "param": "neighbor",
+          "r2": -0.0687,
+          "pearson": 0.1979,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 0.1181
+        }
+      ]
+    },
+    "wass": {
+      "label": "Wasserstein matcher",
+      "bars": [
+        {
+          "param": "cm_adhesion",
+          "r2": 0.6174,
+          "pearson": 0.7912,
+          "n": 1105,
+          "tier": "identifiable"
+        },
+        {
+          "param": "width",
+          "r2": 0.5234,
+          "pearson": 0.7266,
+          "n": 1105,
+          "tier": "identifiable",
+          "mean_abs_err": 0.4199
+        },
+        {
+          "param": "contact",
+          "r2": 0.3742,
+          "pearson": 0.6199,
+          "n": 1105,
+          "tier": "weak",
+          "mean_abs_err": 0.2789
+        },
+        {
+          "param": "lambda",
+          "r2": 0.156,
+          "pearson": 0.4749,
+          "n": 1105,
+          "tier": "non-identifiable"
+        },
+        {
+          "param": "temp",
+          "r2": 0.1534,
+          "pearson": 0.4203,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 1.2501
+        },
+        {
+          "param": "contact_no",
+          "r2": 0.1341,
+          "pearson": 0.4444,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 0.0655
+        },
+        {
+          "param": "neighbor",
+          "r2": -0.0641,
+          "pearson": 0.202,
+          "n": 1105,
+          "tier": "non-identifiable",
+          "mean_abs_err": 0.1181
+        }
+      ]
+    }
+  }
+}

@@ -161,6 +161,8 @@ This reader consolidates and re-orders the data EDA into the thesis's decision o
 
 An earlier broad notebook, `data/cll_spheroid_eda_complete.ipynb`, is catalogued as a referenced orphan in `_provenance_notes.md`.
 
+## Set your own quality bar  (interactive, beyond the thesis)
+
 ## Complete analysis index  (every thesis analysis in this theme)
 
 ### Each analysis, what it shows, its thesis label, and the result

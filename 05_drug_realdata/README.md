@@ -47,6 +47,8 @@ Real spheroid trajectories from reference wells across seven patients and a pane
 
 **What it motivated (Closes the loop with RQ1).** Confirms the real-data features used for inversion are the reliable ones.
 
+## Drug panel, drug by drug  (inferred delta J_cc with intervals)
+
 ## Complete analysis index  (every thesis analysis in this theme)
 
 ### Each analysis, what it shows, its thesis label, and the result

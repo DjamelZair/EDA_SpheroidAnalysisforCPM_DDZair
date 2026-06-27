@@ -299,7 +299,155 @@
     render();
   }
 
-  var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate };
+  /* ---------- E. QC THRESHOLD EXPLORER (Theme 01) ---------- */
+  function qcthreshold(mount, d) {
+    header(mount, "Set your quality bar", "drag the threshold and watch how many of the 12,480 frames survive");
+    var M = d.meta.metrics, keys = Object.keys(M), cur = keys[0];
+    var bar = el("div", "iact-controls"); mount.appendChild(bar);
+    var seg = el("div", "iact-seg"); bar.appendChild(seg);
+    var grid = el("div", "iact-2col"); mount.appendChild(grid);
+    var cwrap = el("div"); grid.appendChild(cwrap); var canvas = mkCanvas(cwrap, 320);
+    var side = el("div"); grid.appendChild(side);
+    var kpi = el("div", "iact-bigstat"); side.appendChild(kpi);
+    var note = el("div", "iact-readout"); side.appendChild(note);
+    var sw = el("div", "iact-slider"); mount.appendChild(sw); var slider = el("input"); slider.type = "range"; sw.appendChild(slider);
+    var lab = el("div", "iact-flab"); mount.appendChild(lab);
+    var thr;
+    function passN(m, t) { var cc = m.count_curve, best = cc[0]; cc.forEach(function (p) { if (Math.abs(p.v - t) < Math.abs(best.v - t)) best = p; }); return best.n; }
+    function segBtns() { seg.innerHTML = ""; keys.forEach(function (k) { var b = chip(M[k].label, k === cur); b.onclick = function () { cur = k; setup(); }; seg.appendChild(b); }); }
+    function setup() { segBtns(); var m = M[cur]; slider.min = m.min; slider.max = m.max; slider.step = (m.max - m.min) / 200 || 0.001; thr = m.default; slider.value = thr; lab.textContent = m.label + " threshold" + (m.invert ? " (PASS = at or below)" : " (PASS = at or above)"); draw(); }
+    function draw() {
+      var m = M[cur]; thr = +slider.value; var x = ctxOf(canvas), W = canvas.clientWidth, H = 320;
+      var hr = [0, 132]; var yr = [m.min, m.max]; var a = scatterAxes(x, W, H, hr, yr);
+      d.points.forEach(function (p) { var v = p[cur]; var pass = m.invert ? v <= thr : v >= thr; x.beginPath(); x.arc(a.px(p.h), a.py(v), 2.4, 0, 7); x.fillStyle = pass ? C.gold : C.clay; x.globalAlpha = pass ? 0.75 : 0.5; x.fill(); x.globalAlpha = 1; });
+      var ty = a.py(thr); x.beginPath(); x.setLineDash([5, 4]); x.strokeStyle = C.cream; x.lineWidth = 1.5; x.moveTo(a.pad.l, ty); x.lineTo(W - 16, ty); x.stroke(); x.setLineDash([]);
+      x.fillStyle = C.muted; x.font = "11px 'DM Sans'"; x.textAlign = "center"; x.fillText("time (h)", W / 2, H - 6);
+      x.save(); x.translate(12, H / 2); x.rotate(-Math.PI / 2); x.fillText(m.label, 0, 0); x.restore();
+      var n = passN(m, thr), pct = (100 * n / d.meta.n_total).toFixed(0);
+      kpi.innerHTML = "<div class='iact-bignum'>" + n.toLocaleString() + " / " + d.meta.n_total.toLocaleString() + "</div><div class='iact-biglab'>frames pass (" + pct + "%) at " + m.label.toLowerCase() + " " + (m.invert ? "&le; " : "&ge; ") + thr.toFixed(3) + "</div>";
+      note.innerHTML = "Gold dots pass your bar, red dots fail. Median " + m.label.toLowerCase() + " is " + m.p50.toFixed(3) + ".";
+      canvas._draw = draw;
+    }
+    slider.oninput = draw; setup();
+  }
+
+  /* ---------- F. MODEL EXPLORER (Theme 02) ---------- */
+  function modelscatter(mount, d) {
+    header(mount, "Pixel overlap vs feature preservation", "click a segmenter: high Dice does not mean trustworthy shape numbers");
+    var grid = el("div", "iact-2col"); mount.appendChild(grid);
+    var cwrap = el("div"); grid.appendChild(cwrap); var canvas = mkCanvas(cwrap, 360);
+    var card = el("div", "iact-card"); grid.appendChild(card); card.innerHTML = "<div class='iact-hint'>Click a model point.</div>";
+    var xr = [d.meta.x_axis.min, d.meta.x_axis.max], yr = [d.meta.y_axis.min, d.meta.y_axis.max], screen = [], sel = null;
+    function draw() {
+      var x = ctxOf(canvas), W = canvas.clientWidth, H = 360; var a = scatterAxes(x, W, H, xr, yr); screen = [];
+      if (d.meta.reliability_bar) { var ry = a.py(d.meta.reliability_bar); x.setLineDash([5, 4]); x.strokeStyle = "rgba(168,181,184,0.5)"; x.beginPath(); x.moveTo(a.pad.l, ry); x.lineTo(W - 16, ry); x.stroke(); x.setLineDash([]); }
+      d.points.forEach(function (p) { var X = a.px(p.dice), Y = a.py(p.ccc); screen.push({ X: X, Y: Y, p: p }); x.beginPath(); x.arc(X, Y, p.winner ? 8 : 5, 0, 7); x.fillStyle = p.winner ? C.green : C.gold; x.fill(); if (p === sel) { x.lineWidth = 2.5; x.strokeStyle = C.cream; x.stroke(); } x.fillStyle = C.muted; x.font = "10px 'DM Sans'"; x.textAlign = "left"; x.fillText(p.label, X + 9, Y + 3); });
+      x.fillStyle = C.muted; x.font = "11px 'DM Sans'"; x.textAlign = "center"; x.fillText(d.meta.x_axis.label, W / 2, H - 6);
+      x.save(); x.translate(12, H / 2); x.rotate(-Math.PI / 2); x.fillText(d.meta.y_axis.label, 0, 0); x.restore();
+      canvas._draw = draw;
+    }
+    function show(p) {
+      var h = "<div class='iact-cardh'>" + p.label + (p.winner ? " <span class='iact-badge' style='background:var(--green);color:var(--teal-1)'>chosen</span>" : "") + "</div>";
+      var kv = "<div class='iact-kv'><div class='iact-kvg'>overall</div><div><span>Dice (pixel)</span><b>" + fmt(p.dice, 3) + "</b></div><div><span>CC-Dice</span><b>" + fmt(p.cc_dice, 3) + "</b></div><div><span>CCC (shape)</span><b>" + fmt(p.ccc, 3) + "</b></div></div>";
+      kv += "<div class='iact-kv'><div class='iact-kvg'>per-feature agreement (CCC)</div>";
+      d.meta.features.forEach(function (f) { var v = (p.features_ccc || {})[f]; if (v == null) return; var w = Math.round(Math.max(0, v) * 100); kv += "<div><span>" + f.replace(/_/g, " ") + "</span><b style='color:" + (v >= 0.85 ? C.green : v >= 0.5 ? C.gold : C.clay) + "'>" + fmt(v, 3) + "</b></div>"; });
+      kv += "</div>"; card.innerHTML = h + kv;
+    }
+    canvas.addEventListener("click", function (e) { var r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, best = null, bd = 1600; screen.forEach(function (s) { var dd = (s.X - mx) * (s.X - mx) + (s.Y - my) * (s.Y - my); if (dd < bd) { bd = dd; best = s.p; } }); if (best) { sel = best; show(best); draw(); } });
+    draw();
+  }
+
+  /* ---------- G. DISCRIMINABILITY HEATMAP (Theme 04) ---------- */
+  function heatmap(mount, d) {
+    header(mount, "Feature to parameter importance", "which shape numbers carry information about which CPM knob");
+    var note = el("div", "iact-readout"); note.innerHTML = "Click a cell to read its importance. Brighter gold = that feature is more informative about that parameter."; mount.appendChild(note);
+    var ncol = d.params.length;
+    var g = el("div"); g.style.display = "grid"; g.style.gridTemplateColumns = "minmax(96px,1.1fr) repeat(" + ncol + ",1fr)"; g.style.gap = "3px"; g.style.marginTop = "0.8rem"; mount.appendChild(g);
+    function cell(txt, cls) { var c = el("div", cls); c.textContent = txt; c.style.padding = "0.5rem 0.3rem"; c.style.fontFamily = "'JetBrains Mono',monospace"; c.style.fontSize = "0.62rem"; c.style.textAlign = "center"; return c; }
+    g.appendChild(cell("", "")); d.params.forEach(function (p) { var c = cell(p, ""); c.style.color = "#e7c98a"; c.style.textTransform = "uppercase"; c.style.letterSpacing = ".08em"; g.appendChild(c); });
+    var read = el("div", "iact-readout"); read.style.marginTop = "0.8rem";
+    d.features.forEach(function (f, i) {
+      var rl = cell(f, ""); rl.style.color = "#f3ecd6"; rl.style.textAlign = "right"; rl.style.fontFamily = "'DM Sans',sans-serif"; rl.style.fontSize = "0.78rem"; g.appendChild(rl);
+      d.params.forEach(function (p, j) {
+        var v = d.matrix[i][j], t = Math.max(0, Math.min(1, v));
+        var bg = "rgb(" + Math.round(lerp(13, 200, t)) + "," + Math.round(lerp(89, 160, t)) + "," + Math.round(lerp(99, 92, t)) + ")";
+        var c = cell(v.toFixed(2), ""); c.style.background = bg; c.style.color = t > 0.55 ? "#052e36" : "#f3ecd6"; c.style.borderRadius = "2px"; c.style.cursor = "pointer";
+        if (d.gold_bar && v >= d.gold_bar) { c.style.outline = "1.5px solid #f3ecd6"; }
+        c.onclick = function () { read.innerHTML = "<b>" + f + "</b> carries <b style='color:#e7c98a'>" + v.toFixed(3) + "</b> importance for <b>" + p + "</b>" + (d.gold_bar && v >= d.gold_bar ? " (above the reliability bar)" : ""); };
+        g.appendChild(c);
+      });
+    });
+    mount.appendChild(read);
+  }
+
+  /* ---------- H. IDENTIFIABILITY EXPLORER (Theme 04) ---------- */
+  function idbars(mount, d) {
+    header(mount, "Which knobs can we recover?", "leave-one-out recovery R-squared per parameter");
+    var TIER = { identifiable: C.green, weak: C.gold, "non-identifiable": C.muted };
+    var vkeys = Object.keys(d.variants), cur = vkeys.indexOf("default") >= 0 ? "default" : vkeys[0];
+    var seg = el("div", "iact-seg"); mount.appendChild(seg);
+    var leg = el("div", "iact-readout"); leg.innerHTML = "<span style='color:" + C.green + "'>&#9632; identifiable</span> &nbsp; <span style='color:" + C.gold + "'>&#9632; weakly</span> &nbsp; <span style='color:" + C.muted + "'>&#9632; non-identifiable</span>"; mount.appendChild(leg);
+    var cwrap = el("div"); mount.appendChild(cwrap);
+    var det = el("div", "iact-readout"); mount.appendChild(det);
+    function segBtns() { seg.innerHTML = ""; vkeys.forEach(function (k) { var b = chip(d.variants[k].label || k, k === cur); b.onclick = function () { cur = k; render(); }; seg.appendChild(b); }); }
+    var canvas, geom = [];
+    function render() {
+      segBtns(); cwrap.innerHTML = ""; var bars = d.variants[cur].bars; canvas = mkCanvas(cwrap, 34 * bars.length + 30);
+      var draw = function () {
+        var x = ctxOf(canvas), W = canvas.clientWidth, H = canvas.clientHeight / DPR, padL = 110, padR = 54, bh = (H - 16) / bars.length; geom = [];
+        x.clearRect(0, 0, W, H);
+        bars.forEach(function (b, i) {
+          var y = 8 + i * bh, w = (W - padL - padR) * Math.max(0, Math.min(1, b.r2)); geom.push({ y: y, bh: bh, b: b });
+          x.fillStyle = TIER[b.tier] || C.gold; x.fillRect(padL, y + bh * 0.2, w, bh * 0.5);
+          x.fillStyle = C.cream; x.font = "12px 'DM Sans'"; x.textAlign = "right"; x.fillText(b.param.replace(/_/g, " "), padL - 8, y + bh * 0.5);
+          x.textAlign = "left"; x.fillStyle = C.goldL; x.fillText("R² " + b.r2.toFixed(2), padL + w + 6, y + bh * 0.5);
+        });
+        canvas._draw = draw;
+      }; draw();
+      canvas.onclick = function (e) { var r = canvas.getBoundingClientRect(), my = e.clientY - r.top, hit = geom.filter(function (gg) { return my >= gg.y && my <= gg.y + gg.bh; })[0]; if (hit) { var b = hit.b; det.innerHTML = "<b>" + b.param.replace(/_/g, " ") + "</b> — tier <b style='color:" + (TIER[b.tier]) + "'>" + b.tier + "</b>, R² " + b.r2.toFixed(3) + ", Pearson " + b.pearson.toFixed(3) + ", n " + b.n + (b.mean_abs_err != null ? ", MAE " + b.mean_abs_err.toFixed(3) : ""); } };
+    }
+    render();
+  }
+
+  /* ---------- I. DRUG PANEL FOREST (Theme 05) ---------- */
+  function forest(mount, d) {
+    header(mount, "Drug panel: inferred cell-cell adhesion shift", "each drug's delta J_cc with bootstrap interval; click for the wells behind it");
+    var SIG = { sig: C.green, borderline: C.gold, ns: C.muted };
+    var rows = d.rows.slice().sort(function (a, b) { return (a.order - b.order) || (a.est - b.est); });
+    var leg = el("div", "iact-readout"); leg.innerHTML = "<span style='color:" + C.green + "'>&#9632; significant</span> &nbsp; <span style='color:" + C.gold + "'>&#9632; borderline</span> &nbsp; <span style='color:" + C.muted + "'>&#9632; not significant</span> &nbsp; dashed line = no change (0)"; mount.appendChild(leg);
+    var grid = el("div", "iact-2col"); mount.appendChild(grid);
+    var cwrap = el("div"); grid.appendChild(cwrap);
+    var card = el("div", "iact-card"); grid.appendChild(card); card.innerHTML = "<div class='iact-hint'>Click a drug row.</div>";
+    var lo = Math.min.apply(null, rows.map(function (r) { return r.lo; })), hi = Math.max.apply(null, rows.map(function (r) { return r.hi; }));
+    var pad = (hi - lo) * 0.06; var xr = [lo - pad, hi + pad];
+    var H = 22 * rows.length + 36; var canvas = mkCanvas(cwrap, H); var geom = [];
+    function draw() {
+      var x = ctxOf(canvas), W = canvas.clientWidth, padL = 132, padR = 40; geom = [];
+      var px = function (v) { return lerp(padL, W - padR, (v - xr[0]) / (xr[1] - xr[0])); };
+      x.clearRect(0, 0, W, H);
+      var zx = px(0); x.setLineDash([4, 4]); x.strokeStyle = C.muted; x.lineWidth = 1; x.beginPath(); x.moveTo(zx, 18); x.lineTo(zx, H - 8); x.stroke(); x.setLineDash([]);
+      rows.forEach(function (r, i) {
+        var y = 24 + i * 22, col = SIG[r.sig] || C.gold; geom.push({ y: y, r: r });
+        x.strokeStyle = col; x.lineWidth = 1.5; x.beginPath(); x.moveTo(px(r.lo), y); x.lineTo(px(r.hi), y); x.stroke();
+        var rad = Math.max(3, Math.min(7, 2 + Math.sqrt(r.n))); x.beginPath(); x.arc(px(r.est), y, rad, 0, 7); x.fillStyle = col; x.fill();
+        x.fillStyle = C.cream; x.font = "11px 'DM Sans'"; x.textAlign = "right"; x.fillText(r.label, padL - 8, y + 3);
+      });
+      x.fillStyle = C.muted; x.font = "11px 'DM Sans'"; x.textAlign = "center"; x.fillText(d.meta.x_label, (padL + W - padR) / 2, 12);
+      canvas._draw = draw;
+    }
+    function show(r) {
+      var wells = (d.details && d.details[r.label]) || [];
+      var h = "<div class='iact-cardh'>" + r.label + " <span class='iact-badge' style='background:" + (SIG[r.sig]) + ";color:var(--teal-1)'>" + r.sig + "</span></div>";
+      var kv = "<div class='iact-kv'><div class='iact-kvg'>" + r.cls + "</div><div><span>delta J_cc</span><b>" + fmt(r.est, 2) + "</b></div><div><span>interval</span><b>[" + fmt(r.lo, 2) + ", " + fmt(r.hi, 2) + "]</b></div><div><span>wells</span><b>" + r.n + "</b></div></div>";
+      if (wells.length) { kv += "<div class='iact-kv'><div class='iact-kvg'>wells (" + wells.length + ")</div>"; wells.slice(0, 8).forEach(function (w) { kv += "<div><span>P" + w.patient + " " + (w.stim || "") + "</span><b>" + fmt(w.delta, 2) + "</b></div>"; }); if (wells.length > 8) kv += "<div><span>...</span><b>+" + (wells.length - 8) + "</b></div>"; kv += "</div>"; }
+      card.innerHTML = h + kv;
+    }
+    canvas.addEventListener("click", function (e) { var r = canvas.getBoundingClientRect(), my = e.clientY - r.top, hit = geom.filter(function (g) { return Math.abs(g.y - my) <= 11; })[0]; if (hit) { show(hit.r); } });
+    draw();
+  }
+
+  var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
+    qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest };
   function boot() {
     var mounts = document.querySelectorAll(".iact[data-widget]");
     Array.prototype.forEach.call(mounts, function (m) {

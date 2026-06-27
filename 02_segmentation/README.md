@@ -67,6 +67,8 @@ Eight segmenters were compared on the same 45-image test set: a rule-based basel
 
 **What it motivated (Bounds the hardest case).** Confirms F3 is a genuine ceiling, not a tuning artefact.
 
+## Explore the leaderboard  (pixel overlap vs feature preservation)
+
 ## Complete analysis index  (every thesis analysis in this theme)
 
 ### Each analysis, what it shows, its thesis label, and the result
