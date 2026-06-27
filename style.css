@@ -146,6 +146,9 @@ footer a{color:inherit;border-bottom:1px solid currentColor;padding-bottom:1px}
 /* ===== Theme 03 interactive widgets ===== */
 .iact{color:var(--paper)}
 .iact-head{display:flex;align-items:baseline;gap:0.8rem;flex-wrap:wrap;margin-bottom:1rem}
+.iact-help-btn{margin-left:auto;align-self:center;width:24px;height:24px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--gold);background:transparent;color:var(--gold-3);font-family:'Instrument Serif',serif;font-style:italic;font-size:0.95rem;line-height:1;cursor:pointer;transition:all .15s}
+.iact-help-btn:hover,.iact-help-btn.on{background:var(--gold);color:var(--teal-1)}
+.iact-help-panel{background:var(--teal-1);border-left:3px solid var(--gold);border-radius:3px;padding:0.8rem 1rem;margin:-0.4rem 0 1rem;font-size:0.86rem;line-height:1.55;color:var(--paper)}
 .iact-ttl{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:1.25rem;letter-spacing:.01em;color:var(--paper)}
 .iact-sub{font-family:'Instrument Serif',serif;font-style:italic;color:var(--gold-3);font-size:1rem}
 .iact-controls{display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;margin-bottom:1rem}
