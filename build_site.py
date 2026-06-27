@@ -104,7 +104,7 @@ THEME1 = [
          ttl="Does augmentation cover the real regimes?", sub="real vs augmented vs 51 originals",
          alt="contrast, mean-intensity and focus distributions for real, augmented and original frames",
          shows="Augmentation spans 100% of the real contrast range and 91% of the focus "
-               "(Laplacian-variance) range, but only 18% of the mean-intensity range — brightness "
+               "(Laplacian-variance) range, but only 18% of the mean-intensity range; brightness "
                "is the axis it covers least.",
          informs="Confirms the heavy-augmentation U-Net is trained across the contrast and focus "
                  "regimes it will meet at inference; the intensity gap is the one residual exposure.",
@@ -136,11 +136,11 @@ THEME1 = [
     dict(type="figure", img=FIG1 + "fig02_intensity_dynamic_range.png", native=True,
          ttl="Intensity and dynamic range", sub="pooled pixels &middot; frame brightness &middot; 8-bit usage",
          alt="pooled pixel-intensity histogram, per-frame brightness, dynamic-range usage and black/white points",
-         shows="Pooled pixel intensity is bimodal — a dark spheroid on a bright field — per-frame "
+         shows="Pooled pixel intensity is bimodal (a dark spheroid on a bright field); per-frame "
                "brightness clusters near mid-range, and frames use a median of 86% of the available "
                "8-bit range.",
          informs="The two intensity modes overlap once debris is present, so a single global "
-                 "threshold cannot separate object from background — a learned segmenter is needed.",
+                 "threshold cannot separate object from background, so a learned segmenter is needed.",
          informs_tag="Decision: learned segmenter"),
     dict(type="figure", img=FIG1 + "fig03_contrast.png", native=True,
          ttl="Contrast: level, polarity, drift, batch", sub="Michelson contrast across the corpus",
@@ -156,7 +156,7 @@ THEME1 = [
          ttl="Focus is bimodal and metric-agnostic", sub="Laplacian variance, log scale",
          alt="focus-measure histogram, agreement between two focus metrics, sharpness over time",
          shows="Focus splits into a sharp main cluster and a blurred tail on a log scale, and two "
-               "independent focus measures (Laplacian variance and Tenengrad) agree — the spread is "
+               "independent focus measures (Laplacian variance and Tenengrad) agree, so the spread is "
                "real, not an artefact of one metric.",
          informs="Out-of-focus frames blur the boundary-derived perimeter and circularity features, "
                  "reinforcing the restriction of inversion to features that survive segmentation noise.",
@@ -192,7 +192,7 @@ THEME1 = [
                "fragments while the largest component still holds nearly all the area, and "
                "disintegration increases over the time course.",
          informs="Because masks are multi-object but area-dominated, ordinary Dice would ignore the "
-                 "small fragments — CC-Dice scores every component, and post-processing keeps the "
+                 "small fragments, so CC-Dice scores every component, and post-processing keeps the "
                  "largest one.",
          informs_tag="Decision: CC-Dice + largest component"),
 
@@ -241,7 +241,7 @@ THEME1 = [
          ttl="Image quality predicts distance from the library", sub="real to nearest-synthetic distance",
          alt="real-to-synthetic NN distance against fragmentation, contrast and focus",
          shows="How far a real well sits from its nearest synthetic spheroid grows with fragmentation "
-               "(r=0.30) and focus (r=0.43) but not with contrast (r=0.05) — the qualities hardest to "
+               "(r=0.30) and focus (r=0.43) but not with contrast (r=0.05): the qualities hardest to "
                "segment are also the least covered by the simulation library.",
          informs="This is the mechanism behind the ~90% of real wells that fall outside the synthetic "
                  "library, and the reason the inference is reported as relative shifts rather than "

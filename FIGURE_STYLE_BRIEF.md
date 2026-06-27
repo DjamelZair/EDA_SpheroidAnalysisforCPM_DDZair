@@ -1,10 +1,10 @@
-# Figure-presentation brief — thesis EDA site
+# Figure-presentation brief, thesis EDA site
 
 **For:** the data-analysis agent producing the figures embedded in this site
 (`/media/djameldino/Expansion/CLL_data/analysis`, GitHub Pages, repo
 `DjamelZair/EDA_SpheroidAnalysisforCPM_DDZair`, five themes).
 
-**Goal:** the design of the site is settled and the user likes it — what is missing is the
+**Goal:** the design of the site is settled and the user likes it, what is missing is the
 *analysis*. Produce real, correct, publication-quality figures whose **visual styling matches the
 site** so they drop into the existing cards without looking foreign. Style serves the data, never the
 other way round. Read this whole file before generating any figure.
@@ -16,14 +16,14 @@ other way round. Read this whole file before generating any figure.
 The site is a **deep-teal canvas with warm paper text and gold accents**, two signal colours
 (green = good/positive, clay-red = bad/loss). Typography is editorial: a condensed display face,
 a serif italic for emphasis, a mono for labels. Your figures sit inside teal cards, so their
-**data marks** must use this palette — not matplotlib defaults (no `C0` blue, no `tab10`).
+**data marks** must use this palette, not matplotlib defaults (no `C0` blue, no `tab10`).
 
 ```
 Canvas / structure   teal-1 #052e36   teal-2 #0a4a55   teal-3 #0d5963   teal-4 #15616d
 Text / paper         paper  #f3ecd6   cream  #faf3df   paper-2 #e8dab2
 Accent (primary)     gold   #c8a05c   gold-2 #a37432   gold-3 #e7c98a
-Signal — positive    green  #6dd9a1
-Signal — negative    clay   #c44a30
+Signal, positive    green  #6dd9a1
+Signal, negative    clay   #c44a30
 Muted / secondary    muted  #8a9b9f   muted-2 #a8b5b8
 ```
 
@@ -33,9 +33,9 @@ data use a teal→gold ramp; for diverging data use clay ←→ green through a 
 
 Fonts: **DM Sans** for tick labels and body numbers, **JetBrains Mono** for axis titles,
 annotations and units (uppercase, slightly tracked). If those aren't installed, fall back to
-DejaVu Sans / a monospace and note it — do not silently use Arial/Inter.
+DejaVu Sans / a monospace and note it, do not silently use Arial/Inter.
 
-## 2. Background — keep figures white, the site blends them
+## 2. Background, keep figures white, the site blends them
 
 Do **not** bake the teal background into the PNG. Render on a **white** (or transparent) background
 so the same file stays usable in the thesis PDF. The site wraps light figures in
@@ -43,12 +43,12 @@ so the same file stays usable in the thesis PDF. The site wraps light figures in
 white melts into the card. For that blend to look clean:
 
 - pure-white figure background (`#ffffff`), no off-white panels, no drop shadows baked in;
-- avoid large solid black fills (they go muddy under multiply) — use the dark teal `#052e36` for
+- avoid large solid black fills (they go muddy under multiply), use the dark teal `#052e36` for
   "ink" instead of `#000000`;
 - keep ink/text dark enough to survive the multiply (teal-1 `#052e36` or `#1a3f47` for axis text).
 
 If a figure genuinely needs a dark field (e.g. a microscopy panel), render it dark and the embedder
-will use plain `.figwrap` (no blend) — flag which mode each figure is built for.
+will use plain `.figwrap` (no blend), flag which mode each figure is built for.
 
 ## 3. Matplotlib starter (copy-paste, then build the analysis on top)
 
@@ -80,19 +80,19 @@ Sizing: single-column figures ~7×4.5 in, wide cards ~11×4.5 in, square heatmap
 ## 4. Per-figure rules
 
 - **One question per figure.** State it before plotting; the figure must answer exactly that.
-- **One takeaway sentence** per figure — plain academic English, no hype. This becomes the card's
+- **One takeaway sentence** per figure, plain academic English, no hype. This becomes the card's
   `.verdict` line on the site, so write it as a finding ("J_cm drops 30% in 7/7 patients"), not a
   description ("a bar chart of J_cm").
 - **Uncertainty is mandatory** where it exists: CIs/error bars/bootstrap bands, n stated in-figure,
   and draw the zero/null reference line when an interval can cross it.
 - **Numbers must match the canonical thesis values** already on the site (e.g. drug-panel BCR-axis
   ΔJ_cc: tau −1.4 CI [−3.0, +0.2] weak, end-state +4.6 CI [+2.1, +7.0] significant). Do not invent
-  or re-round. If your computation disagrees with a published site number, **stop and flag it** —
+  or re-round. If your computation disagrees with a published site number, **stop and flag it** , 
   don't quietly overwrite.
 - **No chartjunk:** no 3-D, no rainbow, no dual hidden axes, no gradient fills behind bars, legends
   only when >1 series, direct-label lines where it's cleaner than a legend.
 - **Honest scales:** bar charts start at zero; if you truncate an axis, mark it. Log scales labelled.
-- **Accessibility:** don't rely on green-vs-clay alone — pair colour with shape/marker/position so
+- **Accessibility:** don't rely on green-vs-clay alone, pair colour with shape/marker/position so
   the contrast survives colour-blindness and the multiply blend.
 
 ## 5. Delivery
@@ -101,7 +101,7 @@ Save figures under `assets/cll/figures/<theme>/` (existing subfolders: `morpholo
 `cpm`). Use lowercase snake_case names that say what the figure shows
 (`drug_panel_jcc_forest.png`, not `fig12.png`). For each figure return: filename, the one-line
 takeaway (for the `.verdict`), n / source notebook, and whether it's a **light** (white, blended) or
-**dark** (microscopy) figure so the page is wrapped correctly. Do not touch the HTML/CSS — the curate
+**dark** (microscopy) figure so the page is wrapped correctly. Do not touch the HTML/CSS, the curate
 role embeds the figures; you supply the analysis.
 ```
 deliverable per figure:

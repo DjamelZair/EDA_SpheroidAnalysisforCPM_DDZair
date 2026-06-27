@@ -102,5 +102,5 @@ try:
     import imaging_eda.imaging_data_eda  # noqa: F401
 except Exception as e:
     import traceback; traceback.print_exc()
-    print(f"\n[partial] stopped at: {e!r} — figures saved before this point are valid.")
+    print(f"\n[partial] stopped at: {e!r}, figures saved before this point are valid.")
 print("Done.")

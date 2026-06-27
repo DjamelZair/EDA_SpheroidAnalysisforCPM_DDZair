@@ -43,7 +43,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 ![](../assets/cll/figures/01_image_eda/fig06_augmentation_coverage.png)
 
-**What it shows.** Augmentation spans 100% of the real contrast range and 91% of the focus (Laplacian-variance) range, but only 18% of the mean-intensity range — brightness is the axis it covers least.
+**What it shows.** Augmentation spans 100% of the real contrast range and 91% of the focus (Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is the axis it covers least.
 
 **What it motivated (Validates heavy augmentation).** Confirms the heavy-augmentation U-Net is trained across the contrast and focus regimes it will meet at inference; the intensity gap is the one residual exposure.
 
@@ -69,9 +69,9 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 ![](../assets/cll/figures/01_image_eda/fig02_intensity_dynamic_range.png)
 
-**What it shows.** Pooled pixel intensity is bimodal — a dark spheroid on a bright field — per-frame brightness clusters near mid-range, and frames use a median of 86% of the available 8-bit range.
+**What it shows.** Pooled pixel intensity is bimodal (a dark spheroid on a bright field); per-frame brightness clusters near mid-range, and frames use a median of 86% of the available 8-bit range.
 
-**What it motivated (Decision: learned segmenter).** The two intensity modes overlap once debris is present, so a single global threshold cannot separate object from background — a learned segmenter is needed.
+**What it motivated (Decision: learned segmenter).** The two intensity modes overlap once debris is present, so a single global threshold cannot separate object from background, so a learned segmenter is needed.
 
 ### Contrast: level, polarity, drift, batch - Michelson contrast across the corpus
 
@@ -85,7 +85,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 ![](../assets/cll/figures/01_image_eda/fig04a_sharpness.png)
 
-**What it shows.** Focus splits into a sharp main cluster and a blurred tail on a log scale, and two independent focus measures (Laplacian variance and Tenengrad) agree — the spread is real, not an artefact of one metric.
+**What it shows.** Focus splits into a sharp main cluster and a blurred tail on a log scale, and two independent focus measures (Laplacian variance and Tenengrad) agree, so the spread is real, not an artefact of one metric.
 
 **What it motivated (Decision: restrict inversion features).** Out-of-focus frames blur the boundary-derived perimeter and circularity features, reinforcing the restriction of inversion to features that survive segmentation noise.
 
@@ -113,7 +113,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 **What it shows.** Only about 20% of frames are a single cohesive object; most carry a long tail of fragments while the largest component still holds nearly all the area, and disintegration increases over the time course.
 
-**What it motivated (Decision: CC-Dice + largest component).** Because masks are multi-object but area-dominated, ordinary Dice would ignore the small fragments — CC-Dice scores every component, and post-processing keeps the largest one.
+**What it motivated (Decision: CC-Dice + largest component).** Because masks are multi-object but area-dominated, ordinary Dice would ignore the small fragments, so CC-Dice scores every component, and post-processing keeps the largest one.
 
 ## D. Fragmentation vs treatment  (biology preview, associative)
 
@@ -149,7 +149,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 ![](../assets/cll/figures/01_image_eda/fig09_quality_coverage_link.png)
 
-**What it shows.** How far a real well sits from its nearest synthetic spheroid grows with fragmentation (r=0.30) and focus (r=0.43) but not with contrast (r=0.05) — the qualities hardest to segment are also the least covered by the simulation library.
+**What it shows.** How far a real well sits from its nearest synthetic spheroid grows with fragmentation (r=0.30) and focus (r=0.43) but not with contrast (r=0.05): the qualities hardest to segment are also the least covered by the simulation library.
 
 **What it motivated (Why relative shifts, not absolutes).** This is the mechanism behind the ~90% of real wells that fall outside the synthetic library, and the reason the inference is reported as relative shifts rather than absolute parameter values.
 
