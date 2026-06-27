@@ -159,10 +159,14 @@
     var cwrap = el("div"); grid.appendChild(cwrap);
     var canvas = mkCanvas(cwrap, 360);
     var card = el("div", "iact-card"); grid.appendChild(card);
-    card.innerHTML = "<div class='iact-hint'>Click any spheroid in the cloud.</div>";
+    card.innerHTML = "<div class='iact-hint'>Click any point. Outlined points have a rendered spheroid.</div>";
+    var leg = el("div", "iact-readout"); leg.style.marginTop = "0.4rem";
+    leg.innerHTML = "<span style='color:#f3ecd6'>&#9711; outlined</span> = has a rendered spheroid (click to view) &nbsp;&middot;&nbsp; <span style='opacity:.45'>faded</span> = parameters only";
+    cwrap.appendChild(leg);
 
     var pts = d.points, exIds = [], exImg = {};
     if (d.extremes) Object.keys(d.extremes).forEach(function (k) { var v = d.extremes[k]; var id = typeof v === "object" ? v.sample_id : v; exIds.push(id); if (v && v.img) exImg[id] = v.img; });
+    function hasRender(p) { var S = d.meta.spheroids; return !!(S && p.sample_id >= S.min && p.sample_id <= S.max); }
     var showEx = false, screen = [];
     function rng(key) { var lo = Infinity, hi = -Infinity; pts.forEach(function (p) { lo = Math.min(lo, p[key]); hi = Math.max(hi, p[key]); }); return [lo, hi]; }
     function colorFor(v, r) { var t = (v - r[0]) / (r[1] - r[0] || 1); return "rgb(" + Math.round(lerp(125, 231, t)) + "," + Math.round(lerp(179, 200, t)) + "," + Math.round(lerp(189, 124, t)) + ")"; }
@@ -173,10 +177,12 @@
       var a = scatterAxes(x, W, H, xr, yr); screen = [];
       pts.forEach(function (p) {
         var X = a.px(p[selX.value]), Y = a.py(p[selY.value]); screen.push({ X: X, Y: Y, p: p });
-        var ex = showEx && exIds.indexOf(p.sample_id) >= 0;
-        x.beginPath(); x.arc(X, Y, ex ? 6 : 3, 0, 7);
-        x.fillStyle = ex ? C.clay : colorFor(p[selC.value], cr); x.globalAlpha = ex ? 1 : 0.7; x.fill(); x.globalAlpha = 1;
+        var ex = showEx && exIds.indexOf(p.sample_id) >= 0, rend = hasRender(p);
+        x.beginPath(); x.arc(X, Y, ex ? 6 : rend ? 3.5 : 2.4, 0, 7);
+        x.fillStyle = ex ? C.clay : colorFor(p[selC.value], cr);
+        x.globalAlpha = ex ? 1 : rend ? 0.92 : 0.26; x.fill(); x.globalAlpha = 1;
         if (ex) { x.lineWidth = 1.5; x.strokeStyle = C.cream; x.stroke(); }
+        else if (rend) { x.lineWidth = 1; x.strokeStyle = "rgba(243,236,214,0.85)"; x.stroke(); }
       });
       if (sel) { x.beginPath(); x.arc(a.px(sel[selX.value]), a.py(sel[selY.value]), 7, 0, 7); x.strokeStyle = C.goldL; x.lineWidth = 2.5; x.stroke(); }
       x.fillStyle = C.muted; x.font = "11px 'DM Sans'"; x.textAlign = "center";
