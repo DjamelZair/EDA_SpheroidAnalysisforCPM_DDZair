@@ -253,21 +253,41 @@ def _chart(b):
             f'<div class="chart-host" style="height:{h}px"><canvas id="{b["id"]}"></canvas></div>'
             f'{note}{informs}</section>{script}')
 
+def _interactive(b, rel_root):
+    """Mount point for a Theme-03 interactive widget (rendered by theme3_interactive.js)."""
+    src = f'{rel_root}assets/data/{b["json"]}'
+    intro = ""
+    if b.get("intro"):
+        intro = f'<p style="margin-bottom:1rem">{inline(b["intro"])}</p>'
+    note = ""
+    if b.get("informs"):
+        note = (f'<div class="verdict">{inline(b["informs"])}'
+                f'<span class="small">{inline(b.get("informs_tag","beyond the thesis"))}</span></div>')
+    return (f'<section class="card">{intro}'
+            f'<div class="iact" data-widget="{b["widget"]}" data-json="{src}"></div>'
+            f'{note}</section>')
+
+_INTERACTIVE_JS = '<script src="{rel}assets/theme3_interactive.js" defer></script>'
+
 _RENDER = dict(hero=_hero, kpis=_kpis, section=_section, figure=_figure,
-               prose=_prose, table=_table, tools=_tools, bigcta=_bigcta, chart=_chart)
+               prose=_prose, table=_table, tools=_tools, bigcta=_bigcta, chart=_chart,
+               interactive=_interactive)
 
 def render_theme_html(*, title, blocks, rel_root="../", prev_next=None, out_path=None):
     has_charts = any(b["type"] == "chart" for b in blocks)
+    has_iact = any(b["type"] == "interactive" for b in blocks)
     head = (CHART_CDN + CHART_RUNTIME) if has_charts else ""
     parts = [head, _header(rel_root, active=None), '<main>']
     for b in blocks:
         fn = _RENDER[b["type"]]
         if b["type"] in ("hero",):
             parts.append(fn(b, rel_root, prev_next))
-        elif b["type"] in ("figure", "bigcta"):
+        elif b["type"] in ("figure", "bigcta", "interactive"):
             parts.append(fn(b, rel_root))
         else:
             parts.append(fn(b))
+    if has_iact:
+        parts.append(_INTERACTIVE_JS.format(rel=rel_root))
     parts.append(
         '<footer>&copy; 2026 Djamel Zair &middot; Amsterdam &middot; '
         '<a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a></footer>')

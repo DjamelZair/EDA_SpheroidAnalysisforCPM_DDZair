@@ -23,6 +23,8 @@ A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion
 
 **What it motivated (Sets up the identifiability question).** Identifies which knobs leave a size signature in morphology, the precondition for being identifiable later.
 
+## Tune it yourself: knob to spheroid  (live morph, beyond the thesis)
+
 ## What the library looks like  (16 random samples at the final step)
 
 ### Sixteen synthetic spheroids from the simulation library - final MCS, one replicate
@@ -33,6 +35,8 @@ A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion
 
 **What it motivated (Shows the library's morphological spread).** Confirms visually that the sampled parameter space produces a wide morphological range, the diversity the inversion relies on.
 
+## Walk the morphospace  (1,105 samples, click any one)
+
 ## Which knobs drive cluster size?  (Sobol indices, direct vs total effect)
 
 ### Sobol first-order vs total effect - share of variance in cluster area
@@ -42,6 +46,10 @@ A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion
 **What it shows.** Direct effect (S1) is how much a knob alone moves area; total effect (ST) adds its interactions with the other knobs. A large gap means the knob acts mostly through those interactions.
 
 **What it motivated (Interactions bound identifiability).** Target volume dominates; cell-cell and cell-medium adhesion carry sizeable interaction effects. These interactions limit how cleanly a single knob can be read back from morphology.
+
+## The surrogate, opened up  (XGBoost, cross-validated)
+
+## Does the simulator cover reality?  (real wells vs the synthetic world)
 
 ### Library yield - sampled to usable
 

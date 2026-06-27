@@ -449,6 +449,15 @@ THEME3 = [
          informs="Identifies which knobs leave a size signature in morphology, the precondition "
                  "for being identifiable later.",
          informs_tag="Sets up the identifiability question"),
+    dict(type="section", title='Tune it yourself: <span class="it">knob to spheroid</span>',
+         right="live morph, beyond the thesis"),
+    dict(type="interactive", widget="morph", json="theme3_morph.json",
+         intro="The thesis only shows static sweep curves. Here you grab a knob (target volume or "
+               "cell-cell adhesion J_cc) and watch a real rendered spheroid grow or compact while its "
+               "cluster-area curve tracks the move.",
+         informs="Binds the rendered CPM lattice to the swept parameter, so size and shape respond as "
+                 "you drag, not just a line plot.",
+         informs_tag="Beyond the thesis: live morph"),
     dict(type="section", title='What the <span class="it">library</span> looks like',
          right="16 random samples at the final step"),
     dict(type="figure", img="fig/saltelli_gallery.png",
@@ -460,6 +469,15 @@ THEME3 = [
          informs="Confirms visually that the sampled parameter space produces a wide morphological "
                  "range, the diversity the inversion relies on.",
          informs_tag="Shows the library's morphological spread"),
+    dict(type="section", title='Walk the <span class="it">morphospace</span>',
+         right="1,105 samples, click any one"),
+    dict(type="interactive", widget="morphospace", json="theme3_morphospace.json",
+         intro="Every dot is one of 1,105 synthetic spheroids. Click one to read the exact seven CPM "
+               "parameters that produced it and the morphology that resulted. Swap the axes, recolour "
+               "by any knob, or highlight the morphological extremes.",
+         informs="Turns the library from a 16-panel gallery into a navigable map, where any point "
+                 "reveals its generating parameters and shape.",
+         informs_tag="Beyond the thesis: navigable library"),
     dict(type="section", title='Which knobs <span class="it">drive</span> cluster size?',
          right="Sobol indices, direct vs total effect"),
     dict(type="figure", img=CLLF + "cpm/sobol_S1_vs_ST.png",
@@ -471,6 +489,24 @@ THEME3 = [
                  "interaction effects. These interactions limit how cleanly a single knob can be "
                  "read back from morphology.",
          informs_tag="Interactions bound identifiability"),
+    dict(type="section", title='The <span class="it">surrogate</span>, opened up',
+         right="XGBoost, cross-validated"),
+    dict(type="interactive", widget="surrogate", json="theme3_surrogate.json",
+         intro="A gradient-boosted surrogate predicts each shape feature from the seven knobs. Toggle "
+               "between how well it predicts (per-feature cross-validated R-squared, click a bar for "
+               "the five folds) and what drives each feature (Sobol direct, total, and interaction gap).",
+         informs="Circularity is near-perfectly predictable while eccentricity is the weak link; the "
+                 "direct-versus-total toggle makes interaction effects something you can manipulate.",
+         informs_tag="Beyond the thesis: interactive sensitivity"),
+    dict(type="section", title='Does the simulator <span class="it">cover reality</span>?',
+         right="real wells vs the synthetic world"),
+    dict(type="interactive", widget="coverage", json="theme3_coverage.json",
+         intro="The synthetic library (grey) and the 152 real spheroid wells (coloured) projected into "
+               "the same PCA morphospace. Drag the threshold to see how many real wells fall outside "
+               "the simulated world.",
+         informs="Most real spheroids sit on the rim or outside the synthetic cloud, the reason the "
+                 "thesis reports relative shifts rather than absolute parameters.",
+         informs_tag="Beyond the thesis: live coverage"),
     dict(type="chart", id="t3_yield", fn="barH", height=240,
          title="Library yield", sub="sampled to usable",
          data=dict(labels=["Sampled (Saltelli)", "Usable", "Dropped (degenerate)"],

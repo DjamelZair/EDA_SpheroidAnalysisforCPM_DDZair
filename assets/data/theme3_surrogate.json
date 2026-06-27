@@ -1,0 +1,464 @@
+{
+ "meta": {
+  "title": "The XGBoost surrogate: can morphology be predicted, and what drives it?",
+  "surrogate_config": "XGBoost (n_estimators=400, max_depth=4, learning_rate=0.05)",
+  "cv_scheme": "5-fold cross-validation",
+  "n_vectors_total": 1152,
+  "n_vectors_usable": 1105,
+  "sobol_caveat": "Preliminary: Sobol magnitudes computed on 384 of 1152 completed Saltelli vectors; treat indices as provisional (rankings are stable, exact values may shift).",
+  "source_files": [
+   "surrogate_cv_per_feature.csv",
+   "surrogate_model_benchmark_folds.csv",
+   "sobol_indices_preliminary.csv"
+  ]
+ },
+ "features": [
+  "total_area",
+  "equivalent_diameter",
+  "eccentricity",
+  "solidity",
+  "perimeter",
+  "circularity"
+ ],
+ "feature_labels": [
+  "Area",
+  "Equiv. diameter",
+  "Eccentricity",
+  "Solidity",
+  "Perimeter",
+  "Circularity"
+ ],
+ "parameters": [
+  "width",
+  "temp",
+  "contact",
+  "neighbor",
+  "contact_no",
+  "lambda",
+  "cm_adhesion"
+ ],
+ "parameter_labels": [
+  "width",
+  "temp",
+  "contact",
+  "neighbor",
+  "contact_no",
+  "lambda",
+  "cm_adhesion"
+ ],
+ "r2_bars": [
+  {
+   "feature": "total_area",
+   "label": "Area",
+   "cv_r2_mean": 0.8577,
+   "cv_r2_std": 0.0149,
+   "n": 1152,
+   "mae_pct": 16.71,
+   "folds": [
+    0.8476,
+    0.8787,
+    0.902,
+    0.716,
+    0.7979
+   ],
+   "note": "Easy to predict (R2=0.86) and tight across folds; cell width dominates with a large interaction tail."
+  },
+  {
+   "feature": "equivalent_diameter",
+   "label": "Equiv. diameter",
+   "cv_r2_mean": 0.7615,
+   "cv_r2_std": 0.0945,
+   "n": 1105,
+   "mae_pct": 17.51,
+   "folds": [
+    0.7956,
+    0.8195,
+    0.8736,
+    0.6118,
+    0.7171
+   ],
+   "note": "Predictable on average (R2=0.76) but fold spread is wide; again width-driven."
+  },
+  {
+   "feature": "eccentricity",
+   "label": "Eccentricity",
+   "cv_r2_mean": 0.6573,
+   "cv_r2_std": 0.1376,
+   "n": 1105,
+   "mae_pct": 27.48,
+   "folds": [
+    0.6845,
+    0.6816,
+    0.7251,
+    0.811,
+    0.4194
+   ],
+   "note": "The weak link (R2=0.66) and most variable across folds - elongation is the hardest morphology to recover from parameters."
+  },
+  {
+   "feature": "solidity",
+   "label": "Solidity",
+   "cv_r2_mean": 0.8175,
+   "cv_r2_std": 0.0976,
+   "n": 1105,
+   "mae_pct": 14.02,
+   "folds": [
+    0.6279,
+    0.8183,
+    0.9052,
+    0.872,
+    0.8689
+   ],
+   "note": "Solidly predictable (R2=0.82); driven almost entirely by cm_adhesion."
+  },
+  {
+   "feature": "perimeter",
+   "label": "Perimeter",
+   "cv_r2_mean": 0.886,
+   "cv_r2_std": 0.046,
+   "n": 1105,
+   "mae_pct": 12.88,
+   "folds": [
+    0.8931,
+    0.8054,
+    0.9281,
+    0.9344,
+    0.8716
+   ],
+   "note": "Strong fit (R2=0.89); boundary length is set by cm_adhesion plus contact."
+  },
+  {
+   "feature": "circularity",
+   "label": "Circularity",
+   "cv_r2_mean": 0.9733,
+   "cv_r2_std": 0.0061,
+   "n": 1105,
+   "mae_pct": 9.76,
+   "folds": [
+    0.9809,
+    0.9697,
+    0.9628,
+    0.977,
+    0.9785
+   ],
+   "note": "Nearly perfectly predictable (R2=0.97) with the tightest folds; cm_adhesion is the lone strong driver."
+  }
+ ],
+ "sobol": {
+  "features": [
+   "total_area",
+   "equivalent_diameter",
+   "eccentricity",
+   "solidity",
+   "perimeter",
+   "circularity"
+  ],
+  "parameters": [
+   "width",
+   "temp",
+   "contact",
+   "neighbor",
+   "contact_no",
+   "lambda",
+   "cm_adhesion"
+  ],
+  "S1": [
+   [
+    0.3985,
+    0.0052,
+    0.0234,
+    -0.0035,
+    0.0064,
+    0.0919,
+    -0.0058
+   ],
+   [
+    0.446,
+    0.0118,
+    0.0333,
+    -0.0001,
+    -0.0157,
+    0.0677,
+    0.003
+   ],
+   [
+    0.6282,
+    0.0734,
+    0.0059,
+    0.002,
+    0.0055,
+    -0.0108,
+    0.0013
+   ],
+   [
+    0.0219,
+    0.0018,
+    0.0871,
+    0.002,
+    -0.0053,
+    0.0125,
+    0.6721
+   ],
+   [
+    0.0325,
+    -0.002,
+    0.0595,
+    -0.003,
+    0.0077,
+    -0.001,
+    0.6696
+   ],
+   [
+    -0.0017,
+    0.0241,
+    0.1202,
+    -0.0006,
+    0.0252,
+    0.0022,
+    0.7092
+   ]
+  ],
+  "ST": [
+   [
+    0.7998,
+    0.0228,
+    0.0689,
+    0.0025,
+    0.1265,
+    0.3339,
+    0.0307
+   ],
+   [
+    0.8777,
+    0.0481,
+    0.0915,
+    0.0106,
+    0.1091,
+    0.2983,
+    0.0232
+   ],
+   [
+    0.9126,
+    0.1499,
+    0.0793,
+    0.0059,
+    0.0231,
+    0.1698,
+    0.0216
+   ],
+   [
+    0.1132,
+    0.0195,
+    0.2134,
+    0.0008,
+    0.0249,
+    0.0099,
+    0.8918
+   ],
+   [
+    0.0956,
+    0.0059,
+    0.2157,
+    0.0024,
+    0.0182,
+    0.0032,
+    0.9436
+   ],
+   [
+    0.0015,
+    0.0384,
+    0.1987,
+    0.0004,
+    0.0566,
+    0.0015,
+    0.7793
+   ]
+  ],
+  "S1_conf": [
+   [
+    0.1505,
+    0.02,
+    0.0213,
+    0.0116,
+    0.0571,
+    0.0668,
+    0.0188
+   ],
+   [
+    0.1747,
+    0.0259,
+    0.0391,
+    0.0148,
+    0.0528,
+    0.0514,
+    0.0179
+   ],
+   [
+    0.1534,
+    0.0446,
+    0.0225,
+    0.0078,
+    0.0168,
+    0.0431,
+    0.0133
+   ],
+   [
+    0.0394,
+    0.0207,
+    0.0479,
+    0.0029,
+    0.0202,
+    0.0229,
+    0.1101
+   ],
+   [
+    0.0413,
+    0.006,
+    0.0614,
+    0.0061,
+    0.0157,
+    0.0094,
+    0.1252
+   ],
+   [
+    0.0045,
+    0.0239,
+    0.0585,
+    0.0027,
+    0.0328,
+    0.0051,
+    0.1124
+   ]
+  ],
+  "ST_conf": [
+   [
+    0.223,
+    0.0104,
+    0.0213,
+    0.0009,
+    0.0414,
+    0.1067,
+    0.0111
+   ],
+   [
+    0.2676,
+    0.0199,
+    0.0347,
+    0.0046,
+    0.0411,
+    0.1192,
+    0.0089
+   ],
+   [
+    0.1112,
+    0.0653,
+    0.0461,
+    0.0023,
+    0.0072,
+    0.0913,
+    0.0056
+   ],
+   [
+    0.0328,
+    0.0073,
+    0.055,
+    0.0002,
+    0.0084,
+    0.0048,
+    0.1512
+   ],
+   [
+    0.0261,
+    0.0019,
+    0.058,
+    0.0009,
+    0.0077,
+    0.0015,
+    0.1532
+   ],
+   [
+    0.0004,
+    0.0076,
+    0.0346,
+    0.0001,
+    0.0126,
+    0.0003,
+    0.0883
+   ]
+  ],
+  "gap": [
+   [
+    0.4013,
+    0.0176,
+    0.0455,
+    0.006,
+    0.1201,
+    0.242,
+    0.0365
+   ],
+   [
+    0.4317,
+    0.0363,
+    0.0582,
+    0.0107,
+    0.1248,
+    0.2306,
+    0.0202
+   ],
+   [
+    0.2844,
+    0.0765,
+    0.0734,
+    0.0039,
+    0.0176,
+    0.1806,
+    0.0203
+   ],
+   [
+    0.0913,
+    0.0177,
+    0.1263,
+    -0.0012,
+    0.0302,
+    -0.0026,
+    0.2197
+   ],
+   [
+    0.0631,
+    0.0079,
+    0.1562,
+    0.0054,
+    0.0105,
+    0.0042,
+    0.274
+   ],
+   [
+    0.0032,
+    0.0143,
+    0.0785,
+    0.001,
+    0.0314,
+    -0.0007,
+    0.0701
+   ]
+  ],
+  "global_ST_by_param": {
+   "width": 0.4667,
+   "temp": 0.0474,
+   "contact": 0.1446,
+   "neighbor": 0.0038,
+   "contact_no": 0.0597,
+   "lambda": 0.1361,
+   "cm_adhesion": 0.4484
+  },
+  "param_interpretation": {
+   "width": "Cell target width: the dominant driver of size features (area, diameter) and the strongest single contributor to eccentricity; much of its effect on area is interaction-borne (large ST-S1).",
+   "temp": "Membrane fluctuation temperature: minor across the board; a small direct effect on eccentricity only.",
+   "contact": "Homotypic contact energy: moderate driver of perimeter, solidity and circularity via boundary shape.",
+   "neighbor": "Neighbour-order radius: negligible for every feature (S1 and ST near zero).",
+   "contact_no": "Non-specific contact energy: a modest, mostly interaction-mediated contributor to area/diameter.",
+   "lambda": "Volume-constraint stiffness (lambda): secondary size driver of area and diameter, largely through interactions.",
+   "cm_adhesion": "Cell-matrix adhesion: the dominant shape driver - controls solidity, perimeter and circularity almost single-handedly."
+  }
+ }
+}
