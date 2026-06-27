@@ -185,7 +185,7 @@ function sweepline(id,d){const el=document.getElementById(id);if(!el)return;
   let p=d.order[0]; let chart;
   function draw(){const o=base(false);o.parsing=false;
     o.plugins.tooltip.callbacks={title:i=>d.nice[p]+' = '+i[0].parsed.x,label:c=>'cluster area '+(+c.parsed.y).toLocaleString()+' px'};
-    o.scales={x:ax(d.nice[p]),y:ax('cluster area (px)')};
+    o.scales={x:ax(d.nice[p],{type:'linear'}),y:ax('cluster area (px)')};
     const pts=d.levels[p].map((x,i)=>({x:x,y:d.area[p][i]}));
     if(chart)chart.destroy();
     chart=new Chart(el,{type:'line',data:{datasets:[{data:pts,borderColor:C.GOLD,
