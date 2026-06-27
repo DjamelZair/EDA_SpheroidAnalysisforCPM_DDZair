@@ -404,7 +404,7 @@
         });
         canvas._draw = draw;
       }; draw();
-      canvas.onclick = function (e) { var r = canvas.getBoundingClientRect(), my = e.clientY - r.top, hit = geom.filter(function (gg) { return my >= gg.y && my <= gg.y + gg.bh; })[0]; if (hit) { var b = hit.b; det.innerHTML = "<b>" + b.param.replace(/_/g, " ") + "</b> — tier <b style='color:" + (TIER[b.tier]) + "'>" + b.tier + "</b>, R² " + b.r2.toFixed(3) + ", Pearson " + b.pearson.toFixed(3) + ", n " + b.n + (b.mean_abs_err != null ? ", MAE " + b.mean_abs_err.toFixed(3) : ""); } };
+      canvas.onclick = function (e) { var r = canvas.getBoundingClientRect(), my = e.clientY - r.top, hit = geom.filter(function (gg) { return my >= gg.y && my <= gg.y + gg.bh; })[0]; if (hit) { var b = hit.b; det.innerHTML = "<b>" + b.param.replace(/_/g, " ") + "</b>: tier <b style='color:" + (TIER[b.tier]) + "'>" + b.tier + "</b>, R² " + b.r2.toFixed(3) + ", Pearson " + b.pearson.toFixed(3) + ", n " + b.n + (b.mean_abs_err != null ? ", MAE " + b.mean_abs_err.toFixed(3) : ""); } };
     }
     render();
   }
