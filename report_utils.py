@@ -133,8 +133,8 @@ def _table(b):
     head = "".join(f"<th>{inline(c)}</th>" for c in b["head"])
     rows = "".join("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>" for r in b["rows"])
     cap = f'<div class="card-h"><span class="ttl">{b["title"]}</span></div>' if b.get("title") else ""
-    return (f'<section class="card">{cap}<table style="width:100%;border-collapse:collapse">'
-            f'<thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table></section>')
+    return (f'<section class="card">{cap}<div class="tablewrap"><table>'
+            f'<thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table></div></section>')
 
 def _tools(b):
     chips = "".join(f'<span class="chip{" gold" if c.get("gold") else ""}">{inline(c["t"])}</span>'
