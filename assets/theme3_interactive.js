@@ -161,8 +161,8 @@
     var card = el("div", "iact-card"); grid.appendChild(card);
     card.innerHTML = "<div class='iact-hint'>Click any spheroid in the cloud.</div>";
 
-    var pts = d.points, exIds = [];
-    if (d.extremes) Object.keys(d.extremes).forEach(function (k) { var v = d.extremes[k]; exIds.push(typeof v === "object" ? v.sample_id : v); });
+    var pts = d.points, exIds = [], exImg = {};
+    if (d.extremes) Object.keys(d.extremes).forEach(function (k) { var v = d.extremes[k]; var id = typeof v === "object" ? v.sample_id : v; exIds.push(id); if (v && v.img) exImg[id] = v.img; });
     var showEx = false, screen = [];
     function rng(key) { var lo = Infinity, hi = -Infinity; pts.forEach(function (p) { lo = Math.min(lo, p[key]); hi = Math.max(hi, p[key]); }); return [lo, hi]; }
     function colorFor(v, r) { var t = (v - r[0]) / (r[1] - r[0] || 1); return "rgb(" + Math.round(lerp(125, 231, t)) + "," + Math.round(lerp(179, 200, t)) + "," + Math.round(lerp(189, 124, t)) + ")"; }
@@ -186,6 +186,7 @@
     }
     function showCard(p) {
       var ph = "<div class='iact-cardh'>Sample #" + p.sample_id + (exIds.indexOf(p.sample_id) >= 0 ? " <span class='iact-badge'>extreme</span>" : "") + "</div>";
+      if (exImg[p.sample_id]) ph += "<img class='iact-spheroid' style='margin-bottom:0.7rem' src='" + exImg[p.sample_id] + "' alt='rendered spheroid for sample " + p.sample_id + "'>";
       var rows = "<div class='iact-kv'><div class='iact-kvg'>CPM parameters</div>";
       pLabels.forEach(function (k) { rows += "<div><span>" + k.replace(/_/g, " ") + "</span><b>" + fmt(p[k], 2) + "</b></div>"; });
       rows += "</div><div class='iact-kv'><div class='iact-kvg'>resulting morphology</div>";
