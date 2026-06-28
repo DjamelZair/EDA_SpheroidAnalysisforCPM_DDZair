@@ -601,8 +601,8 @@ THEME4 = [
     dict(type="interactive", widget="heatmap", json="theme4_discriminability_heatmap.json",
          intro="How much each shape feature responds to each CPM knob, as XGBoost-surrogate Sobol "
                "total-effect weights (per-knob min-max normalised, clipped at 0.05). Brighter gold means "
-               "more sensitive; click a cell to read its value. Shown for five knobs; cell-medium "
-               "adhesion and volume elasticity are omitted here.",
+               "more sensitive; click a cell to read its value. All seven knobs are shown: width and volume "
+               "elasticity drive size, while contact J and cell-medium adhesion drive shape.",
          informs="Area and circularity carry most of the recoverable signal, consistent with the "
                  "identifiability ranking above.",
          informs_tag="Beyond the thesis: clickable matrix"),
