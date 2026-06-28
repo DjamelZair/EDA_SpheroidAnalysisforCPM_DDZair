@@ -388,8 +388,8 @@
 
   /* ---------- G. DISCRIMINABILITY HEATMAP (Theme 04) ---------- */
   function heatmap(mount, d) {
-    header(mount, "Feature to parameter importance", "which shape numbers carry information about which CPM knob");
-    var note = el("div", "iact-readout"); note.innerHTML = "Click a cell to read its importance. Brighter gold = that feature is more informative about that parameter."; mount.appendChild(note);
+    header(mount, "Feature to parameter sensitivity", "surrogate Sobol total-effect weights, per knob");
+    var note = el("div", "iact-readout"); note.innerHTML = "Each cell is the XGBoost-surrogate Sobol total-effect weight (per-knob min-max normalised). Brighter gold = that feature is more sensitive to that knob. Click a cell to read its value."; mount.appendChild(note);
     var ncol = d.params.length;
     var g = el("div"); g.style.display = "grid"; g.style.gridTemplateColumns = "minmax(96px,1.1fr) repeat(" + ncol + ",1fr)"; g.style.gap = "3px"; g.style.marginTop = "0.8rem"; mount.appendChild(g);
     function cell(txt, cls) { var c = el("div", cls); c.textContent = txt; c.style.padding = "0.5rem 0.3rem"; c.style.fontFamily = "'JetBrains Mono',monospace"; c.style.fontSize = "0.62rem"; c.style.textAlign = "center"; return c; }
@@ -444,7 +444,7 @@
 
   /* ---------- I. DRUG PANEL FOREST (Theme 05) ---------- */
   function forest(mount, d) {
-    header(mount, "Drug panel: inferred cell-cell adhesion shift", "each drug's delta J_cc with bootstrap interval; click for the wells behind it");
+    header(mount, "Drug panel: inferred cell-cell adhesion shift", "each drug's delta J_cc with its q25 to q75 spread; click for the wells behind it");
     var SIG = { sig: C.green, borderline: C.gold, ns: C.muted };
     var rows = d.rows.slice().sort(function (a, b) { return (a.order - b.order) || (a.est - b.est); });
     var leg = el("div", "iact-readout"); leg.innerHTML = "<span style='color:" + C.green + "'>&#9632; significant</span> &nbsp; <span style='color:" + C.gold + "'>&#9632; borderline</span> &nbsp; <span style='color:" + C.muted + "'>&#9632; not significant</span> &nbsp; dashed line = no change (0)"; mount.appendChild(leg);
@@ -481,12 +481,31 @@
 
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest };
+
+  var HELP = {
+    morph: "Pick a knob with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
+    morphospace: "Each dot is one synthetic spheroid. Click a dot to read its 7 CPM parameters and resulting morphology. Outlined dots also have a rendered spheroid image; faded dots show parameters only. Use the dropdowns to change the axes or recolour by a knob, and Highlight extremes to flag the morphological corners.",
+    coverage: "Grey dots are synthetic spheroids and coloured dots are the real wells, projected into the same PCA space. Drag the threshold to set how far a real well must sit from the nearest synthetic spheroid to count as outside the library; the headline count and the red/green colouring update.",
+    surrogate: "Two tabs. 'How well can it predict' shows the surrogate's cross-validated R-squared per shape feature (click a bar for its 5 folds). 'What drives each feature' shows Sobol importances per knob, with a feature dropdown and a direct / total / interaction-gap toggle.",
+    qcthreshold: "Pick a quality metric with the buttons, then drag the threshold. Gold dots pass your bar and red dots fail, and the headline shows how many of the 12,480 frames pass.",
+    modelscatter: "Each dot is a segmentation model, placed by pixel overlap (Dice) against shape-number agreement (CCC). Click a model to see its overall metrics, per-feature reliability and training configuration.",
+    heatmap: "Each cell is the XGBoost-surrogate Sobol total-effect weight: how much a shape feature (row) responds to a CPM knob (column), min-max normalised per knob. Brighter gold means more sensitive. Click a cell to read its value. Five knobs are shown; cell-medium adhesion and volume elasticity are omitted here.",
+    idbars: "Bars are the per-parameter recovery R-squared under the selected matcher (toggle tau, end-state or Wasserstein). Green, gold and grey mean identifiable, weakly identifiable and non-identifiable; the dashed line is the 0.75 identifiable bar. Click a bar for Pearson, sample count and error.",
+    forest: "Each row is a drug's inferred cell-cell adhesion shift (median) with its q25 to q75 spread; the dashed line is no change (zero). Colour shows significance, a heuristic where the spread excludes zero (not a formal statistical test). Click a drug to see the individual wells behind its estimate.",
+  };
+  function addHelp(m, widget) {
+    var head = m.querySelector(".iact-head"); if (!head || !HELP[widget]) return;
+    var btn = el("button", "iact-help-btn", "i"); btn.title = "How to use this";
+    var panel = el("div", "iact-help-panel", HELP[widget]); panel.style.display = "none";
+    head.appendChild(btn); m.insertBefore(panel, head.nextSibling);
+    btn.onclick = function () { panel.style.display = panel.style.display === "none" ? "block" : "none"; btn.classList.toggle("on"); };
+  }
   function boot() {
     var mounts = document.querySelectorAll(".iact[data-widget]");
     Array.prototype.forEach.call(mounts, function (m) {
-      var w = WIDGETS[m.getAttribute("data-widget")], src = m.getAttribute("data-json");
+      var widget = m.getAttribute("data-widget"), w = WIDGETS[widget], src = m.getAttribute("data-json");
       if (!w || !src) return;
-      fetch(src).then(function (r) { return r.json(); }).then(function (d) { try { w(m, d); } catch (e) { m.innerHTML = "<div class='iact-hint'>interactive failed to load</div>"; console.error(e); } })
+      fetch(src).then(function (r) { return r.json(); }).then(function (d) { try { w(m, d); addHelp(m, widget); } catch (e) { m.innerHTML = "<div class='iact-hint'>interactive failed to load</div>"; console.error(e); } })
         .catch(function (e) { m.innerHTML = "<div class='iact-hint'>data unavailable</div>"; console.error(e); });
     });
   }

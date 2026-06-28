@@ -516,7 +516,8 @@ THEME3 = [
     dict(type="section", title='Does the simulator <span class="it">cover reality</span>?',
          right="real wells vs the synthetic world"),
     dict(type="interactive", widget="coverage", json="theme3_coverage.json",
-         intro="The synthetic library (grey) and the 152 real spheroid wells (coloured) projected into "
+         intro="The synthetic library (grey) and the 152 real spheroid wells (control, stimulated and "
+               "drug; coloured) projected into "
                "the same PCA morphospace. Drag the threshold to see how many real wells fall outside "
                "the simulated world.",
          informs="Most real spheroids sit on the rim or outside the synthetic cloud, the reason the "
@@ -589,18 +590,21 @@ THEME4 = [
     dict(type="interactive", widget="idbars", json="theme4_identifiability.json",
          intro="Per-parameter recovery R-squared from the inversion benchmark, under the tau-registered "
                "matcher (primary) or the end-state matcher (secondary). The dashed line is the "
-               "identifiable bar at R-squared 0.75; click a bar for its Pearson correlation, sample "
+               "identifiable bar at R-squared 0.70; click a bar for its Pearson correlation, sample "
                "count and error.",
-         informs="No parameter reaches the 0.75 identifiable bar: cell-medium adhesion, target volume "
+         informs="No parameter reaches the 0.70 identifiable bar: cell-medium adhesion, target volume "
                  "and contact are only weakly identifiable, and the rest are non-identifiable. This is "
                  "the spine of RQ2.",
          informs_tag="Beyond the thesis: interactive identifiability"),
-    dict(type="section", title='Feature to parameter <span class="it">importance</span>',
-         right="discriminability heatmap"),
+    dict(type="section", title='Feature to parameter <span class="it">sensitivity</span>',
+         right="surrogate Sobol total-effect weights"),
     dict(type="interactive", widget="heatmap", json="theme4_discriminability_heatmap.json",
-         intro="Which shape number carries information about which CPM knob. Click any cell to read "
-               "its importance value.",
-         informs="Shows at a glance that area and circularity carry most of the identifiable signal.",
+         intro="How much each shape feature responds to each CPM knob, as XGBoost-surrogate Sobol "
+               "total-effect weights (per-knob min-max normalised, clipped at 0.05). Brighter gold means "
+               "more sensitive; click a cell to read its value. Shown for five knobs; cell-medium "
+               "adhesion and volume elasticity are omitted here.",
+         informs="Area and circularity carry most of the recoverable signal, consistent with the "
+                 "identifiability ranking above.",
          informs_tag="Beyond the thesis: clickable matrix"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 04', chips=[
         dict(t="tab:rq2_1_identifiability (tau)", gold=True), dict(t="cpm_discriminability.json"),
@@ -660,9 +664,11 @@ THEME5 = [
     dict(type="section", title='Drug panel, <span class="it">drug by drug</span>',
          right="inferred delta J_cc with intervals"),
     dict(type="interactive", widget="forest", json="theme5_drug_forest.json",
-         intro="Every drug's inferred cell-cell adhesion shift with its bootstrap interval, grouped by "
-               "mechanism class. Click a drug to see the wells behind it. The pooled BCR-axis shift is "
-               "weak under tau (-1.4, interval crosses zero) and significant only at end-state (+4.6).",
+         intro="Every drug's inferred cell-cell adhesion shift (median, with the q25 to q75 spread "
+               "across its wells), grouped by mechanism class. Click a drug to see the wells behind it. "
+               "Significance here is a heuristic (the spread excludes zero), not a formal test. The "
+               "pooled BCR-axis shift (bootstrap CI) is weak under tau (-1.4, interval crosses zero) "
+               "and significant only at end-state (+4.6).",
          informs="Reads the whole panel at once and ties each estimate back to its underlying wells.",
          informs_tag="Beyond the thesis: drug-by-drug detail"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 05', chips=[
