@@ -1,0 +1,89 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Data inventory - CLL CPM thesis</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"></head><body><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script><script>
+const C={TEAL_1:'#052e36',TEAL_3:'#0d5963',GOLD:'#c8a05c',GOLD_2:'#a37432',GOLD_3:'#e7c98a',
+  PAPER:'#f3ecd6',MUTED:'rgba(168,181,184,0.65)',CLAY:'#c44a30',ICE:'#7CFEF0',GREEN:'#6dd9a1'};
+const GRID='rgba(199,160,92,0.12)', MF={family:'JetBrains Mono',size:10};
+function ax(label,opts){return Object.assign({ticks:{color:C.PAPER,font:MF},grid:{color:GRID},
+  border:{display:false},title:label?{display:true,text:label,color:C.GOLD_3,font:{family:'JetBrains Mono',size:11}}:{display:false}},opts||{});}
+function tip(){return {backgroundColor:C.TEAL_1,titleColor:C.PAPER,bodyColor:C.PAPER,borderColor:C.GOLD,borderWidth:1,padding:9,cornerRadius:2,displayColors:false};}
+function leg(show){return {display:show,position:'top',align:'end',labels:{color:C.PAPER,font:{family:'JetBrains Mono',size:10,weight:'500'},boxWidth:14,boxHeight:14}};}
+function base(showLeg){return {responsive:true,maintainAspectRatio:false,animation:{duration:850,easing:'easeOutCubic'},
+  plugins:{legend:leg(showLeg),tooltip:tip()}};}
+
+function barH(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(d.datasets.length>1);o.indexAxis='y';
+  o.scales={x:ax(d.xlabel,{min:d.min||0,max:d.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toLocaleString(undefined,{maximumFractionDigits:d.dec??2})}}),y:ax()};
+  if(d.logx){o.scales.x.type='logarithmic';delete o.scales.x.min;delete o.scales.x.max;}
+  new Chart(el,{type:'bar',data:{labels:d.labels,datasets:d.datasets.map(s=>({label:s.label,data:s.data,backgroundColor:s.color,borderColor:C.TEAL_1,borderWidth:1.2}))},options:o});}
+
+function barV(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(d.datasets.length>1);
+  o.scales={x:ax(d.xlabel),y:ax(d.ylabel,{min:d.min||0,max:d.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toFixed(d.dec??2)}})};
+  new Chart(el,{type:'bar',data:{labels:d.labels,datasets:d.datasets.map(s=>({label:s.label,data:s.data,backgroundColor:s.color,borderColor:C.TEAL_1,borderWidth:1.2}))},options:o});}
+
+function scatter(id,d){const el=document.getElementById(id);if(!el)return;
+  const o=base(false);o.plugins.tooltip.callbacks={label:c=>d.xlabel+' '+c.parsed.x.toFixed(2)+'  '+d.ylabel+' '+c.parsed.y};
+  o.scales={x:ax(d.xlabel),y:ax(d.ylabel,{min:0})};
+  new Chart(el,{type:'scatter',data:{datasets:[{data:d.points,backgroundColor:C.GOLD,borderColor:C.TEAL_1,borderWidth:1,radius:5,hoverRadius:7}]},options:o});}
+
+/* parameter sweep line with a parameter toggle (cluster area vs level) */
+function sweepline(id,d){const el=document.getElementById(id);if(!el)return;
+  let p=d.order[0]; let chart;
+  function draw(){const o=base(false);o.parsing=false;
+    o.plugins.tooltip.callbacks={title:i=>d.nice[p]+' = '+i[0].parsed.x,label:c=>'cluster area '+(+c.parsed.y).toLocaleString()+' px'};
+    o.scales={x:ax(d.nice[p],{type:'linear'}),y:ax('cluster area (px)')};
+    const pts=d.levels[p].map((x,i)=>({x:x,y:d.area[p][i]}));
+    if(chart)chart.destroy();
+    chart=new Chart(el,{type:'line',data:{datasets:[{data:pts,borderColor:C.GOLD,
+      backgroundColor:'rgba(199,160,92,0.15)',pointRadius:3,pointHoverRadius:5,borderWidth:2,tension:.25,fill:true}]},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');p=b.dataset.metric;draw();}));}
+
+/* model leaderboard, horizontal bar with a metric toggle, winner in gold */
+function lbboard(id,d){const el=document.getElementById(id);if(!el)return;
+  let metric=d.metrics[0].key; let chart;
+  function draw(){const m=d.metrics.find(x=>x.key===metric);
+    const sorted=[...d.models].sort((a,b)=>b[metric]-a[metric]);
+    const labels=sorted.map(x=>x.label), vals=sorted.map(x=>x[metric]);
+    const cols=sorted.map(x=>x.winner?C.GOLD:(x[metric]>=m.mid?C.GOLD_2:'rgba(168,181,184,0.55)'));
+    const o=base(false);o.indexAxis='y';
+    o.plugins.tooltip.callbacks={label:c=>m.label+' '+c.parsed.x.toFixed(3)};
+    o.scales={x:ax(m.label,{min:m.min||0,max:m.max,ticks:{color:C.PAPER,font:MF,callback:v=>(+v).toFixed(2)}}),y:ax()};
+    if(chart)chart.destroy();
+    chart=new Chart(el,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:cols,borderColor:C.TEAL_1,borderWidth:1.2}]},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');metric=b.dataset.metric;draw();}));}
+
+/* multi-feature drug timecourse with a feature toggle */
+function timecourse(id,d){const el=document.getElementById(id);if(!el)return;
+  const COLORS=[C.ICE,C.CLAY,C.GOLD,C.GREEN,C.GOLD_3]; let metric=d.order[0]; let chart;
+  function draw(){const sets=d.series.map((s,i)=>({label:s.label,data:d.features[metric][s.key],
+      borderColor:COLORS[i%COLORS.length],backgroundColor:COLORS[i%COLORS.length],
+      pointRadius:2.5,pointHoverRadius:5,borderWidth:2,tension:0.25}));
+    const o=base(true);o.parsing=false;
+    o.plugins.tooltip.callbacks={title:items=>'day '+items[0].parsed.x.toFixed(2),label:c=>c.dataset.label+': '+(+c.parsed.y).toLocaleString()};
+    o.scales={x:ax('time (days)',{type:'linear',min:0}),y:ax(d.nice[metric])};
+    if(chart)chart.destroy(); chart=new Chart(el,{type:'line',data:{datasets:sets},options:o});}
+  draw();
+  const wrap=el.closest('.card').querySelector('.metric-toggle');
+  if(wrap)wrap.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.classList.contains('active'))return;
+    wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');metric=b.dataset.metric;draw();}));}
+</script><header>
+  <a class="brand-block" href="../index.html">
+    <span class="brand-name">CLL <span class="dot">&rarr;</span> CPM<span class="role">Analysis appendix &middot; MSc thesis</span></span>
+  </a>
+  <nav class="top">
+    <a href="../index.html">Themes</a>
+    <a href="../THESIS_CITE_MAP.md">Cite map</a>
+    <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header><main><a class="back" href="../index.html">&larr; All analysis themes</a><nav class="rq-tabs"><a href="../00_data_inventory/index.html" class="active">Theme 00<span class="label">Data inventory</span></a><a href="../01_image_intensity_eda/index.html" class="">Theme 01<span class="label">Image EDA</span></a><a href="../02_segmentation/index.html" class="">Theme 02<span class="label">Segmentation</span></a><a href="../03_simulation_library/index.html" class="">Theme 03<span class="label">Sim library</span></a><a href="../04_separability_identifiability/index.html" class="">Theme 04<span class="label">Identifiability</span></a><a href="../05_drug_realdata/index.html" class="">Theme 05<span class="label">Drug / real data</span></a></nav><section class="bhero"><div class="bg" style="background-image:url('../assets/hero_spheroid_healthy.png')"></div><div class="radial"></div><div class="scrim"></div><div class="inner"><div class="meta"><span>Theme 00</span><span class="dot">&middot;</span><span>Data inventory</span><span class="dot">&middot;</span><span>Appendix A.0</span></div><h1 class="display">What the <span class="gold">dataset</span> <span class="it">is</span>.</h1><p class="lede">Before any analysis: exactly what data exists. Seven CLL patients, a roughly 99,000-frame brightfield archive, and only 51 hand-drawn masks, the single constraint that shapes every downstream method choice.</p><p class="summary">This theme is the ledger for the whole project: the cohort, the imaging, the frame counts, the label budget, the train/val/test split and the drug panel, all in one place. Theme 01 then characterises what those images <strong>look like</strong>; Themes 02 to 05 build the segmentation, simulation and inference on top of this inventory.</p></div><div class="cap">Patient-derived CLL spheroid &middot; brightfield &middot; time-lapse</div></section><section class="kpi-strip"><div class="kpi"><div class="lbl">Patients</div><div class="num numeric">7</div><div class="desc">CLL donors; reference wells across the cohort.</div></div><div class="kpi"><div class="lbl">Raw frames</div><div class="num numeric">99k</div><div class="desc">Brightfield archive; 12,485 in the real inference set.</div></div><div class="kpi gold"><div class="lbl">Hand-annotated</div><div class="num numeric">51</div><div class="desc">About 0.05% of the corpus, the defining constraint.</div></div><div class="kpi gold"><div class="lbl">Drug panel</div><div class="num numeric">23</div><div class="desc">Drugs across seven mechanism classes.</div></div></section><section class="card" style="padding:0;overflow:hidden"><div class="figwrap"><img src="../assets/cll/figures/what_we_do_strip.png" alt="raw microscopy, AI segmentation outline, extracted shape numbers"></div><div style="padding:1.2rem 1.7rem 1.5rem"><div class="card-h"><span class="ttl">What the pipeline does, end to end</span><span class="sub">raw frame to outline to shape numbers</span></div><p>A microscopy frame goes in, the AI draws the spheroid outline, and a handful of shape numbers come out. Those numbers are the observables every later stage consumes.</p><div class="verdict">Fixes the unit of analysis: the segmenter is judged on whether these shape numbers are trustworthy, not on raw pixel overlap.<span class="small">Frames the whole pipeline</span></div></div></section><div class="sec-h"><h2 class="display">The <span class="it">cohort</span> and corpus, at a glance</h2><span class="right">every asset, counted</span></div><section class="card"><div class="card-h"><span class="ttl">Data inventory: cohort, imaging, frames, labels, splits and the drug panel</span></div><div class="tablewrap"><table><thead><tr><th>Asset</th><th>Count</th><th>Detail</th><th>Where it is used</th></tr></thead><tbody><tr><td>Patients (CLL donors)</td><td>7</td><td>Reference wells inverted across the cohort</td><td>RQ3 real-data inference</td></tr><tr><td>Imaging channel</td><td>1</td><td>Brightfield, single-channel grayscale time-lapse</td><td>All stages</td></tr><tr><td>Raw archive</td><td>~99,000 frames</td><td>Full local brightfield archive</td><td>Corpus</td></tr><tr><td>Real inference set</td><td>12,485 frames</td><td>Segmented for feature extraction</td><td>Themes 01 & 05</td></tr><tr><td>Hand-annotated masks</td><td>51 frames</td><td>About 0.05% of the corpus, the defining constraint</td><td>RQ1 ground truth</td></tr><tr><td>Classical pseudo-labels</td><td>4,552 frames</td><td>Classical-pipeline masks for stage-1 pretraining</td><td>RQ1 stage 1</td></tr><tr><td>Train / val / test split</td><td>216 / 45 / 45 images</td><td>37 / 9 / 8 spheroids, plate-level stratified</td><td>RQ1</td></tr><tr><td>Held-out test</td><td>45 frames</td><td>Never seen during training</td><td>RQ1 evaluation</td></tr><tr><td>Drug panel</td><td>23 drugs</td><td>BTKi, Syk, PI3K, JAK, CXCR4, MEK, NF-kB classes</td><td>RQ3 drug response</td></tr><tr><td>Real wells (coverage)</td><td>152 wells</td><td>Control, stimulated and drug conditions</td><td>Morphospace coverage</td></tr><tr><td>Sampling depth</td><td>~20 timepoints / well</td><td>Median, over roughly 5.5 days</td><td>Time-course features</td></tr></tbody></table></div></section><div class="sec-h"><h2 class="display">Corpus scale and the label <span class="it">bottleneck</span></h2><span class="right">cohort & the defining constraint</span></div><section class="card"><div class="card-h"><span class="ttl">Corpus scale and label scarcity</span><span class="sub">hover for counts</span></div><div class="chart-host" style="height:380px"><canvas id="t0_corpus"></canvas></div><p style="margin-top:.9rem;font-size:.94rem;line-height:1.6;color:var(--paper);opacity:.92">Only 51 of roughly 99,000 frames are hand-annotated (about 0.05%), expanded to 306 by augmentation. The held-out test set is 45 frames.</p><div class="verdict">A 1-in-1000 label ratio motivates the two-stage training strategy: pretrain on classical pseudo-labels, then fine-tune on the 51 ground-truth masks.<span class="small">Decision: two-stage training</span></div></section><script>barH("t0_corpus",{"labels": ["Raw archive", "Inference set", "Pseudo-labels", "Augmented train", "Ground-truth", "Held-out test"], "datasets": [{"label": "frames", "data": [99000, 12485, 4552, 306, 51, 45], "color": "#c8a05c"}], "logx": true, "xlabel": "number of frames (log scale)", "dec": 0});</script><section class="card" style="padding:0;overflow:hidden"><div class="figwrap native"><img src="../assets/cll/figures/01_image_eda/fig01_dataset_composition.png" alt="stacked bars of labelled images by split, real frames by treatment class, and timepoints per well"></div><div style="padding:1.2rem 1.7rem 1.5rem"><div class="card-h"><span class="ttl">Dataset composition</span><span class="sub">annotated split &middot; real set by class &middot; sampling depth</span></div><p>The 51 ground-truth frames expand to about 255 augmented pairs across the train/val/test split; the ~12k-frame inference corpus is dominated by CXCR4-antagonist and control wells, each sampled at a median of 20 timepoints over roughly 5.5 days.</p><div class="verdict">The label scarcity and the class imbalance together drive the plate-stratified split and the two-stage training that pretrains on pseudo-labels before fine-tuning on the 51 masks.<span class="small">Cohort & the defining constraint</span></div></div></section><div class="sec-h"><h2 class="display">Does augmentation cover the real <span class="it">regimes</span>?</h2><span class="right">real vs augmented vs the 51 originals</span></div><section class="card" style="padding:0;overflow:hidden"><div class="figwrap native"><img src="../assets/cll/figures/01_image_eda/fig06_augmentation_coverage.png" alt="contrast, mean-intensity and focus distributions for real, augmented and original frames"></div><div style="padding:1.2rem 1.7rem 1.5rem"><div class="card-h"><span class="ttl">Does augmentation cover the real regimes?</span><span class="sub">real vs augmented vs 51 originals</span></div><p>Augmentation spans 100% of the real contrast range and 91% of the focus (Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is the axis it covers least.</p><div class="verdict">Confirms the heavy-augmentation U-Net is trained across the contrast and focus regimes it will meet at inference; the intensity gap is the one residual exposure.<span class="small">Validates heavy augmentation</span></div></div></section><div class="sec-h"><h2 class="display">Complete analysis <span class="it">index</span></h2><span class="right">every thesis analysis in this theme</span></div><section class="card"><div class="card-h"><span class="ttl">Each analysis, what it shows, its thesis label, and the result</span></div><div class="tablewrap"><table><thead><tr><th>Analysis</th><th>What it shows</th><th>Thesis label</th><th>Key result / status</th></tr></thead><tbody><tr><td>Cohort & dataset inventory</td><td>Patients, frames, channels, label counts, splits, drug panel, real wells</td><td>appendix:data:eda</td><td>Shown as the inventory table above</td></tr><tr><td>Data augmentation</td><td>11 geometric + photometric ops, 51 originals to 255 augmented pairs</td><td>app:aug / tab:aug_ops</td><td>5 augmentations per original</td></tr><tr><td>Patient mapping & split</td><td>Train/val/test 216/45/45 images (37/9/8 spheroids), plate-level stratification</td><td>app:patient_mapping / tab:patient_mapping</td><td>P1043 noted in train and test</td></tr></tbody></table></div></section><section class="stack-row"><div class="lbl"><span class="it">Sources</span> &middot; Theme 00</div><div class="stack-chips"><span class="chip gold">RQ1_segmentation/01_data_eda.ipynb</span><span class="chip">patient_mapping</span><span class="chip">augmentation ops</span><span class="chip">drug panel metadata</span><span class="chip">7 patients</span></div></section><section class="big-cta"><h3>Next: what the <span class="it">signal</span> looks like.</h3><div class="links"><a class="cta primary" href="../01_image_intensity_eda/index.html">Theme 01 &middot; Image & intensity EDA &rarr;</a><a class="cta" href="../index.html">Back to index</a></div></section><footer>&copy; 2026 Djamel Zair &middot; Amsterdam &middot; <a href="https://github.com/DjamelZair" target="_blank" rel="noopener">GitHub</a></footer></main></body></html>

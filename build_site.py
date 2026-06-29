@@ -14,6 +14,7 @@ F = "figures/"  # theme-local figure dir
 
 # RQ-tab style cross-nav shown on every built theme page
 NAV = [
+    dict(tag="Theme 00", name="Data inventory", href="00_data_inventory/index.html"),
     dict(tag="Theme 01", name="Image EDA", href="01_image_intensity_eda/index.html"),
     dict(tag="Theme 02", name="Segmentation", href="02_segmentation/index.html"),
     dict(tag="Theme 03", name="Sim library", href="03_simulation_library/index.html"),
@@ -48,29 +49,56 @@ _fc = _load("theme1_frag_class.json")
 _fo = _load("theme1_focus.json")
 _nc = _load("theme1_ncomp.json")
 
-THEME1 = [
-    dict(type="hero",
-         meta=["Theme 01", "Data exploratory analysis", "Appendix A.1"],
-         title='What the <span class="gold">data</span> <span class="it">demands</span>.',
-         caption="Patient-derived CLL spheroid &middot; brightfield &middot; AI-drawn outline",
-         lede="The imaging reads size and gross shape robustly, but contrast, focus and "
-              "fragmentation limit the finer boundary features, the same loss that later caps "
-              "CPM-parameter identifiability.",
-         summary="Brightfield microscopy of patient-derived CLL spheroids is low-contrast, "
-                 "unevenly lit, and frequently fragmented under drug treatment. This analysis "
-                 "characterises what the images **are** (intensity, contrast, focus, illumination "
-                 "and fragmentation) and what the dataset **contains**, then traces each property "
-                 "to the segmentation, metric and feature choice it drove downstream."),
-    dict(type="kpis", items=[
-        dict(lbl="Raw frames", num="99k", desc="Local archive; 12,485 in the real inference set.", numeric=True),
-        dict(lbl="Hand-annotated", num="51", desc="About 0.05% of the corpus, the defining constraint.", gold=True, numeric=True),
-        dict(lbl="Contrast covered by aug.", num="~100%", desc="Focus ~91%; validates the heavy-aug U-Net.", gold=True),
-        dict(lbl="Real wells out-of-library", num="~90%", desc="Why the thesis reports relative shifts, not absolutes.", numeric=True),
-    ]),
+# ============================ THEME 0 - DATA INVENTORY ============================
+_INVENTORY_ROWS = [
+    ["Patients (CLL donors)", "7", "Reference wells inverted across the cohort", "RQ3 real-data inference"],
+    ["Imaging channel", "1", "Brightfield, single-channel grayscale time-lapse", "All stages"],
+    ["Raw archive", "~99,000 frames", "Full local brightfield archive", "Corpus"],
+    ["Real inference set", "12,485 frames", "Segmented for feature extraction", "Themes 01 & 05"],
+    ["Hand-annotated masks", "51 frames", "About 0.05% of the corpus, the defining constraint", "RQ1 ground truth"],
+    ["Classical pseudo-labels", "4,552 frames", "Classical-pipeline masks for stage-1 pretraining", "RQ1 stage 1"],
+    ["Train / val / test split", "216 / 45 / 45 images", "37 / 9 / 8 spheroids, plate-level stratified", "RQ1"],
+    ["Held-out test", "45 frames", "Never seen during training", "RQ1 evaluation"],
+    ["Drug panel", "23 drugs", "BTKi, Syk, PI3K, JAK, CXCR4, MEK, NF-kB classes", "RQ3 drug response"],
+    ["Real wells (coverage)", "152 wells", "Control, stimulated and drug conditions", "Morphospace coverage"],
+    ["Sampling depth", "~20 timepoints / well", "Median, over roughly 5.5 days", "Time-course features"],
+]
 
-    dict(type="section", title='A. What is the <span class="it">dataset</span>?',
+THEME0 = [
+    dict(type="hero",
+         meta=["Theme 00", "Data inventory", "Appendix A.0"],
+         title='What the <span class="gold">dataset</span> <span class="it">is</span>.',
+         caption="Patient-derived CLL spheroid &middot; brightfield &middot; time-lapse",
+         lede="Before any analysis: exactly what data exists. Seven CLL patients, a roughly "
+              "99,000-frame brightfield archive, and only 51 hand-drawn masks, the single constraint "
+              "that shapes every downstream method choice.",
+         summary="This theme is the ledger for the whole project: the cohort, the imaging, the frame "
+                 "counts, the label budget, the train/val/test split and the drug panel, all in one "
+                 "place. Theme 01 then characterises what those images **look like**; Themes 02 to 05 "
+                 "build the segmentation, simulation and inference on top of this inventory."),
+    dict(type="kpis", items=[
+        dict(lbl="Patients", num="7", desc="CLL donors; reference wells across the cohort.", numeric=True),
+        dict(lbl="Raw frames", num="99k", desc="Brightfield archive; 12,485 in the real inference set.", numeric=True),
+        dict(lbl="Hand-annotated", num="51", desc="About 0.05% of the corpus, the defining constraint.", gold=True, numeric=True),
+        dict(lbl="Drug panel", num="23", desc="Drugs across seven mechanism classes.", gold=True, numeric=True),
+    ]),
+    dict(type="figure", img=CLL + "what_we_do_strip.png",
+         ttl="What the pipeline does, end to end", sub="raw frame to outline to shape numbers",
+         alt="raw microscopy, AI segmentation outline, extracted shape numbers",
+         shows="A microscopy frame goes in, the AI draws the spheroid outline, and a handful of "
+               "shape numbers come out. Those numbers are the observables every later stage consumes.",
+         informs="Fixes the unit of analysis: the segmenter is judged on whether these shape numbers "
+                 "are trustworthy, not on raw pixel overlap.",
+         informs_tag="Frames the whole pipeline"),
+    dict(type="section", title='The <span class="it">cohort</span> and corpus, at a glance',
+         right="every asset, counted"),
+    dict(type="table",
+         title="Data inventory: cohort, imaging, frames, labels, splits and the drug panel",
+         head=["Asset", "Count", "Detail", "Where it is used"],
+         rows=_INVENTORY_ROWS),
+    dict(type="section", title='Corpus scale and the label <span class="it">bottleneck</span>',
          right="cohort & the defining constraint"),
-    dict(type="chart", id="t1_corpus", fn="barH",
+    dict(type="chart", id="t0_corpus", fn="barH",
          title="Corpus scale and label scarcity", sub="hover for counts",
          data=dict(labels=["Raw archive", "Inference set", "Pseudo-labels", "Augmented train",
                            "Ground-truth", "Held-out test"],
@@ -81,14 +109,6 @@ THEME1 = [
          informs="A 1-in-1000 label ratio motivates the two-stage training strategy: pretrain on "
                  "classical pseudo-labels, then fine-tune on the 51 ground-truth masks.",
          informs_tag="Decision: two-stage training"),
-    dict(type="figure", img=CLL + "what_we_do_strip.png",
-         ttl="What the pipeline does, end to end", sub="raw frame to outline to shape numbers",
-         alt="raw microscopy, AI segmentation outline, extracted shape numbers",
-         shows="A microscopy frame goes in, the AI draws the spheroid outline, and a handful of "
-               "shape numbers come out. Those numbers are the observables every later stage consumes.",
-         informs="Fixes the unit of analysis: the segmenter is judged on whether these shape numbers "
-                 "are trustworthy, not on raw pixel overlap.",
-         informs_tag="Frames the whole pipeline"),
     dict(type="figure", img=FIG1 + "fig01_dataset_composition.png", native=True,
          ttl="Dataset composition", sub="annotated split &middot; real set by class &middot; sampling depth",
          alt="stacked bars of labelled images by split, real frames by treatment class, and timepoints per well",
@@ -100,6 +120,8 @@ THEME1 = [
                  "split and the two-stage training that pretrains on pseudo-labels before fine-tuning "
                  "on the 51 masks.",
          informs_tag="Cohort & the defining constraint"),
+    dict(type="section", title='Does augmentation cover the real <span class="it">regimes</span>?',
+         right="real vs augmented vs the 51 originals"),
     dict(type="figure", img=FIG1 + "fig06_augmentation_coverage.png", native=True,
          ttl="Does augmentation cover the real regimes?", sub="real vs augmented vs 51 originals",
          alt="contrast, mean-intensity and focus distributions for real, augmented and original frames",
@@ -109,8 +131,36 @@ THEME1 = [
          informs="Confirms the heavy-augmentation U-Net is trained across the contrast and focus "
                  "regimes it will meet at inference; the intensity gap is the one residual exposure.",
          informs_tag="Validates heavy augmentation"),
+    dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 00', chips=[
+        dict(t="RQ1_segmentation/01_data_eda.ipynb", gold=True), dict(t="patient_mapping"),
+        dict(t="augmentation ops"), dict(t="drug panel metadata"), dict(t="7 patients")]),
+    dict(type="bigcta", title='Next: what the <span class="it">signal</span> looks like.',
+         links=[dict(t="Theme 01 &middot; Image & intensity EDA &rarr;", href="01_image_intensity_eda/index.html", primary=True),
+                dict(t="Back to index", href="index.html")]),
+]
 
-    dict(type="section", title='B. What does the raw <span class="it">signal</span> look like?',
+THEME1 = [
+    dict(type="hero",
+         meta=["Theme 01", "Data exploratory analysis", "Appendix A.1"],
+         title='What the <span class="gold">data</span> <span class="it">demands</span>.',
+         caption="Patient-derived CLL spheroid &middot; brightfield &middot; AI-drawn outline",
+         lede="The imaging reads size and gross shape robustly, but contrast, focus and "
+              "fragmentation limit the finer boundary features, the same loss that later caps "
+              "CPM-parameter identifiability.",
+         summary="Brightfield microscopy of patient-derived CLL spheroids is low-contrast, "
+                 "unevenly lit, and frequently fragmented under drug treatment. This analysis "
+                 "characterises what the images **are** (intensity, contrast, focus, illumination "
+                 "and fragmentation), then traces each property to the segmentation, metric and "
+                 "feature choice it drove downstream. The dataset inventory itself, who and how "
+                 "much, now lives in Theme 00."),
+    dict(type="kpis", items=[
+        dict(lbl="Hand-annotated", num="51", desc="About 0.05% of the corpus, the defining constraint.", gold=True, numeric=True),
+        dict(lbl="Contrast covered by aug.", num="~100%", desc="Validates the heavy-aug U-Net.", gold=True),
+        dict(lbl="Focus covered by aug.", num="~91%", desc="Laplacian-variance range spanned by augmentation.", numeric=True),
+        dict(lbl="Real wells out-of-library", num="~90%", desc="Why the thesis reports relative shifts, not absolutes.", numeric=True),
+    ]),
+
+    dict(type="section", title='A. What does the raw <span class="it">signal</span> look like?',
          right="why a learned segmenter, not thresholding"),
     dict(type="chart", id="t1_contrast", fn="scatter",
          title="Contrast vs fragment count", sub="51 annotated frames",
@@ -171,7 +221,7 @@ THEME1 = [
                  "leans on shape features that tolerate illumination drift.",
          informs_tag="Decision: restrict inversion features"),
 
-    dict(type="section", title='C. What is the object <span class="it">structure</span>?',
+    dict(type="section", title='B. What is the object <span class="it">structure</span>?',
          right="the segmentation criterion: feature preservation"),
     dict(type="chart", id="t1_ncomp", fn="barV", height=340,
          title="Components per annotated image", sub="how multi-object the masks are",
@@ -196,46 +246,25 @@ THEME1 = [
                  "largest one.",
          informs_tag="Decision: CC-Dice + largest component"),
 
-    dict(type="section", title='D. Fragmentation vs <span class="it">treatment</span>',
-         right="biology preview, associative"),
+    dict(type="section", title='C. A glimpse of the drug-response <span class="it">payoff</span>',
+         right="preview only &middot; full analysis in Theme 05"),
     dict(type="chart", id="t1_frag", fn="barH",
          title="Fragmentation by drug-mechanism class", sub="median fragmentation index, classes with n>=30",
          data=dict(labels=_fc["labels"],
                    datasets=[dict(label="median fragmentation index", data=_fc["median"], color="#c8a05c")],
                    xlabel="median fragmentation index", dec=3),
-         note="Syk-inhibitor and CXCR4-antagonist wells are the most fragmented; BTK, NF-kB and "
-              "MALT1 inhibitors sit lowest. Counts are large and unequal and metadata are "
-              "plate-level, so this is read as an association.",
-         informs="Previews the RQ3 drug-response story (drug class changes cohesion), and shows the "
-                 "most drug-responsive classes are hardest to segment, so feature preservation is the "
-                 "right criterion.",
-         informs_tag="Preview: RQ3 mechanism, associative only"),
-    dict(type="figure", img=FIG1 + "fig08_fragmentation_vs_treatment.png", native=True,
-         ttl="Which mechanism classes fragment most", sub="by class &middot; effect vs control &middot; trajectory",
-         alt="fragmentation by mechanism class, effect size vs control, and disintegration trajectory over time",
-         shows="Syk-inhibitor and CXCR4-antagonist wells fragment most relative to control and the "
-               "gap widens over the time course; per-class differences are significant but, with "
-               "plate-level metadata, are read as associations.",
-         informs="The most drug-responsive classes are also the hardest to segment cleanly, which is "
-                 "exactly why the segmenter is chosen on feature preservation rather than pixel "
-                 "overlap.",
-         informs_tag="Preview: RQ3 mechanism, associative only"),
+         note="A single teaser: Syk-inhibitor and CXCR4-antagonist wells fragment most; BTK, NF-kB and "
+              "MALT1 inhibitors sit lowest. Counts are large, unequal and plate-level, so this is read "
+              "as an association only. The full drug-response analysis, auto-measured trajectories, "
+              "per-drug inferred shifts and the BCR axis, lives in Theme 05.",
+         informs="Previews the RQ3 drug-response story and shows the most drug-responsive classes are "
+                 "the hardest to segment, which is exactly why the segmenter is chosen on feature "
+                 "preservation rather than pixel overlap.",
+         informs_tag="Preview only: full drug panel in Theme 05"),
+    dict(type="bigcta", title='This is only a teaser. The full <span class="it">drug panel</span> lives in Theme 05.',
+         links=[dict(t="Theme 05 &middot; Drug & real-data inference &rarr;", href="05_drug_realdata/index.html", primary=True)]),
 
-    dict(type="section", title='E. Drug response, measured <span class="it">automatically</span>',
-         right="the payoff: morphology to mechanism"),
-    dict(type="chart", id="t1_timecourse", fn="timecourse", height=440,
-         title="Drug response measured automatically from the AI segmenter",
-         sub="three drug conditions, every available timepoint",
-         toggle=[(f, _tc["labels"][f]) for f in _TC_ORDER],
-         data=_tc_chart,
-         note="High-dose trametinib collapses the cluster; PD098060 compacts it; low-dose "
-              "trametinib leaves it intact. Every point is extracted from an AI-segmented frame, "
-              "with no manual measurement.",
-         informs="This is the observable the inference consumes: a per-condition shape trajectory "
-                 "that the CPM matcher compares against the synthetic library.",
-         informs_tag="Feeds RQ2 / RQ3 inference"),
-
-    dict(type="section", title='F. From image quality to library <span class="it">coverage</span>',
+    dict(type="section", title='D. From image quality to library <span class="it">coverage</span>',
          right="why the thesis reports relative shifts"),
     dict(type="figure", img=FIG1 + "fig09_quality_coverage_link.png", native=True,
          ttl="Image quality predicts distance from the library", sub="real to nearest-synthetic distance",
@@ -646,13 +675,17 @@ THEME5 = [
                "high-dose trametinib.",
          informs="Distinct drugs leave distinct, separable trajectories.",
          informs_tag="Separable drug signatures"),
-    dict(type="figure", img=CLLF + "morphology/feature_trajectories.png",
-         ttl="Feature trajectories under treatment", sub="extracted automatically per condition",
-         alt="morphology feature trajectories over time per drug condition",
-         shows="Per-condition shape trajectories, the observable the matcher compares against the "
-               "synthetic library.",
-         informs="These trajectories drive the inversion that produces the per-condition parameter "
-                 "shifts.",
+    dict(type="chart", id="t5_timecourse", fn="timecourse", height=440,
+         title="Drug response measured automatically from the AI segmenter",
+         sub="three drug conditions, every available timepoint",
+         toggle=[(f, _tc["labels"][f]) for f in _TC_ORDER],
+         data=_tc_chart,
+         note="High-dose trametinib collapses the cluster; PD098060 compacts it; low-dose "
+              "trametinib leaves it intact. Every point is extracted from an AI-segmented frame, "
+              "with no manual measurement. Switch the feature to see each shape axis respond.",
+         informs="This is the observable the inference consumes: a per-condition shape trajectory "
+                 "that the CPM matcher compares against the synthetic library to produce the "
+                 "per-condition parameter shifts.",
          informs_tag="Feeds the inversion"),
     dict(type="figure", img=CLLF + "morphology/icc_ccc_heatmap.png",
          ttl="Feature agreement on the real data", sub="AI-derived vs reference",
@@ -679,15 +712,21 @@ THEME5 = [
 ]
 
 
-THEME_SPECS = {0: ("Image &amp; intensity EDA - CLL CPM thesis", THEME1),
-               1: ("Segmentation &amp; feature preservation - CLL CPM thesis", THEME2),
-               2: ("Simulation library - CLL CPM thesis", THEME3),
-               3: ("Separability &amp; identifiability - CLL CPM thesis", THEME4),
-               4: ("Drug panel &amp; real-data inference - CLL CPM thesis", THEME5)}
+THEME_SPECS = {0: ("Data inventory - CLL CPM thesis", THEME0),
+               1: ("Image &amp; intensity EDA - CLL CPM thesis", THEME1),
+               2: ("Segmentation &amp; feature preservation - CLL CPM thesis", THEME2),
+               3: ("Simulation library - CLL CPM thesis", THEME3),
+               4: ("Separability &amp; identifiability - CLL CPM thesis", THEME4),
+               5: ("Drug panel &amp; real-data inference - CLL CPM thesis", THEME5)}
 
 
 # ============================ LANDING ====================================================
 LANDING_THEMES = [
+    dict(num="Theme 00", name='Data <span class="it">inventory</span>',
+         lede="The ledger for the whole project: cohort, imaging, frame counts, the 51-mask label "
+              "budget, the train/val/test split and the 23-drug panel, all counted in one place "
+              "before any analysis begins.",
+         metric="Appendix A.0 &middot; RQ1", href="00_data_inventory/index.html", ready=True),
     dict(num="Theme 01", name='Image &amp; intensity <span class="it">EDA</span>',
          lede="What the segmentation, feature-extraction and inference stages must cope with in the "
               "raw brightfield data, and how the dataset composes. Every figure states the method "
@@ -712,6 +751,7 @@ LANDING_THEMES = [
 ]
 
 LANDING_TAPE = [
+    "Data inventory", "7 patients, 99k frames, 23-drug panel",
     "Image EDA", "99k frames, 51 hand-annotated",
     "Reproducibility audited", "only U-Net (heavy aug.) crosses the 0.85 reliability bar",
     "Cellular Potts simulation", "1,152 sampled, 1,105 usable runs",

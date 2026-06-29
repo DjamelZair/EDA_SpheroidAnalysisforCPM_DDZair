@@ -9,15 +9,19 @@ Numbers are quoted from the thesis tables/sections; nothing invented.
 
 # rows: [analysis, what it shows, thesis label, key result / status]
 INDEX = {
-    0: [  # Theme 1 - image / intensity EDA
-        ["Full data EDA", "Intensity, contrast, focus, fragmentation, cohort over 51 annotated frames",
-         "appendix:data:eda", "Shown interactively above"],
+    0: [  # Theme 0 - data inventory
+        ["Cohort & dataset inventory", "Patients, frames, channels, label counts, splits, drug panel, real wells",
+         "appendix:data:eda", "Shown as the inventory table above"],
         ["Data augmentation", "11 geometric + photometric ops, 51 originals to 255 augmented pairs",
          "app:aug / tab:aug_ops", "5 augmentations per original"],
         ["Patient mapping & split", "Train/val/test 216/45/45 images (37/9/8 spheroids), plate-level stratification",
          "app:patient_mapping / tab:patient_mapping", "P1043 noted in train and test"],
     ],
-    1: [  # Theme 2 - segmentation & feature preservation
+    1: [  # Theme 1 - image / intensity EDA
+        ["Full data EDA", "Intensity, contrast, focus, fragmentation over 51 annotated frames",
+         "appendix:data:eda", "Shown interactively above"],
+    ],
+    2: [  # Theme 2 - segmentation & feature preservation
         ["Classical baseline", "ROI extraction + multi-Otsu vs simpler alternatives, per-stage justification",
          "app:classical_justification", "Justifies ROI + 3-class Otsu"],
         ["Segmentation candidates", "8 models on the fixed 216/45/45 split",
@@ -41,7 +45,7 @@ INDEX = {
         ["Metric formulas", "CCC, ICC(3,1), nRMSE, Dice, CC-Dice, component-count error",
          "app:metric_formulas", "Definitions"],
     ],
-    2: [  # Theme 3 - simulation library
+    3: [  # Theme 3 - simulation library
         ["CPM configuration", "1536x1152 lattice, blob r=250 px, 1000 MCS, 100 frames, 9 (OAT) / 3 (Saltelli) seeds",
          "app:cpm_sim_settings / tab:sim_settings", "CompuCell3D 4.5.0"],
         ["OAT sweep grid", "Per-parameter levels for the one-at-a-time sweep",
@@ -55,7 +59,7 @@ INDEX = {
         ["Reproducibility", "GPU A100, Python 3.10, PyTorch 2.3.1, CC3D 4.5.0, seed 42, AI-tool disclosure",
          "app:reproducibility / tab:reproducibility", "Fixed seeds, full environment"],
     ],
-    3: [  # Theme 4 - separability / identifiability
+    4: [  # Theme 4 - separability / identifiability
         ["Surrogate configuration", "XGBoost: 500 trees, depth 6, LR 0.05, subsample 0.8, L2=1, 5-fold CV",
          "app:surrogate_cv / tab:xgboost", "Forward surrogate (theta to features)"],
         ["Surrogate CV R2", "5-fold CV R2 of the surrogate per morphology feature",
@@ -81,7 +85,7 @@ INDEX = {
         ["Active learning POC", "Surrogate-selected vs random vs oracle candidate selection",
          "app:active_learning / fig:active_learning_poc", "Reduces NN distance to under-covered wells"],
     ],
-    4: [  # Theme 5 - drug panel & real-data inference
+    5: [  # Theme 5 - drug panel & real-data inference
         ["Tau-registered matcher", "Phase-axis tau, z-scored features, Sobol-weighted MAD, k=20, empirical posterior",
          "sec:setup_matching", "Primary matcher"],
         ["Worked example (VID1797 F1)", "One well: observed trajectory to empirical posterior intervals",

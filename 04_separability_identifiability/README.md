@@ -35,7 +35,7 @@ Leave-one-out inversion on the 1,105-run library measures how well each CPM para
 
 ## Which knobs are identifiable?  (leave-one-out recovery)
 
-## Feature to parameter importance  (discriminability heatmap)
+## Feature to parameter sensitivity  (surrogate Sobol total-effect weights)
 
 ## Complete analysis index  (every thesis analysis in this theme)
 

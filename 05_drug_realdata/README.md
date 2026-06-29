@@ -31,13 +31,13 @@ Real spheroid trajectories from reference wells across seven patients and a pane
 
 **What it motivated (Separable drug signatures).** Distinct drugs leave distinct, separable trajectories.
 
-### Feature trajectories under treatment - extracted automatically per condition
+### Drug response measured automatically from the AI segmenter - three drug conditions, every available timepoint
 
-![](../assets/cll/figures/morphology/feature_trajectories.png)
+*(interactive chart in the HTML version)*
 
-**What it shows.** Per-condition shape trajectories, the observable the matcher compares against the synthetic library.
+**What it shows.** High-dose trametinib collapses the cluster; PD098060 compacts it; low-dose trametinib leaves it intact. Every point is extracted from an AI-segmented frame, with no manual measurement. Switch the feature to see each shape axis respond.
 
-**What it motivated (Feeds the inversion).** These trajectories drive the inversion that produces the per-condition parameter shifts.
+**What it motivated (Feeds the inversion).** This is the observable the inference consumes: a per-condition shape trajectory that the CPM matcher compares against the synthetic library to produce the per-condition parameter shifts.
 
 ### Feature agreement on the real data - AI-derived vs reference
 

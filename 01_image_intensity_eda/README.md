@@ -4,50 +4,16 @@
 
 > The imaging reads size and gross shape robustly, but contrast, focus and fragmentation limit the finer boundary features, the same loss that later caps CPM-parameter identifiability.
 
-Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenly lit, and frequently fragmented under drug treatment. This analysis characterises what the images **are** (intensity, contrast, focus, illumination and fragmentation) and what the dataset **contains**, then traces each property to the segmentation, metric and feature choice it drove downstream.
+Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenly lit, and frequently fragmented under drug treatment. This analysis characterises what the images **are** (intensity, contrast, focus, illumination and fragmentation), then traces each property to the segmentation, metric and feature choice it drove downstream. The dataset inventory itself, who and how much, now lives in Theme 00.
 
 | Metric | Value | Note |
 |---|---|---|
-| Raw frames | 99k | Local archive; 12,485 in the real inference set. |
 | Hand-annotated | 51 | About 0.05% of the corpus, the defining constraint. |
-| Contrast covered by aug. | ~100% | Focus ~91%; validates the heavy-aug U-Net. |
+| Contrast covered by aug. | ~100% | Validates the heavy-aug U-Net. |
+| Focus covered by aug. | ~91% | Laplacian-variance range spanned by augmentation. |
 | Real wells out-of-library | ~90% | Why the thesis reports relative shifts, not absolutes. |
 
-## A. What is the dataset?  (cohort & the defining constraint)
-
-### Corpus scale and label scarcity - hover for counts
-
-*(interactive chart in the HTML version)*
-
-**What it shows.** Only 51 of roughly 99,000 frames are hand-annotated (about 0.05%), expanded to 306 by augmentation. The held-out test set is 45 frames.
-
-**What it motivated (Decision: two-stage training).** A 1-in-1000 label ratio motivates the two-stage training strategy: pretrain on classical pseudo-labels, then fine-tune on the 51 ground-truth masks.
-
-### What the pipeline does, end to end - raw frame to outline to shape numbers
-
-![](../assets/cll/figures/what_we_do_strip.png)
-
-**What it shows.** A microscopy frame goes in, the AI draws the spheroid outline, and a handful of shape numbers come out. Those numbers are the observables every later stage consumes.
-
-**What it motivated (Frames the whole pipeline).** Fixes the unit of analysis: the segmenter is judged on whether these shape numbers are trustworthy, not on raw pixel overlap.
-
-### Dataset composition - annotated split &middot; real set by class &middot; sampling depth
-
-![](../assets/cll/figures/01_image_eda/fig01_dataset_composition.png)
-
-**What it shows.** The 51 ground-truth frames expand to about 255 augmented pairs across the train/val/test split; the ~12k-frame inference corpus is dominated by CXCR4-antagonist and control wells, each sampled at a median of 20 timepoints over roughly 5.5 days.
-
-**What it motivated (Cohort & the defining constraint).** The label scarcity and the class imbalance together drive the plate-stratified split and the two-stage training that pretrains on pseudo-labels before fine-tuning on the 51 masks.
-
-### Does augmentation cover the real regimes? - real vs augmented vs 51 originals
-
-![](../assets/cll/figures/01_image_eda/fig06_augmentation_coverage.png)
-
-**What it shows.** Augmentation spans 100% of the real contrast range and 91% of the focus (Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is the axis it covers least.
-
-**What it motivated (Validates heavy augmentation).** Confirms the heavy-augmentation U-Net is trained across the contrast and focus regimes it will meet at inference; the intensity gap is the one residual exposure.
-
-## B. What does the raw signal look like?  (why a learned segmenter, not thresholding)
+## A. What does the raw signal look like?  (why a learned segmenter, not thresholding)
 
 ### Contrast vs fragment count - 51 annotated frames
 
@@ -97,7 +63,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 **What it motivated (Decision: restrict inversion features).** Uneven background biases any intensity-based boundary, another reason the inversion leans on shape features that tolerate illumination drift.
 
-## C. What is the object structure?  (the segmentation criterion: feature preservation)
+## B. What is the object structure?  (the segmentation criterion: feature preservation)
 
 ### Components per annotated image - how multi-object the masks are
 
@@ -115,35 +81,17 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 **What it motivated (Decision: CC-Dice + largest component).** Because masks are multi-object but area-dominated, ordinary Dice would ignore the small fragments, so CC-Dice scores every component, and post-processing keeps the largest one.
 
-## D. Fragmentation vs treatment  (biology preview, associative)
+## C. A glimpse of the drug-response payoff  (preview only &middot; full analysis in Theme 05)
 
 ### Fragmentation by drug-mechanism class - median fragmentation index, classes with n>=30
 
 *(interactive chart in the HTML version)*
 
-**What it shows.** Syk-inhibitor and CXCR4-antagonist wells are the most fragmented; BTK, NF-kB and MALT1 inhibitors sit lowest. Counts are large and unequal and metadata are plate-level, so this is read as an association.
+**What it shows.** A single teaser: Syk-inhibitor and CXCR4-antagonist wells fragment most; BTK, NF-kB and MALT1 inhibitors sit lowest. Counts are large, unequal and plate-level, so this is read as an association only. The full drug-response analysis, auto-measured trajectories, per-drug inferred shifts and the BCR axis, lives in Theme 05.
 
-**What it motivated (Preview: RQ3 mechanism, associative only).** Previews the RQ3 drug-response story (drug class changes cohesion), and shows the most drug-responsive classes are hardest to segment, so feature preservation is the right criterion.
+**What it motivated (Preview only: full drug panel in Theme 05).** Previews the RQ3 drug-response story and shows the most drug-responsive classes are the hardest to segment, which is exactly why the segmenter is chosen on feature preservation rather than pixel overlap.
 
-### Which mechanism classes fragment most - by class &middot; effect vs control &middot; trajectory
-
-![](../assets/cll/figures/01_image_eda/fig08_fragmentation_vs_treatment.png)
-
-**What it shows.** Syk-inhibitor and CXCR4-antagonist wells fragment most relative to control and the gap widens over the time course; per-class differences are significant but, with plate-level metadata, are read as associations.
-
-**What it motivated (Preview: RQ3 mechanism, associative only).** The most drug-responsive classes are also the hardest to segment cleanly, which is exactly why the segmenter is chosen on feature preservation rather than pixel overlap.
-
-## E. Drug response, measured automatically  (the payoff: morphology to mechanism)
-
-### Drug response measured automatically from the AI segmenter - three drug conditions, every available timepoint
-
-*(interactive chart in the HTML version)*
-
-**What it shows.** High-dose trametinib collapses the cluster; PD098060 compacts it; low-dose trametinib leaves it intact. Every point is extracted from an AI-segmented frame, with no manual measurement.
-
-**What it motivated (Feeds RQ2 / RQ3 inference).** This is the observable the inference consumes: a per-condition shape trajectory that the CPM matcher compares against the synthetic library.
-
-## F. From image quality to library coverage  (why the thesis reports relative shifts)
+## D. From image quality to library coverage  (why the thesis reports relative shifts)
 
 ### Image quality predicts distance from the library - real to nearest-synthetic distance
 
@@ -169,8 +117,6 @@ An earlier broad notebook, `data/cll_spheroid_eda_complete.ipynb`, is catalogued
 
 | Analysis | What it shows | Thesis label | Key result / status |
 |---|---|---|---|
-| Full data EDA | Intensity, contrast, focus, fragmentation, cohort over 51 annotated frames | appendix:data:eda | Shown interactively above |
-| Data augmentation | 11 geometric + photometric ops, 51 originals to 255 augmented pairs | app:aug / tab:aug_ops | 5 augmentations per original |
-| Patient mapping & split | Train/val/test 216/45/45 images (37/9/8 spheroids), plate-level stratification | app:patient_mapping / tab:patient_mapping | P1043 noted in train and test |
+| Full data EDA | Intensity, contrast, focus, fragmentation over 51 annotated frames | appendix:data:eda | Shown interactively above |
 
 **Sources / tools:** 01_data_eda.ipynb, imaging_data_eda.ipynb, labelled_qc.csv, frame_qc.csv, timecourse_full_features.csv, Chart.js + scikit-image
