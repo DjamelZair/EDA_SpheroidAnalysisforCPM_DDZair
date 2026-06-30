@@ -31,6 +31,17 @@ Eight segmenters were compared on the same 45-image test set: a rule-based basel
 
 **What it motivated (Decision: rank by feature preservation).** The segmenter is selected on shape-number agreement (Lin's CCC against the six CPM features), not pixel Dice. The heavy-aug U-Net is the only model above the 0.85 bar.
 
+### Component-aware overlap (CC-Dice), measured models only
+
+| Model | CC-Dice (mean, 45-image) | Note |
+|---|---|---|
+| nnU-Net (default) | 0.299 | Highest CC-Dice; still merges fragments (800 GT to 436 pred) |
+| nnU-Net (multi-channel) | 0.295 | Multi-channel does not fix merging |
+| SAM2 (multi-channel) | 0.100 | Over-fragments (800 GT to 1156 pred) |
+| Classical (heuristic ROI) | 0.034 to 0.132 | Range across classical variants |
+| U-Net (heavy aug.) | not computed | CC-Dice never scored for the U-Net; the old 0.18 was a ceiling claim, not a measurement |
+| Pseudo-label + fine-tune | not computed | CC-Dice never scored for this model |
+
 ### Per-feature reliability scoreboard - 8 models x 6 shape numbers
 
 ![](../assets/cll/figures/segmentation/icc_ccc_heatmap.png)

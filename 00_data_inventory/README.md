@@ -2,13 +2,13 @@
 
 **Thesis target:** Theme 00 / Data inventory / Appendix A.0.
 
-> Before any analysis: exactly what data exists. Seven CLL patients, a roughly 99,000-frame brightfield archive, and only 51 hand-drawn masks, the single constraint that shapes every downstream method choice.
+> Before any analysis: exactly what data exists. Five CLL patients (seven patient-timepoint series), a roughly 99,000-frame brightfield archive, and only 51 hand-drawn masks, the single constraint that shapes every downstream method choice.
 
 This theme is the ledger for the whole project: the cohort, the imaging, the frame counts, the label budget, the train/val/test split and the drug panel, all in one place. Theme 01 then characterises what those images **look like**; Themes 02 to 05 build the segmentation, simulation and inference on top of this inventory.
 
 | Metric | Value | Note |
 |---|---|---|
-| Patients | 7 | CLL donors; reference wells across the cohort. |
+| Patients | 5 | Unique CLL donors; 7 patient-timepoint series (706 sampled x3). |
 | Raw frames | 99k | Brightfield archive; 12,485 in the real inference set. |
 | Hand-annotated | 51 | About 0.05% of the corpus, the defining constraint. |
 | Drug panel | 23 | Drugs across seven mechanism classes. |
@@ -27,7 +27,7 @@ This theme is the ledger for the whole project: the cohort, the imaging, the fra
 
 | Asset | Count | Detail | Where it is used |
 |---|---|---|---|
-| Patients (CLL donors) | 7 | Reference wells inverted across the cohort | RQ3 real-data inference |
+| Patients (CLL donors) | 5 unique | 7 patient-timepoint series (706 sampled at t1/t2/t3); 4 patients in the drug panel | RQ3 real-data inference |
 | Imaging channel | 1 | Brightfield, single-channel grayscale time-lapse | All stages |
 | Raw archive | ~99,000 frames | Full local brightfield archive | Corpus |
 | Real inference set | 12,485 frames | Segmented for feature extraction | Themes 01 & 05 |
@@ -77,4 +77,4 @@ This theme is the ledger for the whole project: the cohort, the imaging, the fra
 | Data augmentation | 11 geometric + photometric ops, 51 originals to 255 augmented pairs | app:aug / tab:aug_ops | 5 augmentations per original |
 | Patient mapping & split | Train/val/test 216/45/45 images (37/9/8 spheroids), plate-level stratification | app:patient_mapping / tab:patient_mapping | P1043 noted in train and test |
 
-**Sources / tools:** RQ1_segmentation/01_data_eda.ipynb, patient_mapping, augmentation ops, drug panel metadata, 7 patients
+**Sources / tools:** RQ1_segmentation/01_data_eda.ipynb, patient_mapping, augmentation ops, drug panel metadata, 5 patients / 7 series

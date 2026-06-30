@@ -92,7 +92,7 @@ INDEX = {
          "app:worked_real_inference / fig:example_inversion_appendix", "Shows how data narrows each parameter"],
         ["Boundary & coverage", "Neighbours at sweep endpoints; real-to-library NN distance",
          "app:boundary_coverage / fig:boundary_saturation_appendix", "~90% of real spheroids extrapolated"],
-        ["Stimulation reproducibility", "Per-parameter, how many of 7 patients shift the same way under stimulation",
+        ["Stimulation reproducibility", "Per-parameter, how many of the 7 patient-timepoint series shift the same way under stimulation",
          "sec:res_rq3_1 / fig:rq3_1_stability", "J_cm & J_cc 7/7 agree, width 3/7"],
         ["Expected vs observed shift", "Baseline vs stimulated medians vs a priori biological prediction",
          "sec:res_rq3_2 / tab:rq3_2_expected", "J_cm -30% (7/7), J_cc -7% (7/7) match"],

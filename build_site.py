@@ -51,7 +51,7 @@ _nc = _load("theme1_ncomp.json")
 
 # ============================ THEME 0 - DATA INVENTORY ============================
 _INVENTORY_ROWS = [
-    ["Patients (CLL donors)", "7", "Reference wells inverted across the cohort", "RQ3 real-data inference"],
+    ["Patients (CLL donors)", "5 unique", "7 patient-timepoint series (706 sampled at t1/t2/t3); 4 patients in the drug panel", "RQ3 real-data inference"],
     ["Imaging channel", "1", "Brightfield, single-channel grayscale time-lapse", "All stages"],
     ["Raw archive", "~99,000 frames", "Full local brightfield archive", "Corpus"],
     ["Real inference set", "12,485 frames", "Segmented for feature extraction", "Themes 01 & 05"],
@@ -69,15 +69,15 @@ THEME0 = [
          meta=["Theme 00", "Data inventory", "Appendix A.0"],
          title='What the <span class="gold">dataset</span> <span class="it">is</span>.',
          caption="Patient-derived CLL spheroid &middot; brightfield &middot; time-lapse",
-         lede="Before any analysis: exactly what data exists. Seven CLL patients, a roughly "
-              "99,000-frame brightfield archive, and only 51 hand-drawn masks, the single constraint "
-              "that shapes every downstream method choice.",
+         lede="Before any analysis: exactly what data exists. Five CLL patients (seven "
+              "patient-timepoint series), a roughly 99,000-frame brightfield archive, and only 51 "
+              "hand-drawn masks, the single constraint that shapes every downstream method choice.",
          summary="This theme is the ledger for the whole project: the cohort, the imaging, the frame "
                  "counts, the label budget, the train/val/test split and the drug panel, all in one "
                  "place. Theme 01 then characterises what those images **look like**; Themes 02 to 05 "
                  "build the segmentation, simulation and inference on top of this inventory."),
     dict(type="kpis", items=[
-        dict(lbl="Patients", num="7", desc="CLL donors; reference wells across the cohort.", numeric=True),
+        dict(lbl="Patients", num="5", desc="Unique CLL donors; 7 patient-timepoint series (706 sampled x3).", numeric=True),
         dict(lbl="Raw frames", num="99k", desc="Brightfield archive; 12,485 in the real inference set.", numeric=True),
         dict(lbl="Hand-annotated", num="51", desc="About 0.05% of the corpus, the defining constraint.", gold=True, numeric=True),
         dict(lbl="Drug panel", num="23", desc="Drugs across seven mechanism classes.", gold=True, numeric=True),
@@ -133,7 +133,7 @@ THEME0 = [
          informs_tag="Validates heavy augmentation"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 00', chips=[
         dict(t="RQ1_segmentation/01_data_eda.ipynb", gold=True), dict(t="patient_mapping"),
-        dict(t="augmentation ops"), dict(t="drug panel metadata"), dict(t="7 patients")]),
+        dict(t="augmentation ops"), dict(t="drug panel metadata"), dict(t="5 patients / 7 series")]),
     dict(type="bigcta", title='Next: what the <span class="it">signal</span> looks like.',
          links=[dict(t="Theme 01 &middot; Image & intensity EDA &rarr;", href="01_image_intensity_eda/index.html", primary=True),
                 dict(t="Back to index", href="index.html")]),
@@ -313,20 +313,38 @@ def _loadc(name): return _json.loads((_CD / name).read_text())
 CLL2 = "../assets/cll/figures/"
 MUTED = "#a8b5b8"
 
-# leaderboard: 8 models, real values (dice / CC-Dice / shape-number agreement CCC)
+# leaderboard: 8 models, real values (dice / shape-number agreement CCC).
+# CC-Dice is intentionally NOT a leaderboard column: it was computed only for the
+# nnU-Net / SAM2 / classical variants, never for the U-Net or pseudo-label models,
+# so a per-model CC-Dice ranking would be ungrounded for the headline model. The
+# measured CC-Dice subset is reported separately below.
 _LB = dict(
     metrics=[dict(key="ccc", label="Shape-number agreement (CCC)", min=0, max=1.0, mid=0.5),
-             dict(key="dice", label="Pixel overlap (Dice)", min=0.7, max=0.85, mid=0.79),
-             dict(key="cc_dice", label="Component-aware overlap (CC-Dice)", min=0, max=0.25, mid=0.15)],
+             dict(key="dice", label="Pixel overlap (Dice)", min=0.7, max=0.85, mid=0.79)],
     models=[
-        dict(label="U-Net (heavy aug.)", dice=0.829, cc_dice=0.18, ccc=0.683, winner=True),
-        dict(label="Pseudo-label + fine-tune", dice=0.811, cc_dice=0.157, ccc=0.464),
-        dict(label="SAM2 (grayscale)", dice=0.787, cc_dice=0.116, ccc=0.473),
-        dict(label="SAM2 (multi-channel)", dice=0.768, cc_dice=0.081, ccc=0.434),
-        dict(label="Rule-based baseline", dice=0.760, cc_dice=0.040, ccc=0.378),
-        dict(label="nnU-Net (default)", dice=0.757, cc_dice=0.172, ccc=0.305),
-        dict(label="nnU-Net + cleanup", dice=0.799, cc_dice=0.204, ccc=0.285),
-        dict(label="nnU-Net (multi-channel)", dice=0.755, cc_dice=0.167, ccc=0.270),
+        dict(label="U-Net (heavy aug.)", dice=0.829, ccc=0.683, winner=True),
+        dict(label="Pseudo-label + fine-tune", dice=0.811, ccc=0.464),
+        dict(label="SAM2 (grayscale)", dice=0.787, ccc=0.473),
+        dict(label="SAM2 (multi-channel)", dice=0.768, ccc=0.434),
+        dict(label="Rule-based baseline", dice=0.760, ccc=0.378),
+        dict(label="nnU-Net (default)", dice=0.757, ccc=0.305),
+        dict(label="nnU-Net + cleanup", dice=0.799, ccc=0.285),
+        dict(label="nnU-Net (multi-channel)", dice=0.755, ccc=0.270),
+    ])
+
+# CC-Dice (component-aware overlap, Jaus 2024), MEASURED MODELS ONLY. Source:
+# rq1_segmentation/all_results.json (mean_cc_dice_all / ranking_by_cc_dice_45image).
+# U-Net (heavy aug.) and the pseudo-label model were never scored on CC-Dice.
+_CCDICE = dict(
+    title="Component-aware overlap (CC-Dice), measured models only",
+    head=["Model", "CC-Dice (mean, 45-image)", "Note"],
+    rows=[
+        ["nnU-Net (default)", "0.299", "Highest CC-Dice; still merges fragments (800 GT to 436 pred)"],
+        ["nnU-Net (multi-channel)", "0.295", "Multi-channel does not fix merging"],
+        ["SAM2 (multi-channel)", "0.100", "Over-fragments (800 GT to 1156 pred)"],
+        ["Classical (heuristic ROI)", "0.034 to 0.132", "Range across classical variants"],
+        ["U-Net (heavy aug.)", "not computed", "CC-Dice never scored for the U-Net; the old 0.18 was a ceiling claim, not a measurement"],
+        ["Pseudo-label + fine-tune", "not computed", "CC-Dice never scored for this model"],
     ])
 
 _pp = _loadc("seg_postproc.json")["best"]
@@ -376,7 +394,7 @@ THEME2 = [
     dict(type="section", title='Model <span class="it">leaderboard</span>', right="switch the metric"),
     dict(type="chart", id="t2_lb", fn="lbboard", height=420,
          title="Ranking flips with the metric", sub="click to switch",
-         toggle=[("ccc", "Shape-number agreement"), ("dice", "Pixel overlap"), ("cc_dice", "Component-aware")],
+         toggle=[("ccc", "Shape-number agreement"), ("dice", "Pixel overlap")],
          data=_LB,
          note="Pixel overlap is nearly flat (0.755 to 0.829) and picks the U-Net by a hair. "
               "Shape-number agreement ranks the U-Net first by a wide margin and is the only metric "
@@ -384,6 +402,13 @@ THEME2 = [
          informs="The segmenter is selected on shape-number agreement (Lin's CCC against the six CPM "
                  "features), not pixel Dice. The heavy-aug U-Net is the only model above the 0.85 bar.",
          informs_tag="Decision: rank by feature preservation"),
+    dict(type="table",
+         title=_CCDICE["title"], head=_CCDICE["head"], rows=_CCDICE["rows"],
+         note="CC-Dice (component-aware overlap) motivates the fragment handling, but it was only "
+              "scored for the nnU-Net, SAM2 and classical variants, never for the U-Net or "
+              "pseudo-label models, so it is kept off the headline ranking above. Where it was "
+              "measured, nnU-Net leads (0.30), and even that merges most fragments. Source: "
+              "all_results.json (mean_cc_dice_all)."),
 
     dict(type="figure", img=CLL2 + "segmentation/icc_ccc_heatmap.png",
          ttl="Per-feature reliability scoreboard", sub="8 models x 6 shape numbers",
@@ -650,12 +675,13 @@ THEME5 = [
          caption="Patient-derived spheroids under drug treatment",
          lede="The pipeline inverts real morphology to CPM parameters; the inferred shifts on the "
               "weakly identifiable axes are read as relative changes, not biophysical effects.",
-         summary="Real spheroid trajectories from reference wells across seven patients and a panel of "
-                 "drug conditions are inverted to CPM parameters on the three weakly identifiable axes. "
+         summary="Real spheroid trajectories from reference wells across five patients (seven "
+                 "patient-timepoint series) and a panel of drug conditions are inverted to CPM "
+                 "parameters on the three weakly identifiable axes. "
                  "The inferred shifts are read as relative, simulation-derived changes, not absolute or "
                  "biophysical values."),
     dict(type="kpis", items=[
-        dict(lbl="Patients", num="7", desc="Reference wells inverted across 7 patients.", numeric=True),
+        dict(lbl="Patients", num="5", desc="Unique donors; 7 patient-timepoint series, 4 in the drug panel.", numeric=True),
         dict(lbl="Read as", num="shifts", desc="Relative change on the weakly identifiable axes, not absolutes.", gold=True),
         dict(lbl="Drug-panel BCR shift", num="weak", desc="Tau (primary): J_cc shift -1.4, CI [-3.0, +0.2], spans zero. End-state: +4.6, CI [+2.1, +7.0], significant; the signal is in the settled morphology."),
         dict(lbl="Reported axes", num="3", desc="the three weakly identifiable axes (width, J_cc, J_cm).", numeric=True),
@@ -706,7 +732,7 @@ THEME5 = [
          informs_tag="Beyond the thesis: drug-by-drug detail"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 05', chips=[
         dict(t="real_data_inference_report.ipynb", gold=True), dict(t="drug panel"),
-        dict(t="tau-registration matcher"), dict(t="bootstrap CIs"), dict(t="7 patients")]),
+        dict(t="tau-registration matcher"), dict(t="bootstrap CIs"), dict(t="5 patients / 7 series")]),
     dict(type="bigcta", title='Back to the <span class="it">overview</span>.',
          links=[dict(t="All analysis themes &rarr;", href="index.html", primary=True)]),
 ]
@@ -746,17 +772,17 @@ LANDING_THEMES = [
          metric="Appendix D-H &middot; RQ2", href="04_separability_identifiability/index.html", ready=True),
     dict(num="Theme 05 &middot; Headline", name='Drug panel &amp; real-data <span class="it">inference</span>',
          lede="Inverting real spheroid morphology to CPM parameters, and whether inferred shifts track "
-              "stimulation and drug class across seven patients and the drug panel.",
+              "stimulation and drug class across five patients (seven patient-timepoint series) and the drug panel.",
          metric="Appendix I, J &middot; RQ3", href="05_drug_realdata/index.html", ready=True, featured=True),
 ]
 
 LANDING_TAPE = [
-    "Data inventory", "7 patients, 99k frames, 23-drug panel",
+    "Data inventory", "5 patients (7 series), 99k frames, 23-drug panel",
     "Image EDA", "99k frames, 51 hand-annotated",
     "Reproducibility audited", "only U-Net (heavy aug.) crosses the 0.85 reliability bar",
     "Cellular Potts simulation", "1,152 sampled, 1,105 usable runs",
     "Identifiability", "width, J_cc and J_cm weakly identifiable; the rest non-identifiable",
-    "Real-data inference", "reference wells across 7 patients + drug panel, relative shifts on the weakly identifiable axes",
+    "Real-data inference", "reference wells across 5 patients (7 series) + drug panel, relative shifts on the weakly identifiable axes",
 ]
 
 LANDING_HERO = dict(

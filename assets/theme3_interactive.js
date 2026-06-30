@@ -370,7 +370,7 @@
     }
     function show(p) {
       var h = "<div class='iact-cardh'>" + p.label + (p.winner ? " <span class='iact-badge' style='background:var(--green);color:var(--teal-1)'>chosen</span>" : "") + "</div>";
-      var kv = "<div class='iact-kv'><div class='iact-kvg'>overall</div><div><span>Dice (pixel)</span><b>" + fmt(p.dice, 3) + "</b></div><div><span>CC-Dice</span><b>" + fmt(p.cc_dice, 3) + "</b></div><div><span>CCC (shape)</span><b>" + fmt(p.ccc, 3) + "</b></div></div>";
+      var kv = "<div class='iact-kv'><div class='iact-kvg'>overall</div><div><span>Dice (pixel)</span><b>" + fmt(p.dice, 3) + "</b></div><div><span>CCC (shape)</span><b>" + fmt(p.ccc, 3) + "</b></div></div>";
       kv += "<div class='iact-kv'><div class='iact-kvg'>per-feature agreement (CCC)</div>";
       d.meta.features.forEach(function (f) { var v = (p.features_ccc || {})[f]; if (v == null) return; kv += "<div><span>" + f.replace(/_/g, " ") + "</span><b style='color:" + (v >= 0.85 ? C.green : v >= 0.5 ? C.gold : C.clay) + "'>" + fmt(v, 3) + "</b></div>"; });
       kv += "</div>";
@@ -490,7 +490,7 @@
     qcthreshold: "Pick a quality metric with the buttons, then drag the threshold. Gold dots pass your bar and red dots fail, and the headline shows how many of the 12,480 frames pass.",
     modelscatter: "Each dot is a segmentation model, placed by pixel overlap (Dice) against shape-number agreement (CCC). Click a model to see its overall metrics, per-feature reliability and training configuration.",
     heatmap: "Each cell is the XGBoost-surrogate Sobol total-effect weight: how much a shape feature (row) responds to a CPM knob (column), min-max normalised per knob. Brighter gold means more sensitive. Click a cell to read its value. All seven knobs are shown: width and volume elasticity drive size, while contact J and cell-medium adhesion drive shape.",
-    idbars: "Bars are the per-parameter recovery R-squared under the selected matcher (toggle tau primary or end-state secondary). Green, gold and grey mean identifiable, weakly identifiable and non-identifiable; the dashed line is the 0.70 identifiable bar. Click a bar for Pearson, sample count and error.",
+    idbars: "Bars are the per-parameter recovery R-squared under the selected matcher (toggle tau primary, end-state secondary, or Wasserstein third). Green, gold and grey mean identifiable, weakly identifiable and non-identifiable; the dashed line is the 0.70 identifiable bar. Click a bar for Pearson, sample count and error.",
     forest: "Each row is a drug's inferred cell-cell adhesion shift (median) with its q25 to q75 spread; the dashed line is no change (zero). Colour shows significance, a heuristic where the spread excludes zero (not a formal statistical test). Click a drug to see the individual wells behind its estimate.",
   };
   function addHelp(m, widget) {
