@@ -39,14 +39,6 @@ The pipeline only works because the identical six features are measured on real 
 
 ## Which parameters drive cluster size?  (Sobol indices, direct vs total effect)
 
-### Sobol first-order vs total effect - share of variance in cluster area
-
-![](../assets/cll/figures/cpm/sobol_S1_vs_ST.png)
-
-**What it shows.** Direct effect (S1) is how much a parameter alone moves area; total effect (ST) adds its interactions with the other parameters. A large gap means the parameter acts mostly through those interactions.
-
-**What it motivated (Interactions bound identifiability).** Target volume dominates; cell-cell and cell-medium adhesion carry sizeable interaction effects. These interactions limit how cleanly a single parameter can be read back from morphology.
-
 ## The surrogate, opened up  (XGBoost, cross-validated)
 
 ## Does the simulator cover reality?  (real wells vs the synthetic world)

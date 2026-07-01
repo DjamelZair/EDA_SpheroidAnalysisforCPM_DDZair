@@ -69,14 +69,6 @@ def aug_standard(res):                    def aug_heavy(res):
 
 So the leaderboard winner is the resnet34 U-Net trained with aug_heavy: three transforms the standard policy does not use (grid distortion, blur, coarse dropout) plus roughly double the strength on the rest. That heavier regularisation, not a different training set, is what the name refers to (the shared offline set is shown in Theme 00).
 
-### Per-feature reliability scoreboard - 8 models x 6 shape numbers
-
-![](../assets/cll/figures/segmentation/icc_ccc_heatmap.png)
-
-**What it shows.** Each cell is the agreement between AI-derived and human-derived value of one shape number. Gold-outlined cells cross the 0.85 bar. Only the U-Net crosses, on area and diameter; roundness and elongation are unreliable for almost every model.
-
-**What it motivated (Decision: operational feature set).** Sets the operational feature set for RQ3: area, diameter, solidity, perimeter, circularity; eccentricity is dropped, perimeter is U-Net-only.
-
 ## Cleanup impact  (overlap recovers, agreement does not)
 
 ### Pixel overlap with vs without cleanup - a small post-processing step

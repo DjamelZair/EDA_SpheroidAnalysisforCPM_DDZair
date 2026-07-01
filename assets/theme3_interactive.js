@@ -388,8 +388,9 @@
 
   /* ---------- G. DISCRIMINABILITY HEATMAP (Theme 04) ---------- */
   function heatmap(mount, d) {
-    header(mount, "Feature to parameter sensitivity", "surrogate Sobol total-effect weights, per parameter");
-    var note = el("div", "iact-readout"); note.innerHTML = "Each cell is the XGBoost-surrogate Sobol total-effect weight (per-parameter min-max normalised). Brighter gold = that feature is more sensitive to that parameter. Click a cell to read its value."; mount.appendChild(note);
+    var mt = d.meta || {};
+    header(mount, mt.title || "Feature to parameter sensitivity", mt.sub || "surrogate Sobol total-effect weights, per parameter");
+    var note = el("div", "iact-readout"); note.innerHTML = mt.note || "Each cell is the XGBoost-surrogate Sobol total-effect weight (per-parameter min-max normalised). Brighter gold = that feature is more sensitive to that parameter. Click a cell to read its value."; mount.appendChild(note);
     var ncol = d.params.length;
     var g = el("div"); g.style.display = "grid"; g.style.gridTemplateColumns = "minmax(96px,1.1fr) repeat(" + ncol + ",1fr)"; g.style.gap = "3px"; g.style.marginTop = "0.8rem"; mount.appendChild(g);
     function cell(txt, cls) { var c = el("div", cls); c.textContent = txt; c.style.padding = "0.5rem 0.3rem"; c.style.fontFamily = "'JetBrains Mono',monospace"; c.style.fontSize = "0.62rem"; c.style.textAlign = "center"; return c; }
@@ -402,7 +403,7 @@
         var bg = "rgb(" + Math.round(lerp(4, 200, t)) + "," + Math.round(lerp(37, 160, t)) + "," + Math.round(lerp(44, 92, t)) + ")";
         var c = cell(v.toFixed(2), ""); c.style.background = bg; c.style.border = "1px solid rgba(199,160,92,0.18)"; c.style.color = t > 0.62 ? "#052e36" : "#f3ecd6"; c.style.borderRadius = "2px"; c.style.cursor = "pointer";
         if (d.gold_bar && v >= d.gold_bar) { c.style.outline = "1.5px solid #f3ecd6"; }
-        c.onclick = function () { read.innerHTML = "<b>" + f + "</b> carries <b style='color:#e7c98a'>" + v.toFixed(3) + "</b> importance for <b>" + p + "</b>" + (d.gold_bar && v >= d.gold_bar ? " (above the reliability bar)" : ""); };
+        c.onclick = function () { read.innerHTML = "<b>" + p + "</b> " + (mt.verb || "carries") + " <b style='color:#e7c98a'>" + v.toFixed(3) + "</b> " + (mt.value_word || "importance for") + " <b>" + f + "</b>" + (d.gold_bar && v >= d.gold_bar ? " (above the " + (mt.bar_word || "reliability") + " bar)" : ""); };
         g.appendChild(c);
       });
     });
@@ -793,10 +794,33 @@
     draw();
   }
 
+  /* ---------- P. SOBOLGAP: per-parameter direct effect vs interaction gap ---------- */
+  function sobolgap(mount, d) {
+    header(mount, "Sobol: direct effect vs interactions", "share of variance in " + d.feature + ", per parameter");
+    var leg = el("div", "iact-readout"); leg.innerHTML = "<span style='color:" + C.gold + "'>&#9608; direct effect (S1)</span> &nbsp; <span style='color:" + C.sky + "'>&#9608; interactions (ST - S1)</span>"; mount.appendChild(leg);
+    var P = d.params, H = 26 * P.length + 30, canvas = mkCanvas(mount, H);
+    var read = el("div", "iact-readout"); read.innerHTML = d.note + " <b style='color:" + C.goldL + "'>" + d.decision + "</b>"; mount.appendChild(read);
+    function draw() {
+      var x = ctxOf(canvas), W = canvas.clientWidth, padL = 168, padR = 46, maxv = Math.max.apply(null, P.map(function (p) { return p.st; })) * 1.05 || 1;
+      var px = function (v) { return lerp(padL, W - padR, v / maxv); };
+      x.clearRect(0, 0, W, H);
+      for (var t = 0; t <= 4; t++) { var gx = lerp(padL, W - padR, t / 4); x.strokeStyle = C.grid; x.beginPath(); x.moveTo(gx, 6); x.lineTo(gx, H - 20); x.stroke(); x.fillStyle = C.muted; x.font = "10px 'DM Sans'"; x.textAlign = "center"; x.fillText((maxv * t / 4).toFixed(2), gx, H - 6); }
+      P.forEach(function (p, i) {
+        var y = 12 + i * 26, h = 15;
+        x.fillStyle = C.gold; x.fillRect(padL, y, px(p.s1) - padL, h);
+        x.fillStyle = "rgba(127,179,189,0.85)"; x.fillRect(px(p.s1), y, px(p.st) - px(p.s1), h);
+        x.fillStyle = C.cream; x.font = "11px 'DM Sans'"; x.textAlign = "right"; x.fillText(p.label, padL - 8, y + 12);
+        x.fillStyle = C.goldL; x.textAlign = "left"; x.fillText(p.st.toFixed(2), px(p.st) + 6, y + 12);
+      });
+      canvas._draw = draw;
+    }
+    draw();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
     featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech, qcdist: qcdist, fragstruct: fragstruct,
-    qualcoverage: qualcoverage };
+    qualcoverage: qualcoverage, sobolgap: sobolgap };
 
   var HELP = {
     morph: "Pick a parameter with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",

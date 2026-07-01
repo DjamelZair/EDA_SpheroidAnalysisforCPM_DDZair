@@ -607,14 +607,13 @@ THEME2 = [
               "double the strength on the rest. That heavier regularisation, not a different training "
               "set, is what the name refers to (the shared offline set is shown in Theme 00)."),
 
-    dict(type="figure", img=CLL2 + "segmentation/icc_ccc_heatmap.png", native=True,
-         ttl="Per-feature reliability scoreboard", sub="8 models x 6 shape numbers",
-         alt="heatmap of agreement scores across models and features",
-         shows="Each cell is the agreement between AI-derived and human-derived value of one shape "
-               "number. Gold-outlined cells cross the 0.85 bar. Only the U-Net crosses, on area and "
-               "diameter; roundness and elongation are unreliable for almost every model.",
-         informs="Sets the operational feature set for RQ3: area, diameter, solidity, perimeter, "
-                 "circularity; eccentricity is dropped, perimeter is U-Net-only.",
+    dict(type="interactive", widget="heatmap", json="theme2_reliability.json",
+         intro="Concordance (Lin's CCC) between each model's shape number and the human one, 8 models "
+               "by 6 features. Click a cell for its value; cells outlined in cream clear the 0.85 "
+               "radiomics reliability bar.",
+         informs="Only the U-Net crosses 0.85, and only on area and diameter; roundness and elongation "
+                 "are unreliable for almost every model. This sets the operational feature set for RQ3 "
+                 "(area, diameter, solidity, perimeter, circularity; eccentricity dropped).",
          informs_tag="Decision: operational feature set"),
 
     dict(type="section", title='Cleanup <span class="it">impact</span>',
@@ -749,12 +748,11 @@ THEME3 = [
          informs_tag="Beyond the thesis: navigable library"),
     dict(type="section", title='Which parameters <span class="it">drive</span> cluster size?',
          right="Sobol indices, direct vs total effect"),
-    dict(type="figure", img=CLLF + "cpm/sobol_S1_vs_ST.png", native=True,
-         ttl="Sobol first-order vs total effect", sub="share of variance in cluster area",
-         alt="Sobol S1 and ST bars per parameter",
-         shows="Direct effect (S1) is how much a parameter alone moves area; total effect (ST) adds its "
-               "interactions with the other parameters. A large gap means the parameter acts mostly through those interactions.",
-         informs="Target volume dominates; cell-cell and cell-medium adhesion carry sizeable "
+    dict(type="interactive", widget="sobolgap", json="theme3_sobolgap.json",
+         intro="For each parameter, the solid gold bar is its direct effect on cluster area (Sobol S1) "
+               "and the sky extension is its interactions with the other parameters (up to the total "
+               "effect ST). A large gap means the parameter acts mostly through interactions.",
+         informs="Target volume dominates; volume elasticity and the adhesion parameters carry sizeable "
                  "interaction effects. These interactions limit how cleanly a single parameter can be "
                  "read back from morphology.",
          informs_tag="Interactions bound identifiability"),
