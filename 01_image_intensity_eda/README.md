@@ -13,6 +13,8 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 | Focus covered by aug. | ~91% | Laplacian-variance range spanned by augmentation. |
 | Real wells out-of-library | ~90% | Why the thesis reports relative shifts, not absolutes. |
 
+## First, what a real spheroid looks like  (actual frames from the corpus)
+
 ## A. What does the raw signal look like?  (why a learned segmenter, not thresholding)
 
 ### Contrast vs fragment count - 51 annotated frames

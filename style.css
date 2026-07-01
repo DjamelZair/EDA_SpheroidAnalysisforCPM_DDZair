@@ -237,3 +237,11 @@ details.codefold pre.codeblock{margin:0}
 .iact-gcell.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
 .iact-gcell img{width:100%;display:block}
 .iact-gcap{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--gold-3);text-align:center;padding:.32rem;text-transform:uppercase;letter-spacing:.06em}
+
+/* real-example thumbnails (examples widget) */
+.iact-thumbs{display:flex;gap:.55rem;margin-top:.9rem;flex-wrap:wrap}
+.iact-thumb{width:84px;cursor:pointer;border:1px solid rgba(199,160,92,.28);border-radius:4px;overflow:hidden;background:var(--teal-1);transition:transform .15s,border-color .15s}
+.iact-thumb:hover{border-color:var(--gold);transform:translateY(-2px)}
+.iact-thumb.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.iact-thumb img{width:100%;display:block}
+.iact-thumb-cap{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--gold-3);text-align:center;padding:.28rem .2rem;text-transform:uppercase;letter-spacing:.03em;line-height:1.2}

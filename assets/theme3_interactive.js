@@ -878,10 +878,40 @@
     draw();
   }
 
+  /* ---------- T. EXAMPLES: real spheroid frames with the AI outline ---------- */
+  function examples(mount, d) {
+    header(mount, "See a real spheroid", "actual brightfield frames from the corpus, with the AI outline in gold; click a thumbnail");
+    var cur = 0;
+    var grid = el("div", "iact-2col"); mount.appendChild(grid);
+    var stage = el("div", "iact-stage"); grid.appendChild(stage);
+    var img = el("img", "iact-spheroid"); img.alt = "real CLL spheroid frame"; stage.appendChild(img);
+    var cap = el("div", "iact-cap"); stage.appendChild(cap);
+    var card = el("div", "iact-card"); grid.appendChild(card);
+    var thumbs = el("div", "iact-thumbs"); mount.appendChild(thumbs);
+    d.items.forEach(function (it, i) {
+      var t = el("div", "iact-thumb" + (i === 0 ? " on" : "")); var ti = el("img"); ti.src = it.img; ti.alt = it.label; t.appendChild(ti);
+      t.appendChild(el("div", "iact-thumb-cap", it.label));
+      t.onclick = function () { cur = i; select(); };
+      thumbs.appendChild(t);
+    });
+    function select() {
+      Array.prototype.forEach.call(thumbs.children, function (c, i) { c.className = "iact-thumb" + (i === cur ? " on" : ""); });
+      var it = d.items[cur]; img.src = it.img; cap.textContent = it.label;
+      card.innerHTML = "<div class='iact-cardh'>" + it.label + "</div>"
+        + "<div class='iact-kv'><div class='iact-kvg'>AI-measured quality</div>"
+        + "<div><span>cluster area</span><b>" + (it.area != null ? it.area.toLocaleString() + " px" : "-") + "</b></div>"
+        + "<div><span>contrast</span><b>" + (it.contrast != null ? it.contrast.toFixed(2) : "-") + "</b></div>"
+        + "<div><span>focus (lap. var.)</span><b>" + (it.focus != null ? it.focus.toFixed(3) : "-") + "</b></div>"
+        + "<div><span>fragmentation</span><b>" + (it.frag != null ? it.frag.toFixed(3) : "-") + "</b></div></div>"
+        + "<p style='font-size:.92rem;line-height:1.55;margin-top:.6rem;opacity:.92'>" + it.note + "</p>";
+    }
+    select();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
     featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech, qcdist: qcdist, fragstruct: fragstruct,
-    qualcoverage: qualcoverage, sobolgap: sobolgap, drugstrip: drugstrip, gallery: gallery, timelapse: timelapse };
+    qualcoverage: qualcoverage, sobolgap: sobolgap, drugstrip: drugstrip, gallery: gallery, timelapse: timelapse, examples: examples };
 
   var HELP = {
     morph: "Pick a parameter with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",

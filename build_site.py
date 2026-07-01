@@ -353,6 +353,17 @@ THEME1 = [
         dict(lbl="Real wells out-of-library", num="~90%", desc="Why the thesis reports relative shifts, not absolutes.", numeric=True),
     ]),
 
+    dict(type="section", title='First, what a real <span class="it">spheroid</span> looks like',
+         right="actual frames from the corpus"),
+    dict(type="interactive", widget="examples", json="theme1_realframes.json",
+         intro="Before the distributions, the concrete thing: real brightfield frames from the corpus, "
+               "cropped around the spheroid, with the U-Net outline in gold. Click through a cohesive "
+               "spheroid, one fragmenting under drug, and the hard cases (blurred, low-contrast, "
+               "unevenly lit) that the rest of this page quantifies.",
+         informs="Every distribution below is a summary over thousands of frames like these. This is "
+                 "what the segmenter and the feature extraction actually operate on.",
+         informs_tag="The concrete object behind the numbers"),
+
     dict(type="section", title='A. What does the raw <span class="it">signal</span> look like?',
          right="why a learned segmenter, not thresholding"),
     dict(type="chart", id="t1_contrast", fn="scatter",
