@@ -459,7 +459,7 @@ THEME1 = [
          intro="Each dot is one real control well (n=48). Switch the image-quality metric to see which "
                "one predicts how far the well sits from its nearest synthetic spheroid: blur (focus) "
                "does, contrast does not, and more-fragmented wells sit slightly closer.",
-         informs="Distance rises with blur (focus r=+0.43) but is flat against contrast (r=+0.03); "
+         informs="Distance rises with blur (focus r=+0.43) but is flat against contrast (r=+0.05); "
                  "more-fragmented wells sit slightly closer (r=-0.30), since the library's dispersed "
                  "synthetic morphologies resemble broken spheroids. Either way, image quality shapes "
                  "coverage, so the inference is reported as relative shifts rather than absolutes.",
