@@ -479,8 +479,77 @@
     draw();
   }
 
+  /* ---------- I. FEATDIST: constructed-corpus feature distribution explorer ---------- */
+  function featdist(mount, d) {
+    header(mount, "Explore the constructed corpus", "six shape features from " + d.n + " annotated spheroid objects; switch feature, log the axis, split by plate");
+    var cur = d.features[0], logMode = true, byPlate = false;
+    var isLog = function (c) { return d.logf.indexOf(c) >= 0; };
+    var bar = el("div", "iact-controls"); mount.appendChild(bar);
+    var seg = el("div", "iact-seg"); bar.appendChild(seg);
+    var tgl = el("div", "iact-seg"); bar.appendChild(tgl);
+    var logBtn = chip("log axis", false), plateBtn = chip("split by plate (VID3201)", false);
+    tgl.appendChild(logBtn); tgl.appendChild(plateBtn);
+    var canvas = mkCanvas(mount, 300);
+    var read = el("div", "iact-readout"); mount.appendChild(read);
+
+    function featButtons() {
+      seg.innerHTML = "";
+      d.features.forEach(function (c) {
+        var b = chip((d.labels[c] || c).replace(" (px)", ""), c === cur);
+        b.onclick = function () { cur = c; if (!isLog(c)) logMode = false; draw(); };
+        seg.appendChild(b);
+      });
+    }
+    logBtn.onclick = function () { if (!isLog(cur)) return; logMode = !logMode; draw(); };
+    plateBtn.onclick = function () { byPlate = !byPlate; draw(); };
+
+    function vals(hlOnly) {
+      var out = [];
+      for (var i = 0; i < d.objects.length; i++) {
+        var o = d.objects[i], v = o[cur];
+        if (v == null) continue;
+        if (hlOnly !== undefined && (o.plate === d.highlight) !== hlOnly) continue;
+        out.push(v);
+      }
+      return out;
+    }
+    function xf(a) { return (isLog(cur) && logMode) ? a.map(function (v) { return Math.log10(Math.max(1, v)); }) : a.slice(); }
+    function hist(a, lo, hi, nb) { var h = new Array(nb).fill(0), w = (hi - lo) / nb || 1; a.forEach(function (v) { var k = Math.floor((v - lo) / w); if (k < 0) k = 0; if (k >= nb) k = nb - 1; h[k]++; }); return h; }
+    function median(a) { var b = a.slice().sort(function (x, y) { return x - y; }), n = b.length; return n ? (n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2) : 0; }
+
+    function draw() {
+      featButtons();
+      logBtn.className = "iact-chip" + (isLog(cur) && logMode ? " on" : ""); logBtn.style.opacity = isLog(cur) ? "1" : "0.4";
+      plateBtn.className = "iact-chip" + (byPlate ? " on" : "");
+      var x = ctxOf(canvas), W = canvas.clientWidth, H = 300, nb = 28, padL = 48, padR = 16, padT = 16, padB = 44;
+      var all = xf(vals()); var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all); if (hi <= lo) hi = lo + 1;
+      var px = function (v) { return lerp(padL, W - padR, (v - lo) / (hi - lo)); };
+      x.clearRect(0, 0, W, H);
+      x.strokeStyle = C.grid; x.fillStyle = C.muted; x.font = "11px 'DM Sans'"; x.lineWidth = 1;
+      for (var t = 0; t <= 4; t++) { var gx = lerp(padL, W - padR, t / 4); x.beginPath(); x.moveTo(gx, padT); x.lineTo(gx, H - padB); x.stroke(); x.fillStyle = C.muted; x.textAlign = "center"; x.fillText(fmt(lerp(lo, hi, t / 4), 2), gx, H - padB + 16); }
+      var maxc = 0, series = [], bw = (W - padL - padR) / nb;
+      if (byPlate) {
+        var hv = hist(xf(vals(true)), lo, hi, nb), hr = hist(xf(vals(false)), lo, hi, nb);
+        var sv = hv.reduce(function (a, b) { return a + b; }, 0) || 1, sr = hr.reduce(function (a, b) { return a + b; }, 0) || 1;
+        var dv = hv.map(function (c) { return c / sv; }), dr = hr.map(function (c) { return c / sr; });
+        maxc = Math.max(Math.max.apply(null, dv), Math.max.apply(null, dr));
+        series = [{ h: dr, col: "rgba(21,97,109,0.75)" }, { h: dv, col: "rgba(200,160,92,0.55)" }];
+      } else { var h1 = hist(all, lo, hi, nb); maxc = Math.max.apply(null, h1); series = [{ h: h1, col: "rgba(21,97,109,0.9)" }]; }
+      series.forEach(function (s) { for (var k = 0; k < nb; k++) { var bh = (s.h[k] / (maxc || 1)) * (H - padT - padB), bx = padL + k * bw, by = H - padB - bh; x.fillStyle = s.col; x.fillRect(bx + 0.5, by, bw - 1, bh); } });
+      var mx = px(median(all)); x.setLineDash([4, 4]); x.strokeStyle = C.gold; x.lineWidth = 1.3; x.beginPath(); x.moveTo(mx, padT); x.lineTo(mx, H - padB); x.stroke(); x.setLineDash([]);
+      x.fillStyle = C.muted; x.textAlign = "center"; x.fillText((d.labels[cur] || cur) + (isLog(cur) && logMode ? "  (log10)" : ""), (padL + W - padR) / 2, H - 6);
+      x.save(); x.translate(13, (padT + H - padB) / 2); x.rotate(-Math.PI / 2); x.textAlign = "center"; x.fillText(byPlate ? "fraction" : "objects", 0, 0); x.restore();
+      var st = d.stats[cur], sk = (isLog(cur) && logMode) ? st.skew_log : st.skew;
+      var r = "median " + fmt(st.median, 2) + "  [IQR " + fmt(st.q25, 2) + ", " + fmt(st.q75, 2) + "]  &middot;  skew " + fmt(sk, 2);
+      if (byPlate) r += "  &middot;  <span style='color:" + C.gold + "'>&#9632; VID3201 (" + d.highlight_note + ")</span> vs <span style='color:" + C.sky + "'>&#9632; other plates</span>";
+      else if (isLog(cur) && logMode) r += "  &middot;  log fixes the size-feature skew";
+      read.innerHTML = r; canvas._draw = draw;
+    }
+    draw();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
-    qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest };
+    qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest, featdist: featdist };
 
   var HELP = {
     morph: "Pick a knob with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
@@ -492,6 +561,7 @@
     heatmap: "Each cell is the XGBoost-surrogate Sobol total-effect weight: how much a shape feature (row) responds to a CPM knob (column), min-max normalised per knob. Brighter gold means more sensitive. Click a cell to read its value. All seven knobs are shown: width and volume elasticity drive size, while contact J and cell-medium adhesion drive shape.",
     idbars: "Bars are the per-parameter recovery R-squared under the selected matcher (toggle tau primary, end-state secondary, or Wasserstein third). Green, gold and grey mean identifiable, weakly identifiable and non-identifiable; the dashed line is the 0.70 identifiable bar. Click a bar for Pearson, sample count and error.",
     forest: "Each row is a drug's inferred cell-cell adhesion shift (median) with its q25 to q75 spread; the dashed line is no change (zero). Colour shows significance, a heuristic where the spread excludes zero (not a formal statistical test). Click a drug to see the individual wells behind its estimate.",
+    featdist: "Pick one of the six shape features with the buttons to see its distribution across the 557 annotated spheroid objects, with the gold dashed line at the median. 'log axis' (for the size features) shows how a log scale fixes their heavy skew. 'split by plate' overlays the held-out VID3201 plate in gold against the other plates, exposing the batch effect that motivates plate-stratified splitting.",
   };
   function addHelp(m, widget) {
     var head = m.querySelector(".iact-head"); if (!head || !HELP[widget]) return;

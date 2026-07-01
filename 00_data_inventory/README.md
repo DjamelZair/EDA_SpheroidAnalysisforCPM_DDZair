@@ -218,13 +218,41 @@ The genuinely plate-stratified 5-fold CV split (patient/plate held out) is a sep
 
 **What it motivated (Decision: two-stage training).** A 1-in-2000 label ratio motivates the two-stage training strategy: pretrain on 4,547 classical pseudo-labels, then fine-tune on the 51 ground-truth masks.
 
-### Does augmentation cover the real regimes? - real vs augmented vs 51 originals
+## Explore the corpus you just built  (the six derived features, interactively)
+
+## Augmentation: a shared set, plus a heavier U-Net policy  (two different things, often confused)
+
+### Does the offline augmented set cover the real regimes? - real vs augmented vs 51 originals
 
 ![](../assets/cll/figures/01_image_eda/fig06_augmentation_coverage.png)
 
-**What it shows.** Augmentation spans 100% of the real contrast range and 91% of the focus (Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is the axis it covers least.
+**What it shows.** The offline augmented training set (the 51 originals expanded to 306 pairs, shared by every model) spans 100% of the real contrast range and 91% of the focus (Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is the axis it covers least.
 
-**What it motivated (Validates heavy augmentation).** Confirms the heavy-augmentation U-Net is trained across the contrast and focus regimes it will meet at inference; the intensity gap is the one residual exposure.
+**What it motivated (Offline set, shared by all models).** This figure is about the offline augmented dataset that all candidates train on. It is a separate thing from the 'heavy augmentation' U-Net variant, which is a training time policy, shown in code below.
+
+### What 'heavy augmentation' actually means
+
+shared offline set -> U-Net online policy -> standard vs heavy
+
+*run_experiments.py:70, 84*
+
+```python
+# EVERY model trains on the same offline-augmented set (51 -> 306 pairs).
+# 'Heavy augmentation' is one U-Net variant's stronger ON-THE-FLY policy,
+# applied per batch during training, NOT a different dataset.
+
+def aug_standard(res):                    def aug_heavy(res):
+    Resize, HFlip, VFlip, Rotate90            Resize, HFlip, VFlip, Rotate90
+    ShiftScaleRotate(0.05, 0.1, 15)          ShiftScaleRotate(0.10, 0.2, 30)   # stronger
+    ElasticTransform(alpha=30)               ElasticTransform(alpha=50)        # stronger
+    RandomBrightnessContrast(0.15)           RandomBrightnessContrast(0.30)    # stronger
+    GaussNoise(p=0.2)                        GaussNoise(10-50, p=0.4)          # stronger
+                                             GridDistortion(0.3)              # + extra
+                                             GaussianBlur(3-7)                # + extra
+                                             CoarseDropout(8 x 32px)          # + extra
+```
+
+So 'U-Net (heavy aug.)' is the resnet34 U-Net trained with aug_heavy: three transforms the standard policy does not use (grid distortion, blur, coarse dropout) plus roughly double the strength on the rest. That heavier regularisation, not a different training set, is what the name refers to.
 
 ## Complete analysis index  (every thesis analysis in this theme)
 
@@ -236,4 +264,4 @@ The genuinely plate-stratified 5-fold CV split (patient/plate held out) is a sep
 | Data augmentation | 11 geometric + photometric ops, 51 originals to 255 augmented pairs | app:aug / tab:aug_ops | 5 augmentations per original |
 | Patient mapping & split | Train/val/test 216/45/45 images (37/9/8 spheroids), plate-level stratification | app:patient_mapping / tab:patient_mapping | P1043 noted in train and test |
 
-**Sources / tools:** shared/io.py, imaging_eda/patient_map.py, imaging_eda/build_tables.py, rq3_inference/extract_features.py, build_training_dataset.py, data/metadata/*.xlsx
+**Sources / tools:** shared/io.py, imaging_eda/patient_map.py, imaging_eda/build_tables.py, rq3_inference/extract_features.py, build_training_dataset.py, unet/run_experiments.py, Complete_EDA.ipynb

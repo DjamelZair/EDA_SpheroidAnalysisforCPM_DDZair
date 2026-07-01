@@ -9,7 +9,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 | Metric | Value | Note |
 |---|---|---|
 | Hand-annotated | 51 | About 0.05% of the corpus, the defining constraint. |
-| Contrast covered by aug. | ~100% | Validates the heavy-aug U-Net. |
+| Contrast covered by aug. | ~100% | Offline augmented set (shared by all models). |
 | Focus covered by aug. | ~91% | Laplacian-variance range spanned by augmentation. |
 | Real wells out-of-library | ~90% | Why the thesis reports relative shifts, not absolutes. |
 

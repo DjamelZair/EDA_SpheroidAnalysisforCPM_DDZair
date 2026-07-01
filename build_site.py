@@ -249,19 +249,59 @@ THEME0 = [
          informs="A 1-in-2000 label ratio motivates the two-stage training strategy: pretrain on "
                  "4,547 classical pseudo-labels, then fine-tune on the 51 ground-truth masks.",
          informs_tag="Decision: two-stage training"),
+
+    # ---- interactive: explore the constructed corpus (from Complete_EDA.ipynb section 4) ----
+    dict(type="section", title='Explore the corpus you just <span class="it">built</span>',
+         right="the six derived features, interactively"),
+    dict(type="interactive", widget="featdist", json="theme0_features.json",
+         intro="The six shape features, computed by regionprops over the 557 annotated spheroid "
+               "objects (the same table built in section C). Switch the feature, toggle a log axis "
+               "to watch the size features de-skew, and split by plate to see the held-out VID3201 "
+               "batch effect. These are the real distributions the segmenter must preserve.",
+         informs="Two construction decisions fall straight out of this: the size features (area, "
+                 "diameter, perimeter) are heavily right-skewed and get log-scaled before modelling, "
+                 "and VID3201 sits apart from the other plates, which is why the split is stratified "
+                 "by plate rather than shuffled.",
+         informs_tag="Beyond the thesis: interactive corpus"),
+
+    # ---- augmentation: shared offline set + the U-Net's heavier online policy ----
+    dict(type="section", title='Augmentation: a <span class="it">shared</span> set, plus a heavier U-Net policy',
+         right="two different things, often confused"),
     dict(type="figure", img=FIG1 + "fig06_augmentation_coverage.png", native=True,
-         ttl="Does augmentation cover the real regimes?", sub="real vs augmented vs 51 originals",
+         ttl="Does the offline augmented set cover the real regimes?", sub="real vs augmented vs 51 originals",
          alt="contrast, mean-intensity and focus distributions for real, augmented and original frames",
-         shows="Augmentation spans 100% of the real contrast range and 91% of the focus "
-               "(Laplacian-variance) range, but only 18% of the mean-intensity range; brightness "
-               "is the axis it covers least.",
-         informs="Confirms the heavy-augmentation U-Net is trained across the contrast and focus "
-                 "regimes it will meet at inference; the intensity gap is the one residual exposure.",
-         informs_tag="Validates heavy augmentation"),
+         shows="The offline augmented training set (the 51 originals expanded to 306 pairs, shared by "
+               "every model) spans 100% of the real contrast range and 91% of the focus "
+               "(Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is "
+               "the axis it covers least.",
+         informs="This figure is about the offline augmented dataset that all candidates train on. It "
+                 "is a separate thing from the 'heavy augmentation' U-Net variant, which is a training "
+                 "time policy, shown in code below.",
+         informs_tag="Offline set, shared by all models"),
+    dict(type="code",
+         title="What 'heavy augmentation' actually means", sub="rq1_segmentation/scripts/unet/run_experiments.py",
+         io=["shared offline set", "U-Net online policy", "standard vs heavy"],
+         src="run_experiments.py:70, 84",
+         code="# EVERY model trains on the same offline-augmented set (51 -> 306 pairs).\n"
+              "# 'Heavy augmentation' is one U-Net variant's stronger ON-THE-FLY policy,\n"
+              "# applied per batch during training, NOT a different dataset.\n\n"
+              "def aug_standard(res):                    def aug_heavy(res):\n"
+              "    Resize, HFlip, VFlip, Rotate90            Resize, HFlip, VFlip, Rotate90\n"
+              "    ShiftScaleRotate(0.05, 0.1, 15)          ShiftScaleRotate(0.10, 0.2, 30)   # stronger\n"
+              "    ElasticTransform(alpha=30)               ElasticTransform(alpha=50)        # stronger\n"
+              "    RandomBrightnessContrast(0.15)           RandomBrightnessContrast(0.30)    # stronger\n"
+              "    GaussNoise(p=0.2)                        GaussNoise(10-50, p=0.4)          # stronger\n"
+              "                                             GridDistortion(0.3)              # + extra\n"
+              "                                             GaussianBlur(3-7)                # + extra\n"
+              "                                             CoarseDropout(8 x 32px)          # + extra",
+         note="So 'U-Net (heavy aug.)' is the resnet34 U-Net trained with aug_heavy: three transforms "
+              "the standard policy does not use (grid distortion, blur, coarse dropout) plus roughly "
+              "double the strength on the rest. That heavier regularisation, not a different training "
+              "set, is what the name refers to."),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 00', chips=[
         dict(t="shared/io.py", gold=True), dict(t="imaging_eda/patient_map.py"),
         dict(t="imaging_eda/build_tables.py"), dict(t="rq3_inference/extract_features.py"),
-        dict(t="build_training_dataset.py"), dict(t="data/metadata/*.xlsx")]),
+        dict(t="build_training_dataset.py"), dict(t="unet/run_experiments.py"), dict(t="Complete_EDA.ipynb")]),
     dict(type="bigcta", title='Next: what the <span class="it">signal</span> looks like.',
          links=[dict(t="Theme 01 &middot; Image & intensity EDA &rarr;", href="01_image_intensity_eda/index.html", primary=True),
                 dict(t="Back to index", href="index.html")]),
@@ -283,7 +323,7 @@ THEME1 = [
                  "much, now lives in Theme 00."),
     dict(type="kpis", items=[
         dict(lbl="Hand-annotated", num="51", desc="About 0.05% of the corpus, the defining constraint.", gold=True, numeric=True),
-        dict(lbl="Contrast covered by aug.", num="~100%", desc="Validates the heavy-aug U-Net.", gold=True),
+        dict(lbl="Contrast covered by aug.", num="~100%", desc="Offline augmented set (shared by all models).", gold=True),
         dict(lbl="Focus covered by aug.", num="~91%", desc="Laplacian-variance range spanned by augmentation.", numeric=True),
         dict(lbl="Real wells out-of-library", num="~90%", desc="Why the thesis reports relative shifts, not absolutes.", numeric=True),
     ]),
