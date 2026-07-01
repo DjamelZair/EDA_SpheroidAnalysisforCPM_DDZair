@@ -880,14 +880,17 @@
 
   /* ---------- T. EXAMPLES: real spheroid frames with the AI outline ---------- */
   function examples(mount, d) {
-    header(mount, "See a real spheroid", "actual brightfield frames from the corpus, with the AI outline in gold; click a thumbnail");
-    var cur = 0;
+    header(mount, "See a real spheroid", "actual brightfield frames from the corpus; toggle the AI outline and click a thumbnail");
+    var cur = 0, outline = true;
+    var bar = el("div", "iact-controls"); var seg = el("div", "iact-seg"); bar.appendChild(seg); mount.appendChild(bar);
+    var oBtn = chip("AI outline", true); seg.appendChild(oBtn);
     var grid = el("div", "iact-2col"); mount.appendChild(grid);
     var stage = el("div", "iact-stage"); grid.appendChild(stage);
     var img = el("img", "iact-spheroid"); img.alt = "real CLL spheroid frame"; stage.appendChild(img);
     var cap = el("div", "iact-cap"); stage.appendChild(cap);
     var card = el("div", "iact-card"); grid.appendChild(card);
     var thumbs = el("div", "iact-thumbs"); mount.appendChild(thumbs);
+    oBtn.onclick = function () { outline = !outline; oBtn.className = "iact-chip" + (outline ? " on" : ""); select(); };
     d.items.forEach(function (it, i) {
       var t = el("div", "iact-thumb" + (i === 0 ? " on" : "")); var ti = el("img"); ti.src = it.img; ti.alt = it.label; t.appendChild(ti);
       t.appendChild(el("div", "iact-thumb-cap", it.label));
@@ -896,7 +899,7 @@
     });
     function select() {
       Array.prototype.forEach.call(thumbs.children, function (c, i) { c.className = "iact-thumb" + (i === cur ? " on" : ""); });
-      var it = d.items[cur]; img.src = it.img; cap.textContent = it.label;
+      var it = d.items[cur]; img.src = (outline || !it.raw) ? it.img : it.raw; cap.textContent = it.label + (outline ? "  (AI outline on)" : "  (raw frame)");
       card.innerHTML = "<div class='iact-cardh'>" + it.label + "</div>"
         + "<div class='iact-kv'><div class='iact-kvg'>AI-measured quality</div>"
         + "<div><span>cluster area</span><b>" + (it.area != null ? it.area.toLocaleString() + " px" : "-") + "</b></div>"
