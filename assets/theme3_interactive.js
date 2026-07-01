@@ -399,8 +399,8 @@
       var rl = cell(f, ""); rl.style.color = "#f3ecd6"; rl.style.textAlign = "right"; rl.style.fontFamily = "'DM Sans',sans-serif"; rl.style.fontSize = "0.78rem"; g.appendChild(rl);
       d.params.forEach(function (p, j) {
         var v = d.matrix[i][j], t = Math.max(0, Math.min(1, v));
-        var bg = "rgb(" + Math.round(lerp(13, 200, t)) + "," + Math.round(lerp(89, 160, t)) + "," + Math.round(lerp(99, 92, t)) + ")";
-        var c = cell(v.toFixed(2), ""); c.style.background = bg; c.style.color = t > 0.55 ? "#052e36" : "#f3ecd6"; c.style.borderRadius = "2px"; c.style.cursor = "pointer";
+        var bg = "rgb(" + Math.round(lerp(4, 200, t)) + "," + Math.round(lerp(37, 160, t)) + "," + Math.round(lerp(44, 92, t)) + ")";
+        var c = cell(v.toFixed(2), ""); c.style.background = bg; c.style.border = "1px solid rgba(199,160,92,0.18)"; c.style.color = t > 0.5 ? "#052e36" : "#f3ecd6"; c.style.borderRadius = "2px"; c.style.cursor = "pointer";
         if (d.gold_bar && v >= d.gold_bar) { c.style.outline = "1.5px solid #f3ecd6"; }
         c.onclick = function () { read.innerHTML = "<b>" + f + "</b> carries <b style='color:#e7c98a'>" + v.toFixed(3) + "</b> importance for <b>" + p + "</b>" + (d.gold_bar && v >= d.gold_bar ? " (above the reliability bar)" : ""); };
         g.appendChild(c);
