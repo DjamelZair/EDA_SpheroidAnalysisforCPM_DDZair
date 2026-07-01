@@ -912,10 +912,30 @@
     select();
   }
 
+  /* ---------- U. PAIR: side-by-side comparison of two frames ---------- */
+  function pair(mount, d) {
+    var mt = d.meta || {}; var outline = true;
+    header(mount, mt.title || "Comparison", mt.sub || "");
+    var bar = el("div", "iact-controls"); var seg = el("div", "iact-seg"); bar.appendChild(seg); mount.appendChild(bar);
+    var oBtn = chip("AI outline", true); seg.appendChild(oBtn);
+    var grid = el("div", "iact-2col"); mount.appendChild(grid);
+    var sides = [d.left, d.right].map(function (s) {
+      var box = el("div", "iact-stage"); var im = el("img", "iact-spheroid"); im.alt = s.label; box.appendChild(im);
+      box.appendChild(el("div", "iact-cap", s.label));
+      var st = el("div", "iact-readout"); st.innerHTML = "area <b>" + s.stats.area.toLocaleString() + " px</b> &middot; fragmentation <b>" + s.stats.frag.toFixed(3) + "</b> &middot; contrast <b>" + s.stats.contrast.toFixed(2) + "</b>"; box.appendChild(st);
+      var nt = el("p"); nt.style.cssText = "font-size:.9rem;opacity:.9;margin-top:.35rem;line-height:1.5"; nt.textContent = s.note; box.appendChild(nt);
+      grid.appendChild(box); return { im: im, s: s };
+    });
+    var read = el("div", "iact-readout"); read.innerHTML = d.note; mount.appendChild(read);
+    function upd() { oBtn.className = "iact-chip" + (outline ? " on" : ""); sides.forEach(function (x) { x.im.src = (outline || !x.s.raw) ? x.s.img : x.s.raw; }); }
+    oBtn.onclick = function () { outline = !outline; upd(); };
+    upd();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
     featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech, qcdist: qcdist, fragstruct: fragstruct,
-    qualcoverage: qualcoverage, sobolgap: sobolgap, drugstrip: drugstrip, gallery: gallery, timelapse: timelapse, examples: examples };
+    qualcoverage: qualcoverage, sobolgap: sobolgap, drugstrip: drugstrip, gallery: gallery, timelapse: timelapse, examples: examples, pair: pair };
 
   var HELP = {
     morph: "Pick a parameter with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",

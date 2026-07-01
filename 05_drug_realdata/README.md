@@ -13,6 +13,8 @@ Real spheroid trajectories from reference wells across five patients (seven pati
 | Drug-panel BCR shift | weak | Tau (primary): J_cc shift -1.4, CI [-3.0, +0.2], spans zero. End-state: +4.6, CI [+2.1, +7.0], significant; the signal is in the settled morphology. |
 | Reported axes | 3 | the three weakly identifiable axes (width, J_cc, J_cm). |
 
+## The stimulus, before any drug  (the reference every drug shift is measured against)
+
 ## Real drug wells, up close  (one frame per mechanism class)
 
 ## What the drugs do to morphology  (two dose conditions, over five days)

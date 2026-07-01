@@ -897,6 +897,16 @@ THEME5 = [
         dict(lbl="Drug-panel BCR shift", num="weak", desc="Tau (primary): J_cc shift -1.4, CI [-3.0, +0.2], spans zero. End-state: +4.6, CI [+2.1, +7.0], significant; the signal is in the settled morphology."),
         dict(lbl="Reported axes", num="3", desc="the three weakly identifiable axes (width, J_cc, J_cm).", numeric=True),
     ]),
+    dict(type="section", title='The <span class="it">stimulus</span>, before any drug',
+         right="the reference every drug shift is measured against"),
+    dict(type="interactive", widget="pair", json="theme5_stimpair.json",
+         intro="Two matched control wells from the same patient at the same timepoint, no drug in "
+               "either. The only difference is the activation cocktail (IL-2/15/21 + CpG), a "
+               "microenvironment mimic. Toggle the AI outline to compare the raw frames.",
+         informs="The cocktail alone makes the spheroid more cohesive (a downward shift in inferred "
+                 "J_cc). Every drug effect below is measured against this stimulated state, so a drug "
+                 "that 'loosens' is really pushing the spheroid back toward the unstimulated look.",
+         informs_tag="The baseline the panel is relative to"),
     dict(type="section", title='Real drug wells, <span class="it">up close</span>',
          right="one frame per mechanism class"),
     dict(type="interactive", widget="examples", json="theme5_realframes.json",
