@@ -31,38 +31,6 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 **What it motivated (Decision: restrict inversion features).** Both inject noise into boundary-derived shape features, the exact perimeter and circularity features the CPM inference relies on, so inversion is restricted to features that survive segmentation noise.
 
-### Intensity and dynamic range - pooled pixels &middot; frame brightness &middot; 8-bit usage
-
-![](../assets/cll/figures/01_image_eda/fig02_intensity_dynamic_range.png)
-
-**What it shows.** Pooled pixel intensity is bimodal (a dark spheroid on a bright field); per-frame brightness clusters near mid-range, and frames use a median of 86% of the available 8-bit range.
-
-**What it motivated (Decision: learned segmenter).** The two intensity modes overlap once debris is present, so a single global threshold cannot separate object from background, so a learned segmenter is needed.
-
-### Contrast: level, polarity, drift, batch - Michelson contrast across the corpus
-
-![](../assets/cll/figures/01_image_eda/fig03_contrast.png)
-
-**What it shows.** Michelson contrast centres near 0.55 with only 0.6% of frames inverted (dark-on-light dominates), climbs over the time course (about 0.55 to 0.71), and varies between experiment batches.
-
-**What it motivated (Decision: contrast-conditional preprocessing).** Contrast is wide, regime-dependent and drifting, which is why the classical baseline needs contrast-conditional preprocessing and the production segmenter is learned.
-
-### Focus is bimodal and metric-agnostic - Laplacian variance, log scale
-
-![](../assets/cll/figures/01_image_eda/fig04a_sharpness.png)
-
-**What it shows.** Focus splits into a sharp main cluster and a blurred tail on a log scale, and two independent focus measures (Laplacian variance and Tenengrad) agree, so the spread is real, not an artefact of one metric.
-
-**What it motivated (Decision: restrict inversion features).** Out-of-focus frames blur the boundary-derived perimeter and circularity features, reinforcing the restriction of inversion to features that survive segmentation noise.
-
-### Illumination is uneven and worsens over time - background coefficient of variation
-
-![](../assets/cll/figures/01_image_eda/fig05_illumination.png)
-
-**What it shows.** Background illumination is uneven (CV about 0.2 to 0.25) and grows worse over the time course; the exemplar shows the shading and debris across the field (the dark disc at the centre is the spheroid itself).
-
-**What it motivated (Decision: restrict inversion features).** Uneven background biases any intensity-based boundary, another reason the inversion leans on shape features that tolerate illumination drift.
-
 ## B. What is the object structure?  (the segmentation criterion: feature preservation)
 
 ### Components per annotated image - how multi-object the masks are
@@ -72,14 +40,6 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 **What it shows.** Most frames are not a single object (median 8 components; about 70% have more than one), and fragment sizes span four orders of magnitude, from the main body down to specks below 100 px.
 
 **What it motivated (Decision: CC-Dice + largest component).** Standard Dice is dominated by the largest component and is blind to small fragments, so CC-Dice (equal weight per component) is the right metric, and post-processing keeps the largest connected component.
-
-### Fragment structure of the masks - counts &middot; area concentration &middot; over time
-
-![](../assets/cll/figures/01_image_eda/fig07_fragmentation_structure.png)
-
-**What it shows.** Only about 20% of frames are a single cohesive object; most carry a long tail of fragments while the largest component still holds nearly all the area, and disintegration increases over the time course.
-
-**What it motivated (Decision: CC-Dice + largest component).** Because masks are multi-object but area-dominated, ordinary Dice would ignore the small fragments, so CC-Dice scores every component, and post-processing keeps the largest one.
 
 ## C. A glimpse of the drug-response payoff  (preview only &middot; full analysis in Theme 05)
 

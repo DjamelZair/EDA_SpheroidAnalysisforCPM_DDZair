@@ -678,9 +678,100 @@
     select();
   }
 
+  /* ---------- M. QCDIST: image-quality metric distribution + drift over time ---------- */
+  function qcdist(mount, d) {
+    header(mount, d.label, d.main.log ? "log scale, across the corpus" : "across the 12,485 real frames");
+    var view = 0, views = d.time ? ["distribution", "over time"] : ["distribution"];
+    var bar = el("div", "iact-controls"); var seg = el("div", "iact-seg"); bar.appendChild(seg); mount.appendChild(bar);
+    if (d.overlay) { var lg = el("div", "iact-readout"); lg.innerHTML = "<span style='color:" + C.sky + "'>&#9608; " + d.main_label + "</span> &nbsp; <span style='color:" + C.gold + "'>&#9473; " + d.overlay_label + "</span>"; mount.appendChild(lg); }
+    var canvas = mkCanvas(mount, 280); var read = el("div", "iact-readout"); mount.appendChild(read);
+    function btns() { seg.innerHTML = ""; views.forEach(function (v, i) { var b = chip(v, i === view); b.onclick = function () { view = i; draw(); }; seg.appendChild(b); }); }
+    function axis(x, W, H, xlab, log) {
+      x.strokeStyle = C.grid; x.lineWidth = 1; x.font = "11px 'DM Sans'";
+      for (var t = 0; t <= 4; t++) { var gx = lerp(46, W - 16, t / 4); x.beginPath(); x.moveTo(gx, 14); x.lineTo(gx, H - 44); x.stroke(); }
+      x.fillStyle = C.muted; x.textAlign = "center"; x.fillText(xlab, (46 + W - 16) / 2, H - 4);
+    }
+    function series(x, arr, lo, hi, W, H, col, fill) {
+      var cx = d.main.centers, N = cx.length, px = function (v) { return lerp(46, W - 16, (v - lo) / (hi - lo || 1)); };
+      var mx = Math.max.apply(null, d.main.density.concat(d.overlay ? d.overlay.density : [])) || 1;
+      var py = function (v) { return lerp(H - 44, 14, v / mx); };
+      if (fill) { x.beginPath(); x.moveTo(px(cx[0]), py(0)); for (var i = 0; i < N; i++) x.lineTo(px(cx[i]), py(arr[i])); x.lineTo(px(cx[N - 1]), py(0)); x.closePath(); x.fillStyle = "rgba(127,179,189,0.3)"; x.fill(); }
+      x.beginPath(); for (i = 0; i < N; i++) { var X = px(cx[i]), Y = py(arr[i]); i ? x.lineTo(X, Y) : x.moveTo(X, Y); } x.strokeStyle = col; x.lineWidth = fill ? 1.6 : 2.2; x.stroke();
+    }
+    function drawDist() {
+      var x = ctxOf(canvas), W = canvas.clientWidth, H = 280, m = d.main;
+      var lo = m.centers[0], hi = m.centers[m.centers.length - 1]; x.clearRect(0, 0, W, H);
+      x.font = "11px 'DM Sans'"; x.fillStyle = C.muted; x.textAlign = "center";
+      for (var t = 0; t <= 4; t++) { var gv = lerp(lo, hi, t / 4), gx = lerp(46, W - 16, t / 4); x.strokeStyle = C.grid; x.beginPath(); x.moveTo(gx, 14); x.lineTo(gx, H - 44); x.stroke(); x.fillStyle = C.muted; x.fillText(m.log ? ("1e" + Math.round(gv)) : gv.toFixed(2), gx, H - 44 + 16); }
+      series(x, m.density, lo, hi, W, H, C.sky, true);
+      if (d.overlay) series(x, d.overlay.density, lo, hi, W, H, C.gold, false);
+      x.fillStyle = C.muted; x.textAlign = "center"; x.fillText(d.label + (m.log ? " (log10)" : ""), (46 + W - 16) / 2, H - 4);
+      x.save(); x.translate(13, H / 2 - 15); x.rotate(-Math.PI / 2); x.fillText("density", 0, 0); x.restore();
+    }
+    function drawTime() {
+      var x = ctxOf(canvas), W = canvas.clientWidth, H = 280, tb = d.time;
+      var hrs = tb.hours, N = hrs.length, hi0 = hrs[N - 1];
+      var vals = tb.med.concat(tb.lo, tb.hi).filter(function (v) { return v != null; });
+      var ymin = Math.min.apply(null, vals), ymax = Math.max.apply(null, vals), pad = (ymax - ymin) * 0.1 || 1;
+      var px = function (v) { return lerp(46, W - 16, v / (hi0 || 1)); }, py = function (v) { return lerp(H - 44, 14, (v - (ymin - pad)) / ((ymax + pad) - (ymin - pad))); };
+      x.clearRect(0, 0, W, H);
+      x.strokeStyle = C.grid; x.fillStyle = C.muted; x.font = "11px 'DM Sans'"; x.textAlign = "center";
+      for (var t = 0; t <= 4; t++) { var gx = lerp(46, W - 16, t / 4); x.beginPath(); x.moveTo(gx, 14); x.lineTo(gx, H - 44); x.stroke(); x.fillStyle = C.muted; x.fillText(Math.round(hi0 * t / 4) + "h", gx, H - 44 + 16); }
+      // IQR band
+      x.beginPath(); var started = false;
+      for (var i = 0; i < N; i++) { if (tb.hi[i] == null) continue; var X = px(hrs[i]), Y = py(tb.hi[i]); started ? x.lineTo(X, Y) : (x.moveTo(X, Y), started = true); }
+      for (i = N - 1; i >= 0; i--) { if (tb.lo[i] == null) continue; x.lineTo(px(hrs[i]), py(tb.lo[i])); }
+      x.closePath(); x.fillStyle = "rgba(200,160,92,0.16)"; x.fill();
+      x.beginPath(); started = false; for (i = 0; i < N; i++) { if (tb.med[i] == null) continue; var Xx = px(hrs[i]), Yy = py(tb.med[i]); started ? x.lineTo(Xx, Yy) : (x.moveTo(Xx, Yy), started = true); } x.strokeStyle = C.gold; x.lineWidth = 2.2; x.stroke();
+      x.fillStyle = C.muted; x.textAlign = "center"; x.fillText("time (hours)", (46 + W - 16) / 2, H - 4);
+      x.save(); x.translate(13, H / 2 - 15); x.rotate(-Math.PI / 2); x.fillText(d.time_label, 0, 0); x.restore();
+    }
+    function draw() { btns(); if (view === 0) drawDist(); else drawTime(); read.innerHTML = d.note + " <b style='color:" + C.goldL + "'>" + d.decision + "</b>"; canvas._draw = draw; }
+    draw();
+  }
+
+  /* ---------- N. FRAGSTRUCT: mask fragment structure (counts / area / over time) ---------- */
+  function fragstruct(mount, d) {
+    header(mount, "Fragment structure of the masks", "how multi-object and area-dominated the masks are");
+    var view = 0, views = ["fragment count", "largest-component area", "over time"];
+    var bar = el("div", "iact-controls"); var seg = el("div", "iact-seg"); bar.appendChild(seg); mount.appendChild(bar);
+    var canvas = mkCanvas(mount, 280); var read = el("div", "iact-readout"); mount.appendChild(read);
+    function btns() { seg.innerHTML = ""; views.forEach(function (v, i) { var b = chip(v, i === view); b.onclick = function () { view = i; draw(); }; seg.appendChild(b); }); }
+    function drawHist(hobj, xlab, col) {
+      var x = ctxOf(canvas), W = canvas.clientWidth, H = 280, cx = hobj.centers, N = cx.length;
+      var lo = cx[0], hi = cx[N - 1], px = function (v) { return lerp(46, W - 16, (v - lo) / (hi - lo || 1)); };
+      var mx = Math.max.apply(null, hobj.density) || 1, py = function (v) { return lerp(H - 44, 14, v / mx); };
+      x.clearRect(0, 0, W, H); x.font = "11px 'DM Sans'";
+      for (var t = 0; t <= 4; t++) { var gv = lerp(lo, hi, t / 4), gx = lerp(46, W - 16, t / 4); x.strokeStyle = C.grid; x.beginPath(); x.moveTo(gx, 14); x.lineTo(gx, H - 44); x.stroke(); x.fillStyle = C.muted; x.textAlign = "center"; x.fillText(gv.toFixed(gv < 3 ? 2 : 0), gx, H - 44 + 16); }
+      var bw = (W - 62) / N;
+      for (var i = 0; i < N; i++) { var bh = (hobj.density[i] / mx) * (H - 58), bx = px(cx[i]) - bw / 2; x.fillStyle = col; x.fillRect(bx + 0.5, H - 44 - bh, bw - 1, bh); }
+      x.fillStyle = C.muted; x.textAlign = "center"; x.fillText(xlab, (46 + W - 16) / 2, H - 4);
+    }
+    function drawTime() {
+      var x = ctxOf(canvas), W = canvas.clientWidth, H = 280, tb = d.time, hrs = tb.hours, N = hrs.length, hi0 = hrs[N - 1];
+      var vals = tb.med.concat(tb.lo, tb.hi).filter(function (v) { return v != null; });
+      var ymax = Math.max.apply(null, vals), ymin = 0;
+      var px = function (v) { return lerp(46, W - 16, v / (hi0 || 1)); }, py = function (v) { return lerp(H - 44, 14, (v - ymin) / (ymax - ymin || 1)); };
+      x.clearRect(0, 0, W, H); x.font = "11px 'DM Sans'"; x.textAlign = "center";
+      for (var t = 0; t <= 4; t++) { var gx = lerp(46, W - 16, t / 4); x.strokeStyle = C.grid; x.beginPath(); x.moveTo(gx, 14); x.lineTo(gx, H - 44); x.stroke(); x.fillStyle = C.muted; x.fillText(Math.round(hi0 * t / 4) + "h", gx, H - 28); }
+      x.beginPath(); var s = false; for (var i = 0; i < N; i++) { if (tb.hi[i] == null) continue; var X = px(hrs[i]), Y = py(tb.hi[i]); s ? x.lineTo(X, Y) : (x.moveTo(X, Y), s = true); } for (i = N - 1; i >= 0; i--) { if (tb.lo[i] == null) continue; x.lineTo(px(hrs[i]), py(tb.lo[i])); } x.closePath(); x.fillStyle = "rgba(196,74,48,0.16)"; x.fill();
+      x.beginPath(); s = false; for (i = 0; i < N; i++) { if (tb.med[i] == null) continue; var Xx = px(hrs[i]), Yy = py(tb.med[i]); s ? x.lineTo(Xx, Yy) : (x.moveTo(Xx, Yy), s = true); } x.strokeStyle = C.clay; x.lineWidth = 2.2; x.stroke();
+      x.fillStyle = C.muted; x.textAlign = "center"; x.fillText("time (hours)", (46 + W - 16) / 2, H - 4);
+      x.save(); x.translate(13, H / 2 - 15); x.rotate(-Math.PI / 2); x.fillText("fragmentation index", 0, 0); x.restore();
+    }
+    function draw() {
+      btns();
+      if (view === 0) drawHist(d.ncomp, "connected components per frame", C.gold);
+      else if (view === 1) drawHist(d.largest, "largest-component area fraction", C.sky);
+      else drawTime();
+      read.innerHTML = d.note + " <b style='color:" + C.goldL + "'>" + d.decision + "</b>"; canvas._draw = draw;
+    }
+    draw();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
-    featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech };
+    featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech, qcdist: qcdist, fragstruct: fragstruct };
 
   var HELP = {
     morph: "Pick a parameter with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
@@ -696,6 +787,8 @@
     compose: "Use the dropdown to break the 12,485 inference frames down by drug-mechanism class, patient, stimulation or condition, and toggle count versus percent. It shows the corpus is not balanced: CXCR4-antagonist wells and the longitudinal patient 706 dominate, and drug frames outnumber controls roughly seven to one, which is why the training split is stratified by plate rather than shuffled.",
     augcover: "Each curve is a distribution of one image-quality metric: the filled area is the real inference frames, the gold line the augmented training set, and the dashed clay line the 51 hand-annotated originals. Switch the metric (contrast, intensity, focus). The shaded band and the headline percent show how much of the real data falls inside the augmented range: contrast and focus are well covered, but brightness (mean intensity) is not, which is the one regime the training set under-samples.",
     drugmech: "Click a drug-mechanism class to read what it targets, how it acts on a CLL cell, and the effect it is expected to have on the spheroid. The animation shows that effect: cells spread apart (looser) or pull together (more compact) relative to the dashed unstimulated baseline, driven by the inferred cell-cell adhesion shift for that class. Remember the shift is a relative, inferred parameter, not a physical measurement, and only the MEK inhibitor clears the significance heuristic (on just four wells).",
+    qcdist: "The filled curve is the distribution of this image-quality metric across the real frames (for intensity, the gold line adds the bright background so you see the two modes). Switch to 'over time' to see the metric's median and interquartile range drift across the imaging time course. The readout states the finding and the method decision it drove.",
+    fragstruct: "Three views of how fragmented the segmentation masks are. 'Fragment count' is the distribution of connected components per frame (most frames are multi-object); 'largest-component area' shows that despite the fragments, one component holds nearly all the area; 'over time' shows fragmentation rising across the time course. Together these motivate scoring with CC-Dice and keeping the largest component.",
   };
   function addHelp(m, widget) {
     var head = m.querySelector(".iact-head"); if (!head || !HELP[widget]) return;

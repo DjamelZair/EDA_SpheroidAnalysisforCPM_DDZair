@@ -376,40 +376,28 @@ THEME1 = [
                  "perimeter and circularity features the CPM inference relies on, so inversion is "
                  "restricted to features that survive segmentation noise.",
          informs_tag="Decision: restrict inversion features"),
-    dict(type="figure", img=FIG1 + "fig02_intensity_dynamic_range.png", native=True,
-         ttl="Intensity and dynamic range", sub="pooled pixels &middot; frame brightness &middot; 8-bit usage",
-         alt="pooled pixel-intensity histogram, per-frame brightness, dynamic-range usage and black/white points",
-         shows="Pooled pixel intensity is bimodal (a dark spheroid on a bright field); per-frame "
-               "brightness clusters near mid-range, and frames use a median of 86% of the available "
-               "8-bit range.",
-         informs="The two intensity modes overlap once debris is present, so a single global "
-                 "threshold cannot separate object from background, so a learned segmenter is needed.",
+    dict(type="interactive", widget="qcdist", json="theme1_qc_intensity.json",
+         intro="Pixel intensity across the real frames. The filled curve is the spheroid (foreground), "
+               "the gold line the bright field (background): two overlapping modes. Switch to over-time "
+               "to see frame brightness drift.",
+         informs="The two intensity modes overlap once debris is present, so a single global threshold "
+                 "cannot separate object from background: a learned segmenter is needed.",
          informs_tag="Decision: learned segmenter"),
-    dict(type="figure", img=FIG1 + "fig03_contrast.png", native=True,
-         ttl="Contrast: level, polarity, drift, batch", sub="Michelson contrast across the corpus",
-         alt="contrast histogram, polarity, contrast drift over time and batch variation",
-         shows="Michelson contrast centres near 0.55 with only 0.6% of frames inverted (dark-on-light "
-               "dominates), climbs over the time course (about 0.55 to 0.71), and varies between "
-               "experiment batches.",
-         informs="Contrast is wide, regime-dependent and drifting, which is why the classical "
-                 "baseline needs contrast-conditional preprocessing and the production segmenter is "
-                 "learned.",
+    dict(type="interactive", widget="qcdist", json="theme1_qc_contrast.json",
+         intro="Michelson contrast across the corpus, and how it drifts over the imaging time course. "
+               "Contrast is wide and regime-dependent.",
+         informs="Contrast is wide, regime-dependent and drifting, which is why the classical baseline "
+                 "needs contrast-conditional preprocessing and the production segmenter is learned.",
          informs_tag="Decision: contrast-conditional preprocessing"),
-    dict(type="figure", img=FIG1 + "fig04a_sharpness.png", native=True,
-         ttl="Focus is bimodal and metric-agnostic", sub="Laplacian variance, log scale",
-         alt="focus-measure histogram, agreement between two focus metrics, sharpness over time",
-         shows="Focus splits into a sharp main cluster and a blurred tail on a log scale, and two "
-               "independent focus measures (Laplacian variance and Tenengrad) agree, so the spread is "
-               "real, not an artefact of one metric.",
+    dict(type="interactive", widget="qcdist", json="theme1_qc_focus.json",
+         intro="Focus (Laplacian variance) on a log scale: a sharp main cluster and a blurred tail. "
+               "Two independent focus measures agree, so the spread is real.",
          informs="Out-of-focus frames blur the boundary-derived perimeter and circularity features, "
                  "reinforcing the restriction of inversion to features that survive segmentation noise.",
          informs_tag="Decision: restrict inversion features"),
-    dict(type="figure", img=FIG1 + "fig05_illumination.png", native=True,
-         ttl="Illumination is uneven and worsens over time", sub="background coefficient of variation",
-         alt="background-CV histogram, illumination drift over time, and an uneven-illumination exemplar",
-         shows="Background illumination is uneven (CV about 0.2 to 0.25) and grows worse over the "
-               "time course; the exemplar shows the shading and debris across the field (the dark "
-               "disc at the centre is the spheroid itself).",
+    dict(type="interactive", widget="qcdist", json="theme1_qc_illumination.json",
+         intro="Background illumination unevenness (coefficient of variation), and how it worsens over "
+               "the time course as debris accumulates.",
          informs="Uneven background biases any intensity-based boundary, another reason the inversion "
                  "leans on shape features that tolerate illumination drift.",
          informs_tag="Decision: restrict inversion features"),
@@ -428,12 +416,10 @@ THEME1 = [
                  "fragments, so CC-Dice (equal weight per component) is the right metric, and "
                  "post-processing keeps the largest connected component.",
          informs_tag="Decision: CC-Dice + largest component"),
-    dict(type="figure", img=FIG1 + "fig07_fragmentation_structure.png", native=True,
-         ttl="Fragment structure of the masks", sub="counts &middot; area concentration &middot; over time",
-         alt="fragment-count histogram, largest-component area fraction, GT-vs-model components, disintegration over time",
-         shows="Only about 20% of frames are a single cohesive object; most carry a long tail of "
-               "fragments while the largest component still holds nearly all the area, and "
-               "disintegration increases over the time course.",
+    dict(type="interactive", widget="fragstruct", json="theme1_fragstruct.json",
+         intro="Three views of how fragmented the masks are: the count of connected components per "
+               "frame, how much of the area the largest component holds, and how fragmentation rises "
+               "over the time course.",
          informs="Because masks are multi-object but area-dominated, ordinary Dice would ignore the "
                  "small fragments, so CC-Dice scores every component, and post-processing keeps the "
                  "largest one.",
