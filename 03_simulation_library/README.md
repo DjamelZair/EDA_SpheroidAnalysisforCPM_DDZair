@@ -23,7 +23,7 @@ The pipeline only works because the identical six features are measured on real 
 
 **What it motivated (Sets up the identifiability question).** Identifies which knobs leave a size signature in morphology, the precondition for being identifiable later.
 
-## Tune it yourself: knob to spheroid  (live morph, beyond the thesis)
+## From knob to spheroid  (live morph, beyond the thesis)
 
 ## What the library looks like  (16 random samples at the final step)
 
@@ -35,7 +35,7 @@ The pipeline only works because the identical six features are measured on real 
 
 **What it motivated (Shows the library's morphological spread).** Confirms visually that the sampled parameter space produces a wide morphological range, the diversity the inversion relies on.
 
-## Walk the morphospace  (1,105 samples, click any one)
+## Across the morphospace  (1,105 samples, click any one)
 
 ## Which knobs drive cluster size?  (Sobol indices, direct vs total effect)
 

@@ -270,7 +270,7 @@ The genuinely plate-stratified 5-fold CV split (patient/plate held out) is a sep
 
 **What it motivated (Decision: two-stage training).** A 1-in-2000 label ratio motivates the two-stage training strategy: pretrain on 4,547 classical pseudo-labels, then fine-tune on the 51 ground-truth masks.
 
-## Explore the corpus you just built  (the six derived features, interactively)
+## The built corpus, feature by feature  (the six derived features, interactively)
 
 ## Augmentation: a shared set, plus a heavier U-Net policy  (two different things, often confused)
 

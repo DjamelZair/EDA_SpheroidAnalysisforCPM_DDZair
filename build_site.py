@@ -288,7 +288,7 @@ THEME0 = [
          informs_tag="Decision: two-stage training"),
 
     # ---- interactive: explore the constructed corpus (from Complete_EDA.ipynb section 4) ----
-    dict(type="section", title='Explore the corpus you just <span class="it">built</span>',
+    dict(type="section", title='The built <span class="it">corpus</span>, feature by feature',
          right="the six derived features, interactively"),
     dict(type="interactive", widget="featdist", json="theme0_features.json",
          intro="The six shape features, computed by regionprops over the 557 annotated spheroid "
@@ -481,7 +481,7 @@ THEME1 = [
               "**`imaging_eda/imaging_data_eda.ipynb`**.\n\n"
               "An earlier broad notebook, `data/cll_spheroid_eda_complete.ipynb`, is catalogued as "
               "a referenced orphan in `_provenance_notes.md`."),
-    dict(type="section", title='Set your own <span class="it">quality bar</span>',
+    dict(type="section", title='A tunable <span class="it">quality bar</span>',
          right="interactive, beyond the thesis"),
     dict(type="interactive", widget="qcthreshold", json="theme1_qc_threshold.json",
          intro="The thesis fixes quality thresholds once. Here you pick a quality metric and drag the "
@@ -664,7 +664,7 @@ THEME2 = [
          informs="Confirms F3 is a genuine ceiling, not a tuning artefact.",
          informs_tag="Bounds the hardest case"),
 
-    dict(type="section", title='Explore the <span class="it">leaderboard</span>',
+    dict(type="section", title='The <span class="it">leaderboard</span>, in detail',
          right="pixel overlap vs feature preservation"),
     dict(type="interactive", widget="modelscatter", json="theme2_model_explorer.json",
          intro="Every segmenter plotted by pixel overlap (Dice) against shape-number agreement (CCC). "
@@ -734,7 +734,7 @@ THEME3 = [
          informs="Identifies which knobs leave a size signature in morphology, the precondition "
                  "for being identifiable later.",
          informs_tag="Sets up the identifiability question"),
-    dict(type="section", title='Tune it yourself: <span class="it">knob to spheroid</span>',
+    dict(type="section", title='From <span class="it">knob to spheroid</span>',
          right="live morph, beyond the thesis"),
     dict(type="interactive", widget="morph", json="theme3_morph.json",
          intro="The thesis only shows static sweep curves. Here you grab a knob (target volume or "
@@ -754,7 +754,7 @@ THEME3 = [
          informs="Confirms visually that the sampled parameter space produces a wide morphological "
                  "range, the diversity the inversion relies on.",
          informs_tag="Shows the library's morphological spread"),
-    dict(type="section", title='Walk the <span class="it">morphospace</span>',
+    dict(type="section", title='Across the <span class="it">morphospace</span>',
          right="1,105 samples, click any one"),
     dict(type="interactive", widget="morphospace", json="theme3_morphospace.json",
          intro="Every dot is one of 1,105 synthetic spheroids. Click one to read the exact seven CPM "
@@ -817,7 +817,7 @@ THEME3 = [
 THEME4 = [
     dict(type="hero",
          meta=["Theme 04", "Separability & identifiability", "Appendix D to H"],
-         title='Which knobs can we <span class="it">read back</span>?',
+         title='Which knobs are <span class="it">recoverable</span>?',
          caption="Leave-one-out inversion on the 1,105-run library",
          lede="The parameter interactions and the thin real-world coverage seen in Theme 03 predict "
               "that some knobs will be unreadable; leave-one-out inversion quantifies exactly which. "

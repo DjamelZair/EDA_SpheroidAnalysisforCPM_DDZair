@@ -1,4 +1,4 @@
-# Which knobs can we read back?
+# Which knobs are recoverable?
 
 **Thesis target:** Theme 04 / Separability & identifiability / Appendix D to H.
 

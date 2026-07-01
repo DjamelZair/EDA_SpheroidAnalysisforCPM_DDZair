@@ -105,7 +105,7 @@ So the leaderboard winner is the resnet34 U-Net trained with aug_heavy: three tr
 
 **What it motivated (Bounds the hardest case).** Confirms F3 is a genuine ceiling, not a tuning artefact.
 
-## Explore the leaderboard  (pixel overlap vs feature preservation)
+## The leaderboard, in detail  (pixel overlap vs feature preservation)
 
 ## Complete analysis index  (every thesis analysis in this theme)
 

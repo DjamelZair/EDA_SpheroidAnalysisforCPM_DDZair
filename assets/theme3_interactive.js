@@ -58,7 +58,7 @@
 
   /* ---------- A. MORPH STUDIO: slider morphs spheroid + redraws curves ---------- */
   function morphStudio(mount, d) {
-    header(mount, "Tune the simulator", "drag a knob, watch the spheroid and its cluster size respond");
+    header(mount, "The simulator's response", "drag a knob, watch the spheroid and its cluster size respond");
     var keys = Object.keys(d.params);
     var cur = keys.indexOf("width") >= 0 ? "width" : keys[0];
     var feat = "total_area";
@@ -140,7 +140,7 @@
 
   /* ---------- B. MORPHOSPACE EXPLORER: clickable 1105-sample cloud ---------- */
   function morphospace(mount, d) {
-    header(mount, "Explore the simulation library", "every point is one of 1,105 synthetic spheroids - click to read its 7 CPM knobs");
+    header(mount, "The simulation library", "every point is one of 1,105 synthetic spheroids - click to read its 7 CPM knobs");
     var feats = d.meta.features, pLabels = d.meta.params;
     var ax1 = (d.meta.default_axes && d.meta.default_axes[0]) || "total_area";
     var ay1 = (d.meta.default_axes && d.meta.default_axes[1]) || "circularity";
@@ -323,7 +323,7 @@
 
   /* ---------- E. QC THRESHOLD EXPLORER (Theme 01) ---------- */
   function qcthreshold(mount, d) {
-    header(mount, "Set your quality bar", "drag the threshold and watch how many of the 12,480 frames survive");
+    header(mount, "The quality bar", "drag the threshold and watch how many of the 12,480 frames survive");
     var M = d.meta.metrics, keys = Object.keys(M), cur = keys[0];
     var bar = el("div", "iact-controls"); mount.appendChild(bar);
     var seg = el("div", "iact-seg"); bar.appendChild(seg);
@@ -411,7 +411,7 @@
 
   /* ---------- H. IDENTIFIABILITY EXPLORER (Theme 04) ---------- */
   function idbars(mount, d) {
-    header(mount, "Which knobs can we recover?", "leave-one-out recovery R-squared per parameter");
+    header(mount, "Which knobs are recoverable?", "leave-one-out recovery R-squared per parameter");
     var TIER = { identifiable: C.green, weak: C.gold, "non-identifiable": C.muted };
     var vkeys = Object.keys(d.variants), cur = vkeys.indexOf("tau") >= 0 ? "tau" : vkeys[0];
     var seg = el("div", "iact-seg"); mount.appendChild(seg);
@@ -481,7 +481,7 @@
 
   /* ---------- I. FEATDIST: constructed-corpus feature distribution explorer ---------- */
   function featdist(mount, d) {
-    header(mount, "Explore the constructed corpus", "six shape features from " + d.n + " annotated spheroid objects; switch feature, log the axis, split by plate");
+    header(mount, "The constructed corpus", "six shape features from " + d.n + " annotated spheroid objects; switch feature, log the axis, split by plate");
     var cur = d.features[0], logMode = true, byPlate = false;
     var isLog = function (c) { return d.logf.indexOf(c) >= 0; };
     var bar = el("div", "iact-controls"); mount.appendChild(bar);
@@ -550,7 +550,7 @@
 
   /* ---------- J. COMPOSE: corpus composition explorer (refacet the frame census) ---------- */
   function compose(mount, d) {
-    header(mount, "Explore the corpus composition", "how the " + d.total.toLocaleString() + " inference frames break down; refacet and switch count vs percent");
+    header(mount, "Corpus composition", "how the " + d.total.toLocaleString() + " inference frames break down; refacet and switch count vs percent");
     var fi = 0, pct = false;
     var bar = el("div", "iact-controls"); mount.appendChild(bar);
     var sel = dropdown(d.facets.map(function (f, i) { return { value: String(i), label: f.label }; }), "0");

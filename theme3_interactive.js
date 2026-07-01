@@ -58,7 +58,7 @@
 
   /* ---------- A. MORPH STUDIO: slider morphs spheroid + redraws curves ---------- */
   function morphStudio(mount, d) {
-    header(mount, "Tune the simulator", "drag a knob, watch the spheroid and its cluster size respond");
+    header(mount, "The simulator's response", "drag a knob, watch the spheroid and its cluster size respond");
     var keys = Object.keys(d.params);
     var cur = keys.indexOf("width") >= 0 ? "width" : keys[0];
     var feat = "total_area";
@@ -140,7 +140,7 @@
 
   /* ---------- B. MORPHOSPACE EXPLORER: clickable 1105-sample cloud ---------- */
   function morphospace(mount, d) {
-    header(mount, "Explore the simulation library", "every point is one of 1,105 synthetic spheroids - click to read its 7 CPM knobs");
+    header(mount, "The simulation library", "every point is one of 1,105 synthetic spheroids - click to read its 7 CPM knobs");
     var feats = d.meta.features, pLabels = d.meta.params;
     var ax1 = (d.meta.default_axes && d.meta.default_axes[0]) || "total_area";
     var ay1 = (d.meta.default_axes && d.meta.default_axes[1]) || "circularity";
@@ -323,7 +323,7 @@
 
   /* ---------- E. QC THRESHOLD EXPLORER (Theme 01) ---------- */
   function qcthreshold(mount, d) {
-    header(mount, "Set your quality bar", "drag the threshold and watch how many of the 12,480 frames survive");
+    header(mount, "The quality bar", "drag the threshold and watch how many of the 12,480 frames survive");
     var M = d.meta.metrics, keys = Object.keys(M), cur = keys[0];
     var bar = el("div", "iact-controls"); mount.appendChild(bar);
     var seg = el("div", "iact-seg"); bar.appendChild(seg);
@@ -370,7 +370,7 @@
     }
     function show(p) {
       var h = "<div class='iact-cardh'>" + p.label + (p.winner ? " <span class='iact-badge' style='background:var(--green);color:var(--teal-1)'>chosen</span>" : "") + "</div>";
-      var kv = "<div class='iact-kv'><div class='iact-kvg'>overall</div><div><span>Dice (pixel)</span><b>" + fmt(p.dice, 3) + "</b></div><div><span>CC-Dice</span><b>" + fmt(p.cc_dice, 3) + "</b></div><div><span>CCC (shape)</span><b>" + fmt(p.ccc, 3) + "</b></div></div>";
+      var kv = "<div class='iact-kv'><div class='iact-kvg'>overall</div><div><span>Dice (pixel)</span><b>" + fmt(p.dice, 3) + "</b></div><div><span>CCC (shape)</span><b>" + fmt(p.ccc, 3) + "</b></div></div>";
       kv += "<div class='iact-kv'><div class='iact-kvg'>per-feature agreement (CCC)</div>";
       d.meta.features.forEach(function (f) { var v = (p.features_ccc || {})[f]; if (v == null) return; kv += "<div><span>" + f.replace(/_/g, " ") + "</span><b style='color:" + (v >= 0.85 ? C.green : v >= 0.5 ? C.gold : C.clay) + "'>" + fmt(v, 3) + "</b></div>"; });
       kv += "</div>";
@@ -388,8 +388,8 @@
 
   /* ---------- G. DISCRIMINABILITY HEATMAP (Theme 04) ---------- */
   function heatmap(mount, d) {
-    header(mount, "Feature to parameter importance", "which shape numbers carry information about which CPM knob");
-    var note = el("div", "iact-readout"); note.innerHTML = "Click a cell to read its importance. Brighter gold = that feature is more informative about that parameter."; mount.appendChild(note);
+    header(mount, "Feature to parameter sensitivity", "surrogate Sobol total-effect weights, per knob");
+    var note = el("div", "iact-readout"); note.innerHTML = "Each cell is the XGBoost-surrogate Sobol total-effect weight (per-knob min-max normalised). Brighter gold = that feature is more sensitive to that knob. Click a cell to read its value."; mount.appendChild(note);
     var ncol = d.params.length;
     var g = el("div"); g.style.display = "grid"; g.style.gridTemplateColumns = "minmax(96px,1.1fr) repeat(" + ncol + ",1fr)"; g.style.gap = "3px"; g.style.marginTop = "0.8rem"; mount.appendChild(g);
     function cell(txt, cls) { var c = el("div", cls); c.textContent = txt; c.style.padding = "0.5rem 0.3rem"; c.style.fontFamily = "'JetBrains Mono',monospace"; c.style.fontSize = "0.62rem"; c.style.textAlign = "center"; return c; }
@@ -411,7 +411,7 @@
 
   /* ---------- H. IDENTIFIABILITY EXPLORER (Theme 04) ---------- */
   function idbars(mount, d) {
-    header(mount, "Which knobs can we recover?", "leave-one-out recovery R-squared per parameter");
+    header(mount, "Which knobs are recoverable?", "leave-one-out recovery R-squared per parameter");
     var TIER = { identifiable: C.green, weak: C.gold, "non-identifiable": C.muted };
     var vkeys = Object.keys(d.variants), cur = vkeys.indexOf("tau") >= 0 ? "tau" : vkeys[0];
     var seg = el("div", "iact-seg"); mount.appendChild(seg);
@@ -479,8 +479,112 @@
     draw();
   }
 
+  /* ---------- I. FEATDIST: constructed-corpus feature distribution explorer ---------- */
+  function featdist(mount, d) {
+    header(mount, "The constructed corpus", "six shape features from " + d.n + " annotated spheroid objects; switch feature, log the axis, split by plate");
+    var cur = d.features[0], logMode = true, byPlate = false;
+    var isLog = function (c) { return d.logf.indexOf(c) >= 0; };
+    var bar = el("div", "iact-controls"); mount.appendChild(bar);
+    var seg = el("div", "iact-seg"); bar.appendChild(seg);
+    var tgl = el("div", "iact-seg"); bar.appendChild(tgl);
+    var logBtn = chip("log axis", false), plateBtn = chip("split by plate (VID3201)", false);
+    tgl.appendChild(logBtn); tgl.appendChild(plateBtn);
+    var canvas = mkCanvas(mount, 300);
+    var read = el("div", "iact-readout"); mount.appendChild(read);
+
+    function featButtons() {
+      seg.innerHTML = "";
+      d.features.forEach(function (c) {
+        var b = chip((d.labels[c] || c).replace(" (px)", ""), c === cur);
+        b.onclick = function () { cur = c; if (!isLog(c)) logMode = false; draw(); };
+        seg.appendChild(b);
+      });
+    }
+    logBtn.onclick = function () { if (!isLog(cur)) return; logMode = !logMode; draw(); };
+    plateBtn.onclick = function () { byPlate = !byPlate; draw(); };
+
+    function vals(hlOnly) {
+      var out = [];
+      for (var i = 0; i < d.objects.length; i++) {
+        var o = d.objects[i], v = o[cur];
+        if (v == null) continue;
+        if (hlOnly !== undefined && (o.plate === d.highlight) !== hlOnly) continue;
+        out.push(v);
+      }
+      return out;
+    }
+    function xf(a) { return (isLog(cur) && logMode) ? a.map(function (v) { return Math.log10(Math.max(1, v)); }) : a.slice(); }
+    function hist(a, lo, hi, nb) { var h = new Array(nb).fill(0), w = (hi - lo) / nb || 1; a.forEach(function (v) { var k = Math.floor((v - lo) / w); if (k < 0) k = 0; if (k >= nb) k = nb - 1; h[k]++; }); return h; }
+    function median(a) { var b = a.slice().sort(function (x, y) { return x - y; }), n = b.length; return n ? (n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2) : 0; }
+
+    function draw() {
+      featButtons();
+      logBtn.className = "iact-chip" + (isLog(cur) && logMode ? " on" : ""); logBtn.style.opacity = isLog(cur) ? "1" : "0.4";
+      plateBtn.className = "iact-chip" + (byPlate ? " on" : "");
+      var x = ctxOf(canvas), W = canvas.clientWidth, H = 300, nb = 28, padL = 48, padR = 16, padT = 16, padB = 44;
+      var all = xf(vals()); var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all); if (hi <= lo) hi = lo + 1;
+      var px = function (v) { return lerp(padL, W - padR, (v - lo) / (hi - lo)); };
+      x.clearRect(0, 0, W, H);
+      x.strokeStyle = C.grid; x.fillStyle = C.muted; x.font = "11px 'DM Sans'"; x.lineWidth = 1;
+      for (var t = 0; t <= 4; t++) { var gx = lerp(padL, W - padR, t / 4); x.beginPath(); x.moveTo(gx, padT); x.lineTo(gx, H - padB); x.stroke(); x.fillStyle = C.muted; x.textAlign = "center"; x.fillText(fmt(lerp(lo, hi, t / 4), 2), gx, H - padB + 16); }
+      var maxc = 0, series = [], bw = (W - padL - padR) / nb;
+      if (byPlate) {
+        var hv = hist(xf(vals(true)), lo, hi, nb), hr = hist(xf(vals(false)), lo, hi, nb);
+        var sv = hv.reduce(function (a, b) { return a + b; }, 0) || 1, sr = hr.reduce(function (a, b) { return a + b; }, 0) || 1;
+        var dv = hv.map(function (c) { return c / sv; }), dr = hr.map(function (c) { return c / sr; });
+        maxc = Math.max(Math.max.apply(null, dv), Math.max.apply(null, dr));
+        series = [{ h: dr, col: "rgba(21,97,109,0.75)" }, { h: dv, col: "rgba(200,160,92,0.55)" }];
+      } else { var h1 = hist(all, lo, hi, nb); maxc = Math.max.apply(null, h1); series = [{ h: h1, col: "rgba(21,97,109,0.9)" }]; }
+      series.forEach(function (s) { for (var k = 0; k < nb; k++) { var bh = (s.h[k] / (maxc || 1)) * (H - padT - padB), bx = padL + k * bw, by = H - padB - bh; x.fillStyle = s.col; x.fillRect(bx + 0.5, by, bw - 1, bh); } });
+      var mx = px(median(all)); x.setLineDash([4, 4]); x.strokeStyle = C.gold; x.lineWidth = 1.3; x.beginPath(); x.moveTo(mx, padT); x.lineTo(mx, H - padB); x.stroke(); x.setLineDash([]);
+      x.fillStyle = C.muted; x.textAlign = "center"; x.fillText((d.labels[cur] || cur) + (isLog(cur) && logMode ? "  (log10)" : ""), (padL + W - padR) / 2, H - 6);
+      x.save(); x.translate(13, (padT + H - padB) / 2); x.rotate(-Math.PI / 2); x.textAlign = "center"; x.fillText(byPlate ? "fraction" : "objects", 0, 0); x.restore();
+      var st = d.stats[cur], sk = (isLog(cur) && logMode) ? st.skew_log : st.skew;
+      var r = "median " + fmt(st.median, 2) + "  [IQR " + fmt(st.q25, 2) + ", " + fmt(st.q75, 2) + "]  &middot;  skew " + fmt(sk, 2);
+      if (byPlate) r += "  &middot;  <span style='color:" + C.gold + "'>&#9632; VID3201 (" + d.highlight_note + ")</span> vs <span style='color:" + C.sky + "'>&#9632; other plates</span>";
+      else if (isLog(cur) && logMode) r += "  &middot;  log fixes the size-feature skew";
+      read.innerHTML = r; canvas._draw = draw;
+    }
+    draw();
+  }
+
+  /* ---------- J. COMPOSE: corpus composition explorer (refacet the frame census) ---------- */
+  function compose(mount, d) {
+    header(mount, "Corpus composition", "how the " + d.total.toLocaleString() + " inference frames break down; refacet and switch count vs percent");
+    var fi = 0, pct = false;
+    var bar = el("div", "iact-controls"); mount.appendChild(bar);
+    var sel = dropdown(d.facets.map(function (f, i) { return { value: String(i), label: f.label }; }), "0");
+    var flab = el("label", "iact-field"); flab.appendChild(el("span", "iact-flab", "break down by")); flab.appendChild(sel); bar.appendChild(flab);
+    var seg = el("div", "iact-seg"); bar.appendChild(seg);
+    var cntBtn = chip("count", true), pctBtn = chip("percent", false); seg.appendChild(cntBtn); seg.appendChild(pctBtn);
+    var canvas = mkCanvas(mount, 340); var read = el("div", "iact-readout"); mount.appendChild(read);
+    sel.onchange = function () { fi = +sel.value; draw(); };
+    cntBtn.onclick = function () { pct = false; draw(); };
+    pctBtn.onclick = function () { pct = true; draw(); };
+    function draw() {
+      cntBtn.className = "iact-chip" + (pct ? "" : " on"); pctBtn.className = "iact-chip" + (pct ? " on" : "");
+      var f = d.facets[fi], cats = f.cats, x = ctxOf(canvas), W = canvas.clientWidth, H = 340;
+      var rowH = Math.max(18, Math.min(34, (H - 24) / cats.length)), padL = 150, padR = 78;
+      x.clearRect(0, 0, W, H);
+      var total = cats.reduce(function (a, c) { return a + c.count; }, 0);
+      var maxv = Math.max.apply(null, cats.map(function (c) { return c.count; }));
+      cats.forEach(function (c, i) {
+        var y = 12 + i * rowH, val = pct ? (c.count / total * 100) : c.count, vmax = pct ? (maxv / total * 100) : maxv;
+        var bw = (W - padL - padR) * (val / (vmax || 1));
+        var isNone = c.name === "(none)" || c.name === "other";
+        x.fillStyle = isNone ? "rgba(168,181,184,0.5)" : C.gold; x.fillRect(padL, y + 2, Math.max(1, bw), rowH - 6);
+        x.fillStyle = C.cream; x.font = "11px 'DM Sans'"; x.textAlign = "right"; x.fillText(c.name, padL - 8, y + rowH / 2 + 3);
+        x.textAlign = "left"; x.fillStyle = C.goldL; x.fillText(pct ? val.toFixed(1) + "%" : Math.round(val).toLocaleString(), padL + bw + 6, y + rowH / 2 + 3);
+      });
+      read.innerHTML = "Largest share: <b style='color:" + C.goldL + "'>" + cats[0].name + "</b> = " + (pct ? (cats[0].count / total * 100).toFixed(1) + "%" : cats[0].count.toLocaleString() + " frames") + " of " + total.toLocaleString() + " (the CXCR4-antagonist and control imbalance drives the plate-stratified split).";
+      canvas._draw = draw;
+    }
+    draw();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
-    qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest };
+    qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
+    featdist: featdist, compose: compose };
 
   var HELP = {
     morph: "Pick a knob with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
@@ -489,9 +593,11 @@
     surrogate: "Two tabs. 'How well can it predict' shows the surrogate's cross-validated R-squared per shape feature (click a bar for its 5 folds). 'What drives each feature' shows Sobol importances per knob, with a feature dropdown and a direct / total / interaction-gap toggle.",
     qcthreshold: "Pick a quality metric with the buttons, then drag the threshold. Gold dots pass your bar and red dots fail, and the headline shows how many of the 12,480 frames pass.",
     modelscatter: "Each dot is a segmentation model, placed by pixel overlap (Dice) against shape-number agreement (CCC). Click a model to see its overall metrics, per-feature reliability and training configuration.",
-    heatmap: "Each cell shows how informative a shape feature (row) is about a CPM knob (column); brighter gold means more informative. Click a cell to read its exact value.",
-    idbars: "Bars are the per-parameter recovery R-squared under the selected matcher (toggle tau, end-state or Wasserstein). Green, gold and grey mean identifiable, weakly identifiable and non-identifiable; the dashed line is the 0.75 identifiable bar. Click a bar for Pearson, sample count and error.",
-    forest: "Each row is a drug's inferred cell-cell adhesion shift with its interval; colour shows significance and the dashed line is no change (zero). Click a drug to see the individual wells behind its estimate.",
+    heatmap: "Each cell is the XGBoost-surrogate Sobol total-effect weight: how much a shape feature (row) responds to a CPM knob (column), min-max normalised per knob. Brighter gold means more sensitive. Click a cell to read its value. All seven knobs are shown: width and volume elasticity drive size, while contact J and cell-medium adhesion drive shape.",
+    idbars: "Bars are the per-parameter recovery R-squared under the selected matcher (toggle tau primary, end-state secondary, or Wasserstein third). Green, gold and grey mean identifiable, weakly identifiable and non-identifiable; the dashed line is the 0.70 identifiable bar. Click a bar for Pearson, sample count and error.",
+    forest: "Each row is a drug's inferred cell-cell adhesion shift (median) with its q25 to q75 spread; the dashed line is no change (zero). Colour shows significance, a heuristic where the spread excludes zero (not a formal statistical test). Click a drug to see the individual wells behind its estimate.",
+    featdist: "Pick one of the six shape features with the buttons to see its distribution across the 557 annotated spheroid objects, with the gold dashed line at the median. 'log axis' (for the size features) shows how a log scale fixes their heavy skew. 'split by plate' overlays the held-out VID3201 plate in gold against the other plates, exposing the batch effect that motivates plate-stratified splitting.",
+    compose: "Use the dropdown to break the 12,485 inference frames down by drug-mechanism class, patient, stimulation or condition, and toggle count versus percent. It shows the corpus is not balanced: CXCR4-antagonist wells and the longitudinal patient 706 dominate, and drug frames outnumber controls roughly seven to one, which is why the training split is stratified by plate rather than shuffled.",
   };
   function addHelp(m, widget) {
     var head = m.querySelector(".iact-head"); if (!head || !HELP[widget]) return;
