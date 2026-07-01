@@ -1086,3 +1086,7 @@ footer {
 .sec-h h2,main > section h2,.intro h2{text-transform:none}
 .about-l h2,.feat-head h2,.contact h2,.work-body h3,.skills h3,.rq .rq-name,
 .feat-chart-block .chh .ttl{text-transform:none}
+
+/* AA contrast: the muted-gold labels sit on the light 'featured' section; darken them */
+.featured .eyebrow,.featured .rq-num,.featured .rq-metric,.featured .feat-head .meta{color:var(--gold-deep)}
+.featured .rq:hover .rq-num{color:var(--gold-2)}
