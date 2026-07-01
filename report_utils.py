@@ -130,8 +130,9 @@ def _prose(b):
     return f'<section class="card">{inner}</section>'
 
 def _code(b):
-    """A provenance code card: optional input->output flow line, a source caption
-    (file:line), the code itself, and an optional note. `code` is shown verbatim."""
+    """A provenance code card. The title, the input->output flow and the note stay
+    visible so the narrative reads on its own; the actual code is COLLAPSED by default
+    inside a <details> and revealed on click. No JS needed."""
     import html as _html
     cap = f'<div class="card-h"><span class="ttl">{b["title"]}</span>' \
           + (f'<span class="sub">{b["sub"]}</span>' if b.get("sub") else "") + "</div>" if b.get("title") else ""
@@ -141,12 +142,13 @@ def _code(b):
             f'<span class="prov-step">{inline(s)}</span>'
             + ('<span class="prov-arrow">&rarr;</span>' if i < len(b["io"]) - 1 else "")
             for i, s in enumerate(b["io"])) + "</div>"
-    src = f'<div class="code-src">{inline(b["src"])}</div>' if b.get("src") else ""
+    src = (f'<span class="code-src-inline">{inline(b["src"])}</span>') if b.get("src") else ""
     body = _html.escape(b["code"])
-    note = (f'<p style="margin:.9rem 1.7rem 0;font-size:.94rem;line-height:1.6;'
+    note = (f'<p style="margin:.9rem 0 0;font-size:.94rem;line-height:1.6;'
             f'color:var(--paper);opacity:.9">{inline(b["note"])}</p>') if b.get("note") else ""
-    return (f'<section class="card">{cap}<div style="padding:0 1.7rem 1.4rem">{flow}{src}'
-            f'<pre class="codeblock"><code>{body}</code></pre>{note}</div></section>')
+    details = (f'<details class="codefold"><summary class="code-summary">show the code{src}</summary>'
+               f'<pre class="codeblock"><code>{body}</code></pre></details>')
+    return (f'<section class="card">{cap}<div style="padding:0 1.7rem 1.4rem">{flow}{details}{note}</div></section>')
 
 def _table(b):
     head = "".join(f"<th>{inline(c)}</th>" for c in b["head"])
@@ -378,9 +380,9 @@ def render_theme_markdown(*, title, blocks, out_path=None):
                 L += [f"### {_strip(b['title'])}", ""]
             if b.get("io"):
                 L += [" -> ".join(_strip(s) for s in b["io"]), ""]
-            if b.get("src"):
-                L += [f"*{_strip(b['src'])}*", ""]
-            L += ["```python", b["code"], "```", ""]
+            src = f" ({_strip(b['src'])})" if b.get("src") else ""
+            L += ["<details>", f"<summary>show the code{src}</summary>", "",
+                  "```python", b["code"], "```", "", "</details>", ""]
             if b.get("note"):
                 L += [_strip(b["note"]), ""]
         elif t == "tools":

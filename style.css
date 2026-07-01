@@ -208,3 +208,14 @@ footer a{color:inherit;border-bottom:1px solid currentColor;padding-bottom:1px}
 .code-src{font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.03em;color:var(--gold-2);margin:0 0 0.5rem;font-weight:600}
 pre.codeblock{margin:0;padding:1.1rem 1.3rem;background:#04252b;border:1px solid rgba(199,160,92,0.28);border-left:3px solid var(--gold);border-radius:4px;overflow-x:auto;box-shadow:inset 0 0 40px rgba(0,0,0,0.25)}
 pre.codeblock code{font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.65;color:#d6e6e2;white-space:pre;tab-size:4}
+
+/* collapsible code cards: code hidden by default, story stays visible */
+details.codefold{margin:.1rem 0 0}
+details.codefold>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:.55rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:var(--gold-3);padding:.5rem .85rem;border:1px solid rgba(199,160,92,.4);border-radius:3px;background:rgba(199,160,92,.08);transition:all .18s}
+details.codefold>summary::-webkit-details-marker{display:none}
+details.codefold>summary::before{content:"\25B8";color:var(--gold);font-size:.8rem;transition:transform .18s}
+details.codefold[open]>summary::before{transform:rotate(90deg)}
+details.codefold>summary:hover{background:rgba(199,160,92,.18);color:var(--gold);border-color:var(--gold)}
+details.codefold[open]>summary{margin-bottom:.75rem}
+.code-src-inline{color:var(--gold-2);text-transform:none;letter-spacing:.02em;font-size:.68rem}
+details.codefold pre.codeblock{margin:0}

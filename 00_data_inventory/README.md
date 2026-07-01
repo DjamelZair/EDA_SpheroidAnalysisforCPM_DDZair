@@ -21,7 +21,8 @@ The lab delivered two archives (Vivek Muniraj, 2025) totalling **312 GB** under 
 
 2 delivered archives -> extracted IncuCyte trees -> 99,055 frames
 
-*$ du -sh data/raw  |  $ find data/raw -iname '*.tif' | wc -l*
+<details>
+<summary>show the code ($ du -sh data/raw  |  $ find data/raw -iname '*.tif' | wc -l)</summary>
 
 ```python
 data/raw/                                              # 312 GB, delivered
@@ -39,13 +40,16 @@ filename encodes everything:  VID1797_E4_1_00d03h00m.tif
                                           field  (00d03h00m = 3 h elapsed)
 ```
 
+</details>
+
 The filename is the primary key for every downstream join: VID (video/experiment), Well (plate position, one spheroid), field and elapsed timepoint.
 
 ### Delivered metadata workbooks
 
 5 delivered .xlsx -> one sheet per experiment -> VID + Well + Volgnummer
 
-*data/metadata/*.xlsx  (+ metadata_legend.xlsx data dictionary)*
+<details>
+<summary>show the code (data/metadata/*.xlsx  (+ metadata_legend.xlsx data dictionary))</summary>
 
 ```python
 Btk inhibitors - Pooled AI metadata.xlsx      (8 experiment sheets)
@@ -62,7 +66,17 @@ legend:   VID        = Video ID (one IncuCyte experiment)
           Volgnummer = number of the patient's blood draw  <-- patient identity
 ```
 
+</details>
+
 Volgnummer is the canonical patient id; VID is the experiment id. They are kept apart on purpose (one patient can span several VIDs, see the match below).
+
+### One real metadata block (BTK inhibitor screen, patient 273)
+
+| Experiment | VID | Well | Volgnummer | Sex | IGHV | Stimulation | Treatment | Target |
+|---|---|---|---|---|---|---|---|---|
+| 20211025 BTKi prol. | 1169 | A1 | 273 | Male | Mutated (VH3) | unstim | untreated | - |
+| 20211025 BTKi prol. | 1169 | A2 | 273 | Male | Mutated (VH3) | unstim | untreated | - |
+| 20211025 BTKi prol. | 1169 | A3 | 273 | Male | Mutated (VH3) | unstim | ibrutinib | BTK |
 
 ## B. The match: images to patients and conditions  (filename decode, then a keyed join)
 
@@ -72,7 +86,8 @@ The images arrive as bare filenames; the biology lives in the workbooks. Matchin
 
 image stem -> regex -> VID / Well / field / timepoint
 
-*shared/io.py:66, 97*
+<details>
+<summary>show the code (shared/io.py:66, 97)</summary>
 
 ```python
 _VID_PATTERN = re.compile(r"^(VID\d+)_([A-Z]\d+)_(\d+)_(\d+d\d+h\d+m)(.*)$")
@@ -85,13 +100,16 @@ def parse_vid_stem(stem):                 # 'VID1797_E4_1_00d03h00m'
             "timepoint": m.group(4)}      # 00d03h00m  -> 180 min
 ```
 
+</details>
+
 Older frames use a BF_ / Brightfield_ convention without a VID; those fall back to an (experiment, Well) key instead.
 
 ### Stage 2: join filename fields to patient + condition
 
 frame_qc.csv -> merge on (VID, Well) -> patient + treatment per frame
 
-*imaging_eda/patient_map.py:58, 68, 105*
+<details>
+<summary>show the code (imaging_eda/patient_map.py:58, 68, 105)</summary>
 
 ```python
 # Volgnummer IS the patient; build a (VID, Well) -> patient lookup
@@ -104,13 +122,16 @@ j  = qc.merge(meta, on=["VID", "Well"], how="left")     # <-- the join
 j.to_csv("frame_patient_treatment.csv")
 ```
 
+</details>
+
 Excel contamination is handled here: VIDs arrive as 1797.0 and wells as A01, normalised to VID1797 / A1 before the join.
 
 ### The patient roster: 5 patients, 7 series
 
 6 VID experiments -> hardcoded roster -> 5 unique patients
 
-*rq3_inference/results_chapter/run_cross_patient_inference.py:46*
+<details>
+<summary>show the code (rq3_inference/results_chapter/run_cross_patient_inference.py:46)</summary>
 
 ```python
 PATIENTS = [                       # (VID, patient_id)
@@ -124,7 +145,21 @@ PATIENTS = [                       # (VID, patient_id)
     #  5 unique patients  ->  7 patient-timepoint series
 ```
 
+</details>
+
 This is why the cohort is 5 patients but 7 series: patient 706 was sampled longitudinally across three separate IncuCyte runs. VID is never the patient.
+
+### The roster as data: 7 VID series resolve to 5 patients
+
+| VID series | Patient | In drug panel? | Note |
+|---|---|---|---|
+| VID1087 | 2089 | yes | drug screen |
+| VID1797 | 267 | no | controls / stimulation only |
+| VID1873 | 706 (t1) | yes | longitudinal, timepoint 1 |
+| VID2017 | 706 (t2) | yes | longitudinal, timepoint 2 |
+| VID2319 | 706 (t3) | yes | longitudinal, timepoint 3 |
+| VID1964 | EE5.1 | yes | refractory patient |
+| VID2359 | 708 | yes | drug screen |
 
 ## C. The derived working tables  (input to construction step to output)
 
@@ -134,7 +169,8 @@ With frames matched to biology, the working tables are computed. Each one below 
 
 binary mask -> skimage regionprops -> per_image_features.csv (405 rows)
 
-*rq3_inference/extract_features.py:128*
+<details>
+<summary>show the code (rq3_inference/extract_features.py:128)</summary>
 
 ```python
 from skimage.measure import regionprops
@@ -150,13 +186,16 @@ def compute_spheroid_features(mask):
             "circularity":  4*math.pi*area / perim**2}
 ```
 
+</details>
+
 These six numbers are the observables every later theme consumes. Output header: image_id, model, total_area, equivalent_diameter, eccentricity, solidity, perimeter, circularity.
 
 ### Frame quality table (contrast, focus, fragmentation)
 
 mask + raw TIFF -> per-frame metrics -> frame_qc.csv (12,485 rows)
 
-*imaging_eda/build_tables.py:174, 195*
+<details>
+<summary>show the code (imaging_eda/build_tables.py:174, 195)</summary>
 
 ```python
 # intensity / contrast / focus, per frame
@@ -171,13 +210,24 @@ frag_index = 1.0 - max(areas) / sum(areas)            # 0 = one blob
 res.to_csv('imaging_eda/cache/frame_qc.csv')          # 12,485 frames
 ```
 
+</details>
+
 frame_qc.csv is the spine of Theme 01 and the coverage analysis: 12,485 rows, 40 columns of QC + join keys.
+
+### One well over time, as it lands in frame_qc.csv (VID1087 A9, STAT6 inhibitor)
+
+| well | drug | class | hours | michelson | focus (lap) | n comp. | area px | frag index |
+|---|---|---|---|---|---|---|---|---|
+| A9 | AS1517499 | STAT6 i | 0 | 0.841 | 0.032 | 3 | 134,874 | 0.021 |
+| A9 | AS1517499 | STAT6 i | 6 | 0.815 | 0.042 | 6 | 148,026 | 0.189 |
+| A9 | AS1517499 | STAT6 i | 12 | 0.794 | 0.039 | 4 | 143,256 | 0.213 |
 
 ### Train / val / test split (source-stratified, seed 42)
 
 51 spheroids x 6 frames -> stratified shuffle -> train/val/test .txt
 
-*rq1_segmentation/scripts/dataset/build_training_dataset.py:344*
+<details>
+<summary>show the code (rq1_segmentation/scripts/dataset/build_training_dataset.py:344)</summary>
 
 ```python
 rng = np.random.RandomState(42)
@@ -191,6 +241,8 @@ for split in ["train", "val", "test"]:
 #  wc -l splits/*.txt  ->  train 216,  val 45,  test 45
 #  original spheroids  ->  37 / 7 / 7   (six frames each)
 ```
+
+</details>
 
 The genuinely plate-stratified 5-fold CV split (patient/plate held out) is a separate generator, train_pseudolabel.make_folds, used for the pseudo-label model.
 
@@ -228,31 +280,7 @@ The genuinely plate-stratified 5-fold CV split (patient/plate held out) is a sep
 
 **What it shows.** The offline augmented training set (the 51 originals expanded to 306 pairs, shared by every model) spans 100% of the real contrast range and 91% of the focus (Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is the axis it covers least.
 
-**What it motivated (Offline set, shared by all models).** This figure is about the offline augmented dataset that all candidates train on. It is a separate thing from the 'heavy augmentation' U-Net variant, which is a training time policy, shown in code below.
-
-### What 'heavy augmentation' actually means
-
-shared offline set -> U-Net online policy -> standard vs heavy
-
-*run_experiments.py:70, 84*
-
-```python
-# EVERY model trains on the same offline-augmented set (51 -> 306 pairs).
-# 'Heavy augmentation' is one U-Net variant's stronger ON-THE-FLY policy,
-# applied per batch during training, NOT a different dataset.
-
-def aug_standard(res):                    def aug_heavy(res):
-    Resize, HFlip, VFlip, Rotate90            Resize, HFlip, VFlip, Rotate90
-    ShiftScaleRotate(0.05, 0.1, 15)          ShiftScaleRotate(0.10, 0.2, 30)   # stronger
-    ElasticTransform(alpha=30)               ElasticTransform(alpha=50)        # stronger
-    RandomBrightnessContrast(0.15)           RandomBrightnessContrast(0.30)    # stronger
-    GaussNoise(p=0.2)                        GaussNoise(10-50, p=0.4)          # stronger
-                                             GridDistortion(0.3)              # + extra
-                                             GaussianBlur(3-7)                # + extra
-                                             CoarseDropout(8 x 32px)          # + extra
-```
-
-So 'U-Net (heavy aug.)' is the resnet34 U-Net trained with aug_heavy: three transforms the standard policy does not use (grid distortion, blur, coarse dropout) plus roughly double the strength on the rest. That heavier regularisation, not a different training set, is what the name refers to.
+**What it motivated (Offline set, shared by all models).** This figure is about the offline augmented dataset that all candidates share. It is a separate thing from the 'heavy augmentation' U-Net variant, which is a training-time policy detailed in Theme 02, where that U-Net wins.
 
 ## Complete analysis index  (every thesis analysis in this theme)
 
@@ -264,4 +292,4 @@ So 'U-Net (heavy aug.)' is the resnet34 U-Net trained with aug_heavy: three tran
 | Data augmentation | 11 geometric + photometric ops, 51 originals to 255 augmented pairs | app:aug / tab:aug_ops | 5 augmentations per original |
 | Patient mapping & split | Train/val/test 216/45/45 images (37/9/8 spheroids), plate-level stratification | app:patient_mapping / tab:patient_mapping | P1043 noted in train and test |
 
-**Sources / tools:** shared/io.py, imaging_eda/patient_map.py, imaging_eda/build_tables.py, rq3_inference/extract_features.py, build_training_dataset.py, unet/run_experiments.py, Complete_EDA.ipynb
+**Sources / tools:** shared/io.py, imaging_eda/patient_map.py, imaging_eda/build_tables.py, rq3_inference/extract_features.py, build_training_dataset.py, data/metadata/*.xlsx, Complete EDA Msc Thesis.ipynb

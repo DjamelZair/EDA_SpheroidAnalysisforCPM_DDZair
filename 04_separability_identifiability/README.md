@@ -2,7 +2,7 @@
 
 **Thesis target:** Theme 04 / Separability & identifiability / Appendix D to H.
 
-> None of the seven parameters reach the identifiable band. Three are weakly identifiable and the other four are non-identifiable, and the analysis says so honestly.
+> The parameter interactions and the thin real-world coverage seen in Theme 03 predict that some knobs will be unreadable; leave-one-out inversion quantifies exactly which. None of the seven reach the identifiable band: three are weakly identifiable, four are non-identifiable, and the analysis says so honestly.
 
 Leave-one-out inversion on the 1,105-run library measures how well each CPM parameter is recovered from morphology (R squared of recovered vs true). Cell-medium width, cell-medium adhesion and cell-cell adhesion are weakly identifiable; the other four are non-identifiable. These are the verified numbers from the recovery benchmark, not the optimistic error metric used elsewhere.
 

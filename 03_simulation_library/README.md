@@ -2,9 +2,9 @@
 
 **Thesis target:** Theme 03 / Synthetic CPM library / Appendix C & F.
 
-> Seven simulation knobs, swept one at a time and jointly, build the synthetic library the real spheroids are matched against.
+> With a segmenter that preserves the six shape numbers (Theme 02), those same features can now be measured on simulated spheroids, so real and synthetic morphology become directly comparable. Seven simulation knobs, swept one at a time and jointly, build the library the real spheroids are matched against.
 
-A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion, contact range, neighbour order, volume elasticity, target volume, and motility) is sampled to build a reference library of morphology trajectories. This theme shows how each knob changes the simulated cluster, and accounts for which runs were usable.
+The pipeline only works because the identical six features are measured on real and synthetic spheroids. A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion, contact range, neighbour order, volume elasticity, target volume, and motility) is sampled to build a reference library of morphology trajectories. This theme shows how each knob changes the simulated cluster, and accounts for which runs were usable.
 
 | Metric | Value | Note |
 |---|---|---|

@@ -124,6 +124,18 @@ THEME0 = [
               "          Volgnummer = number of the patient's blood draw  <-- patient identity",
          note="Volgnummer is the canonical patient id; VID is the experiment id. They are kept apart "
               "on purpose (one patient can span several VIDs, see the match below)."),
+    dict(type="table",
+         title="One real metadata block (BTK inhibitor screen, patient 273)",
+         head=["Experiment", "VID", "Well", "Volgnummer", "Sex", "IGHV", "Stimulation", "Treatment", "Target"],
+         rows=[
+             ["20211025 BTKi prol.", "1169", "A1", "273", "Male", "Mutated (VH3)", "unstim", "untreated", "-"],
+             ["20211025 BTKi prol.", "1169", "A2", "273", "Male", "Mutated (VH3)", "unstim", "untreated", "-"],
+             ["20211025 BTKi prol.", "1169", "A3", "273", "Male", "Mutated (VH3)", "unstim", "ibrutinib", "BTK"],
+         ],
+         note="Three wells of one patient (Volgnummer 273): A1/A2 untreated, A3 ibrutinib. The plate "
+              "layout itself encodes the drug screen. The full workbook carries 100+ columns (flow "
+              "cytometry, cytogenetics del13q14/TP53, clinical labs); the site uses only the join keys "
+              "and the shape-relevant fields."),
 
     # ---- B. THE MATCH ----
     dict(type="section", title='B. The <span class="it">match</span>: images to patients and conditions',
@@ -173,6 +185,20 @@ THEME0 = [
               "    #  5 unique patients  ->  7 patient-timepoint series",
          note="This is why the cohort is 5 patients but 7 series: patient 706 was sampled "
               "longitudinally across three separate IncuCyte runs. VID is never the patient."),
+    dict(type="table",
+         title="The roster as data: 7 VID series resolve to 5 patients",
+         head=["VID series", "Patient", "In drug panel?", "Note"],
+         rows=[
+             ["VID1087", "2089", "yes", "drug screen"],
+             ["VID1797", "267", "no", "controls / stimulation only"],
+             ["VID1873", "706 (t1)", "yes", "longitudinal, timepoint 1"],
+             ["VID2017", "706 (t2)", "yes", "longitudinal, timepoint 2"],
+             ["VID2319", "706 (t3)", "yes", "longitudinal, timepoint 3"],
+             ["VID1964", "EE5.1", "yes", "refractory patient"],
+             ["VID2359", "708", "yes", "drug screen"],
+         ],
+         note="Five unique patients (2089, 267, 706, 708, EE5.1); patient 706 appears three times. "
+              "The drug panel covers four of the five (267 has no drug wells)."),
 
     # ---- C. DERIVED WORKING TABLES ----
     dict(type="section", title='C. The derived working <span class="it">tables</span>',
@@ -211,6 +237,17 @@ THEME0 = [
               "res.to_csv('imaging_eda/cache/frame_qc.csv')          # 12,485 frames",
          note="frame_qc.csv is the spine of Theme 01 and the coverage analysis: 12,485 rows, "
               "40 columns of QC + join keys."),
+    dict(type="table",
+         title="One well over time, as it lands in frame_qc.csv (VID1087 A9, STAT6 inhibitor)",
+         head=["well", "drug", "class", "hours", "michelson", "focus (lap)", "n comp.", "area px", "frag index"],
+         rows=[
+             ["A9", "AS1517499", "STAT6 i", "0", "0.841", "0.032", "3", "134,874", "0.021"],
+             ["A9", "AS1517499", "STAT6 i", "6", "0.815", "0.042", "6", "148,026", "0.189"],
+             ["A9", "AS1517499", "STAT6 i", "12", "0.794", "0.039", "4", "143,256", "0.213"],
+         ],
+         note="A real slice of the derived spine: one drug well sampled over time, each row a frame "
+              "with its contrast, focus and fragmentation computed from the mask and the raw TIFF. "
+              "The fragmentation index climbs as the cluster starts to break apart."),
     dict(type="code",
          title="Train / val / test split (source-stratified, seed 42)", sub="build_training_dataset.py",
          io=["51 spheroids x 6 frames", "stratified shuffle", "train/val/test .txt"],
@@ -263,6 +300,15 @@ THEME0 = [
                  "and VID3201 sits apart from the other plates, which is why the split is stratified "
                  "by plate rather than shuffled.",
          informs_tag="Beyond the thesis: interactive corpus"),
+    dict(type="interactive", widget="compose", json="theme0_composition.json",
+         intro="The 12,485 inference frames are not a balanced set. Break them down by drug-mechanism "
+               "class, patient, stimulation or condition, and switch count versus percent. The "
+               "imbalance is the point: CXCR4-antagonist wells (6,239) and the longitudinal patient 706 "
+               "dominate, and drug frames outnumber controls roughly seven to one.",
+         informs="This imbalance is exactly why the training split is stratified by plate rather than "
+                 "shuffled, and why the drug-panel results in Theme 05 are read per class rather than "
+                 "pooled naively.",
+         informs_tag="Beyond the thesis: interactive composition"),
 
     # ---- augmentation: shared offline set + the U-Net's heavier online policy ----
     dict(type="section", title='Augmentation: a <span class="it">shared</span> set, plus a heavier U-Net policy',
@@ -274,34 +320,14 @@ THEME0 = [
                "every model) spans 100% of the real contrast range and 91% of the focus "
                "(Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is "
                "the axis it covers least.",
-         informs="This figure is about the offline augmented dataset that all candidates train on. It "
-                 "is a separate thing from the 'heavy augmentation' U-Net variant, which is a training "
-                 "time policy, shown in code below.",
+         informs="This figure is about the offline augmented dataset that all candidates share. It is a "
+                 "separate thing from the 'heavy augmentation' U-Net variant, which is a training-time "
+                 "policy detailed in Theme 02, where that U-Net wins.",
          informs_tag="Offline set, shared by all models"),
-    dict(type="code",
-         title="What 'heavy augmentation' actually means", sub="rq1_segmentation/scripts/unet/run_experiments.py",
-         io=["shared offline set", "U-Net online policy", "standard vs heavy"],
-         src="run_experiments.py:70, 84",
-         code="# EVERY model trains on the same offline-augmented set (51 -> 306 pairs).\n"
-              "# 'Heavy augmentation' is one U-Net variant's stronger ON-THE-FLY policy,\n"
-              "# applied per batch during training, NOT a different dataset.\n\n"
-              "def aug_standard(res):                    def aug_heavy(res):\n"
-              "    Resize, HFlip, VFlip, Rotate90            Resize, HFlip, VFlip, Rotate90\n"
-              "    ShiftScaleRotate(0.05, 0.1, 15)          ShiftScaleRotate(0.10, 0.2, 30)   # stronger\n"
-              "    ElasticTransform(alpha=30)               ElasticTransform(alpha=50)        # stronger\n"
-              "    RandomBrightnessContrast(0.15)           RandomBrightnessContrast(0.30)    # stronger\n"
-              "    GaussNoise(p=0.2)                        GaussNoise(10-50, p=0.4)          # stronger\n"
-              "                                             GridDistortion(0.3)              # + extra\n"
-              "                                             GaussianBlur(3-7)                # + extra\n"
-              "                                             CoarseDropout(8 x 32px)          # + extra",
-         note="So 'U-Net (heavy aug.)' is the resnet34 U-Net trained with aug_heavy: three transforms "
-              "the standard policy does not use (grid distortion, blur, coarse dropout) plus roughly "
-              "double the strength on the rest. That heavier regularisation, not a different training "
-              "set, is what the name refers to."),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 00', chips=[
         dict(t="shared/io.py", gold=True), dict(t="imaging_eda/patient_map.py"),
         dict(t="imaging_eda/build_tables.py"), dict(t="rq3_inference/extract_features.py"),
-        dict(t="build_training_dataset.py"), dict(t="unet/run_experiments.py"), dict(t="Complete_EDA.ipynb")]),
+        dict(t="build_training_dataset.py"), dict(t="data/metadata/*.xlsx"), dict(t="Complete EDA Msc Thesis.ipynb")]),
     dict(type="bigcta", title='Next: what the <span class="it">signal</span> looks like.',
          links=[dict(t="Theme 01 &middot; Image & intensity EDA &rarr;", href="01_image_intensity_eda/index.html", primary=True),
                 dict(t="Back to index", href="index.html")]),
@@ -551,7 +577,7 @@ THEME2 = [
         dict(lbl="Reliability bar", num="&ge; 0.85", desc="Concordance threshold from the radiomics standard (IBSI).", numeric=True),
     ]),
 
-    dict(type="figure", img="fig/overlay_dark.png",
+    dict(type="figure", img="fig/overlay_dark.png", native=True,
          ttl="What the chosen segmenter produces", sub="real frames, three drug conditions, three days",
          alt="real microscopy with the AI segmentation outline in gold",
          shows="The gold outline is the U-Net's call on frames it never saw in training; the boxes "
@@ -577,8 +603,28 @@ THEME2 = [
               "pseudo-label models, so it is kept off the headline ranking above. Where it was "
               "measured, nnU-Net leads (0.30), and even that merges most fragments. Source: "
               "all_results.json (mean_cc_dice_all)."),
+    dict(type="code",
+         title="What 'U-Net (heavy aug.)' actually means", sub="the winner's training-time policy",
+         io=["shared offline set", "U-Net online policy", "standard vs heavy"],
+         src="rq1_segmentation/scripts/unet/run_experiments.py:70, 84",
+         code="# EVERY model trains on the same offline-augmented set (51 -> 306 pairs).\n"
+              "# 'Heavy augmentation' is the winning U-Net's stronger ON-THE-FLY policy,\n"
+              "# applied per batch during training, NOT a different dataset.\n\n"
+              "def aug_standard(res):                    def aug_heavy(res):\n"
+              "    Resize, HFlip, VFlip, Rotate90            Resize, HFlip, VFlip, Rotate90\n"
+              "    ShiftScaleRotate(0.05, 0.1, 15)          ShiftScaleRotate(0.10, 0.2, 30)   # stronger\n"
+              "    ElasticTransform(alpha=30)               ElasticTransform(alpha=50)        # stronger\n"
+              "    RandomBrightnessContrast(0.15)           RandomBrightnessContrast(0.30)    # stronger\n"
+              "    GaussNoise(p=0.2)                        GaussNoise(10-50, p=0.4)          # stronger\n"
+              "                                             GridDistortion(0.3)              # + extra\n"
+              "                                             GaussianBlur(3-7)                # + extra\n"
+              "                                             CoarseDropout(8 x 32px)          # + extra",
+         note="So the leaderboard winner is the resnet34 U-Net trained with aug_heavy: three transforms "
+              "the standard policy does not use (grid distortion, blur, coarse dropout) plus roughly "
+              "double the strength on the rest. That heavier regularisation, not a different training "
+              "set, is what the name refers to (the shared offline set is shown in Theme 00)."),
 
-    dict(type="figure", img=CLL2 + "segmentation/icc_ccc_heatmap.png",
+    dict(type="figure", img=CLL2 + "segmentation/icc_ccc_heatmap.png", native=True,
          ttl="Per-feature reliability scoreboard", sub="8 models x 6 shape numbers",
          alt="heatmap of agreement scores across models and features",
          shows="Each cell is the agreement between AI-derived and human-derived value of one shape "
@@ -602,7 +648,7 @@ THEME2 = [
          informs_tag="Negative result: cleanup is cosmetic for feature preservation"),
 
     dict(type="section", title='Hardest <span class="it">case</span>', right="a fully fragmented spheroid"),
-    dict(type="figure", img="fig/hardest_dark.png",
+    dict(type="figure", img="fig/hardest_dark.png", native=True,
          ttl="When the spheroid disintegrates", sub="VID3201 F3, trametinib 50 uM, full time-lapse",
          alt="a heavily fragmented spheroid time-lapse, day 0 to day 4",
          shows="Under high-dose drug the spheroid breaks into many pieces. Pixel overlap drops for "
@@ -663,13 +709,16 @@ THEME3 = [
          meta=["Theme 03", "Synthetic CPM library", "Appendix C & F"],
          title='The <span class="gold">simulator</span>, <span class="it">characterised</span>.',
          caption="Cellular Potts Model spheroid, synthetic lattice",
-         lede="Seven simulation knobs, swept one at a time and jointly, build the synthetic "
+         lede="With a segmenter that preserves the six shape numbers (Theme 02), those same features "
+              "can now be measured on simulated spheroids, so real and synthetic morphology become "
+              "directly comparable. Seven simulation knobs, swept one at a time and jointly, build the "
               "library the real spheroids are matched against.",
-         summary="A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion, "
-                 "contact range, neighbour order, volume elasticity, target volume, and motility) is "
-                 "sampled to build a reference library of morphology trajectories. This theme shows "
-                 "how each knob changes the simulated cluster, and accounts for which runs were "
-                 "usable."),
+         summary="The pipeline only works because the identical six features are measured on real and "
+                 "synthetic spheroids. A Cellular Potts Model with seven parameters (cell-cell and "
+                 "cell-medium adhesion, contact range, neighbour order, volume elasticity, target "
+                 "volume, and motility) is sampled to build a reference library of morphology "
+                 "trajectories. This theme shows how each knob changes the simulated cluster, and "
+                 "accounts for which runs were usable."),
     dict(type="kpis", items=[
         dict(lbl="CPM parameters", num="7", desc="Swept one-at-a-time and jointly (Saltelli).", numeric=True),
         dict(lbl="Sampled vectors", num="1,152", desc="Saltelli design over the 7 parameters.", numeric=True),
@@ -697,7 +746,7 @@ THEME3 = [
          informs_tag="Beyond the thesis: live morph"),
     dict(type="section", title='What the <span class="it">library</span> looks like',
          right="16 random samples at the final step"),
-    dict(type="figure", img="fig/saltelli_gallery.png",
+    dict(type="figure", img="fig/saltelli_gallery.png", native=True,
          ttl="Sixteen synthetic spheroids from the simulation library", sub="final MCS, one replicate",
          alt="gallery of 16 simulated CPM spheroids spanning the parameter space",
          shows="Each panel is one sampled parameter vector rendered at the final simulation step, "
@@ -717,7 +766,7 @@ THEME3 = [
          informs_tag="Beyond the thesis: navigable library"),
     dict(type="section", title='Which knobs <span class="it">drive</span> cluster size?',
          right="Sobol indices, direct vs total effect"),
-    dict(type="figure", img=CLLF + "cpm/sobol_S1_vs_ST.png",
+    dict(type="figure", img=CLLF + "cpm/sobol_S1_vs_ST.png", native=True,
          ttl="Sobol first-order vs total effect", sub="share of variance in cluster area",
          alt="Sobol S1 and ST bars per parameter",
          shows="Direct effect (S1) is how much a knob alone moves area; total effect (ST) adds its "
@@ -742,8 +791,10 @@ THEME3 = [
                "drug; coloured) projected into "
                "the same PCA morphospace. Drag the threshold to see how many real wells fall outside "
                "the simulated world.",
-         informs="Most real spheroids sit on the rim or outside the synthetic cloud, the reason the "
-                 "thesis reports relative shifts rather than absolute parameters.",
+         informs="140 of the 152 real wells (92%) sit beyond the p95 nearest-neighbour distance of the "
+                 "synthetic cloud, and 114 (75%) beyond p99: most real spheroids are extrapolated, not "
+                 "interpolated. This one number is the reason the inference is reported as relative "
+                 "shifts, not absolute parameters (Themes 04 and 05 build on it).",
          informs_tag="Beyond the thesis: live coverage"),
     dict(type="chart", id="t3_yield", fn="barH", height=240,
          title="Library yield", sub="sampled to usable",
@@ -769,8 +820,10 @@ THEME4 = [
          meta=["Theme 04", "Separability & identifiability", "Appendix D to H"],
          title='Which knobs can we <span class="it">read back</span>?',
          caption="Leave-one-out inversion on the 1,105-run library",
-         lede="None of the seven parameters reach the identifiable band. Three are weakly identifiable "
-              "and the other four are non-identifiable, and the analysis says so honestly.",
+         lede="The parameter interactions and the thin real-world coverage seen in Theme 03 predict "
+              "that some knobs will be unreadable; leave-one-out inversion quantifies exactly which. "
+              "None of the seven reach the identifiable band: three are weakly identifiable, four are "
+              "non-identifiable, and the analysis says so honestly.",
          summary="Leave-one-out inversion on the 1,105-run library measures how well each CPM "
                  "parameter is recovered from morphology (R squared of recovered vs true). Cell-medium "
                  "width, cell-medium adhesion and cell-cell adhesion are weakly identifiable; the other four are non-identifiable. "
@@ -810,10 +863,12 @@ THEME4 = [
     dict(type="section", title='Which knobs are <span class="it">identifiable</span>?',
          right="leave-one-out recovery"),
     dict(type="interactive", widget="idbars", json="theme4_identifiability.json",
-         intro="Per-parameter recovery R-squared from the inversion benchmark, under the tau-registered "
-               "matcher (primary) or the end-state matcher (secondary). The dashed line is the "
-               "identifiable bar at R-squared 0.70; click a bar for its Pearson correlation, sample "
-               "count and error.",
+         intro="Per-parameter recovery R-squared from the inversion benchmark. Two matchers: the "
+               "tau-registered matcher (primary) compares the whole trajectory after aligning its "
+               "phase, so it is the more conservative test; the end-state matcher (secondary) compares "
+               "only the settled morphology. Where they disagree, the settled shape carries the signal. "
+               "The dashed line is the identifiable bar at R-squared 0.70 (the thesis bar from "
+               "METHODS.md); click a bar for its Pearson correlation, sample count and error.",
          informs="No parameter reaches the 0.70 identifiable bar: cell-medium adhesion, target volume "
                  "and contact are only weakly identifiable, and the rest are non-identifiable. This is "
                  "the spine of RQ2.",
@@ -856,13 +911,13 @@ THEME5 = [
     ]),
     dict(type="section", title='What the <span class="it">drugs</span> do to morphology',
          right="three dose conditions"),
-    dict(type="figure", img=CLLF + "morphology/drug_strip_high_dose.png",
+    dict(type="figure", img=CLLF + "morphology/drug_strip_high_dose.png", native=True,
          ttl="High-dose trametinib collapses the cluster", sub="MEK inhibitor, 50 uM",
          alt="time strip of a high-dose-treated spheroid disintegrating",
          shows="The cluster loses cohesion and breaks apart over the time course.",
          informs="An end-state shift in the inferred contact parameters.",
          informs_tag="Relative shift on the contact axes"),
-    dict(type="figure", img=CLLF + "morphology/drug_strip_pd098060.png",
+    dict(type="figure", img=CLLF + "morphology/drug_strip_pd098060.png", native=True,
          ttl="PD098060 compacts the cluster", sub="MEK pathway, 100 uM",
          alt="time strip of a PD098060-treated spheroid compacting",
          shows="The cluster stays cohesive but contracts, a different morphological signature from "
@@ -881,7 +936,7 @@ THEME5 = [
                  "that the CPM matcher compares against the synthetic library to produce the "
                  "per-condition parameter shifts.",
          informs_tag="Feeds the inversion"),
-    dict(type="figure", img=CLLF + "morphology/icc_ccc_heatmap.png",
+    dict(type="figure", img=CLLF + "morphology/icc_ccc_heatmap.png", native=True,
          ttl="Feature agreement on the real data", sub="AI-derived vs reference",
          alt="heatmap of feature agreement on real data",
          shows="Agreement between AI-derived and reference shape numbers on the real spheroids, the "
@@ -898,6 +953,18 @@ THEME5 = [
                "and significant only at end-state (+4.6).",
          informs="Reads the whole panel at once and ties each estimate back to its underlying wells.",
          informs_tag="Beyond the thesis: drug-by-drug detail"),
+    dict(type="section", title='The whole arc, in one <span class="it">line</span>',
+         right="what the six themes add up to"),
+    dict(type="prose", title="End to end",
+         text="99,055 raw brightfield frames, built into a working corpus (Theme 00), are read by a "
+              "segmenter chosen for feature preservation rather than pixel overlap (Theme 02), because "
+              "the raw signal limits the finer shape features (Theme 01). The same six features are "
+              "then measured on a 1,105-run synthetic CPM library (Theme 03), which shows most real "
+              "spheroids fall outside the simulated world (92% beyond p95). Leave-one-out inversion "
+              "(Theme 04) finds only three weakly identifiable axes (width, J_cm, J_cc) and four "
+              "non-identifiable ones, so the real-data drug inference (Theme 05) is read as relative "
+              "shifts on those axes, not absolute biophysical values. **The honest limit, weak "
+              "identifiability and thin coverage, is the finding, not a failure.**"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 05', chips=[
         dict(t="real_data_inference_report.ipynb", gold=True), dict(t="drug panel"),
         dict(t="tau-registration matcher"), dict(t="bootstrap CIs"), dict(t="5 patients / 7 series")]),

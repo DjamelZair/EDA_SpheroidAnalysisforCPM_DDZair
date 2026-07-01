@@ -53,6 +53,44 @@ def regen(src, dst, crop_top=0.0, p_lo=2.0, p_hi=98.0):
           f"stretch=[{plo:.2f},{phi:.2f}]")
 
 
+PAGE = np.array([10, 74, 85])          # #0a4a55 page background
+
+
+def _ramp_dark(L):
+    """3-stop ramp NEARBLACK -> TEAL (0..HISTOP) -> PAGE bg (HISTOP..1). Unlike _ramp,
+    the brightest regions (white panel margins) fall back to the page background instead
+    of cream, so photographic montages read dark and native rather than as a light block."""
+    out = np.empty(L.shape + (3,), np.float32)
+    lo = L <= HISTOP
+    t = np.clip(L / HISTOP, 0, 1)[..., None]
+    out[lo] = (NEARBLACK[None, :] * (1 - t) + TEAL[None, :] * t)[lo]
+    hi = ~lo
+    t2 = np.clip((L - HISTOP) / (1 - HISTOP), 0, 1)[..., None]
+    out[hi] = (TEAL[None, :] * (1 - t2) + PAGE[None, :] * t2)[hi]
+    return out
+
+
+def regen_dark(src, dst, crop_top=0.0, p_lo=2.0, p_hi=98.0):
+    """Like regen but maps the white background to the page teal (dark), for photographic
+    microscopy montages that should sit native on the dark page (no cream block)."""
+    im = Image.open(src).convert("RGB")
+    a = np.asarray(im).astype(np.float32)
+    if crop_top:
+        a = a[int(a.shape[0] * crop_top):, :, :]
+    R, G, B = a[..., 0], a[..., 1], a[..., 2]
+    L = (0.299 * R + 0.587 * G + 0.114 * B) / 255.0
+    plo, phi = np.percentile(L, p_lo), np.percentile(L, p_hi)
+    Ls = np.clip((L - plo) / max(phi - plo, 1e-3), 0, 1)
+    out = _ramp_dark(Ls)
+    red = (R - np.maximum(G, B) > 28) & (R > 70)
+    green = (G - np.maximum(R, B) > 26) & (G > 60)
+    out[green] = CREAM
+    out[red] = GOLD
+    out = np.clip(out, 0, 255).astype(np.uint8)
+    Image.fromarray(out).save(dst)
+    print(f"{dst}: {out.shape} dark background (page teal), red->gold={int(red.sum())}")
+
+
 def regen_bg(src, dst):
     """For COLOURED figures (e.g. multicolour cell lattices): replace the near-white
     background with teal so the colours pop on the dark site, and lift dark text/borders
@@ -75,10 +113,10 @@ def regen_bg(src, dst):
 if __name__ == "__main__":
     PORT = "/media/djameldino/Expansion/CLL_data/html portfolio/assets/cll/figures/"
     here = sys.argv[1] if len(sys.argv) > 1 else "."
-    regen(PORT + "morphology/segmentation_overlay_grid.png",
-          here + "/02_segmentation/fig/overlay_dark.png", crop_top=0.105)
-    regen(PORT + "segmentation/hardest_case_showcase.png",
-          here + "/02_segmentation/fig/hardest_dark.png")
+    regen_dark(PORT + "morphology/segmentation_overlay_grid.png",
+               here + "/02_segmentation/fig/overlay_dark.png", crop_top=0.105)
+    regen_dark(PORT + "segmentation/hardest_case_showcase.png",
+               here + "/02_segmentation/fig/hardest_dark.png")
     # Theme 3: Saltelli VTK library gallery (coloured cell lattices) -> teal background
     import os
     os.makedirs(here + "/03_simulation_library/fig", exist_ok=True)

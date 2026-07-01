@@ -548,8 +548,43 @@
     draw();
   }
 
+  /* ---------- J. COMPOSE: corpus composition explorer (refacet the frame census) ---------- */
+  function compose(mount, d) {
+    header(mount, "Explore the corpus composition", "how the " + d.total.toLocaleString() + " inference frames break down; refacet and switch count vs percent");
+    var fi = 0, pct = false;
+    var bar = el("div", "iact-controls"); mount.appendChild(bar);
+    var sel = dropdown(d.facets.map(function (f, i) { return { value: String(i), label: f.label }; }), "0");
+    var flab = el("label", "iact-field"); flab.appendChild(el("span", "iact-flab", "break down by")); flab.appendChild(sel); bar.appendChild(flab);
+    var seg = el("div", "iact-seg"); bar.appendChild(seg);
+    var cntBtn = chip("count", true), pctBtn = chip("percent", false); seg.appendChild(cntBtn); seg.appendChild(pctBtn);
+    var canvas = mkCanvas(mount, 340); var read = el("div", "iact-readout"); mount.appendChild(read);
+    sel.onchange = function () { fi = +sel.value; draw(); };
+    cntBtn.onclick = function () { pct = false; draw(); };
+    pctBtn.onclick = function () { pct = true; draw(); };
+    function draw() {
+      cntBtn.className = "iact-chip" + (pct ? "" : " on"); pctBtn.className = "iact-chip" + (pct ? " on" : "");
+      var f = d.facets[fi], cats = f.cats, x = ctxOf(canvas), W = canvas.clientWidth, H = 340;
+      var rowH = Math.max(18, Math.min(34, (H - 24) / cats.length)), padL = 150, padR = 78;
+      x.clearRect(0, 0, W, H);
+      var total = cats.reduce(function (a, c) { return a + c.count; }, 0);
+      var maxv = Math.max.apply(null, cats.map(function (c) { return c.count; }));
+      cats.forEach(function (c, i) {
+        var y = 12 + i * rowH, val = pct ? (c.count / total * 100) : c.count, vmax = pct ? (maxv / total * 100) : maxv;
+        var bw = (W - padL - padR) * (val / (vmax || 1));
+        var isNone = c.name === "(none)" || c.name === "other";
+        x.fillStyle = isNone ? "rgba(168,181,184,0.5)" : C.gold; x.fillRect(padL, y + 2, Math.max(1, bw), rowH - 6);
+        x.fillStyle = C.cream; x.font = "11px 'DM Sans'"; x.textAlign = "right"; x.fillText(c.name, padL - 8, y + rowH / 2 + 3);
+        x.textAlign = "left"; x.fillStyle = C.goldL; x.fillText(pct ? val.toFixed(1) + "%" : Math.round(val).toLocaleString(), padL + bw + 6, y + rowH / 2 + 3);
+      });
+      read.innerHTML = "Largest share: <b style='color:" + C.goldL + "'>" + cats[0].name + "</b> = " + (pct ? (cats[0].count / total * 100).toFixed(1) + "%" : cats[0].count.toLocaleString() + " frames") + " of " + total.toLocaleString() + " (the CXCR4-antagonist and control imbalance drives the plate-stratified split).";
+      canvas._draw = draw;
+    }
+    draw();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
-    qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest, featdist: featdist };
+    qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
+    featdist: featdist, compose: compose };
 
   var HELP = {
     morph: "Pick a knob with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
@@ -562,6 +597,7 @@
     idbars: "Bars are the per-parameter recovery R-squared under the selected matcher (toggle tau primary, end-state secondary, or Wasserstein third). Green, gold and grey mean identifiable, weakly identifiable and non-identifiable; the dashed line is the 0.70 identifiable bar. Click a bar for Pearson, sample count and error.",
     forest: "Each row is a drug's inferred cell-cell adhesion shift (median) with its q25 to q75 spread; the dashed line is no change (zero). Colour shows significance, a heuristic where the spread excludes zero (not a formal statistical test). Click a drug to see the individual wells behind its estimate.",
     featdist: "Pick one of the six shape features with the buttons to see its distribution across the 557 annotated spheroid objects, with the gold dashed line at the median. 'log axis' (for the size features) shows how a log scale fixes their heavy skew. 'split by plate' overlays the held-out VID3201 plate in gold against the other plates, exposing the batch effect that motivates plate-stratified splitting.",
+    compose: "Use the dropdown to break the 12,485 inference frames down by drug-mechanism class, patient, stimulation or condition, and toggle count versus percent. It shows the corpus is not balanced: CXCR4-antagonist wells and the longitudinal patient 706 dominate, and drug frames outnumber controls roughly seven to one, which is why the training split is stratified by plate rather than shuffled.",
   };
   function addHelp(m, widget) {
     var head = m.querySelector(".iact-head"); if (!head || !HELP[widget]) return;

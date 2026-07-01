@@ -49,6 +49,12 @@ Real spheroid trajectories from reference wells across five patients (seven pati
 
 ## Drug panel, drug by drug  (inferred delta J_cc with intervals)
 
+## The whole arc, in one line  (what the six themes add up to)
+
+### End to end
+
+99,055 raw brightfield frames, built into a working corpus (Theme 00), are read by a segmenter chosen for feature preservation rather than pixel overlap (Theme 02), because the raw signal limits the finer shape features (Theme 01). The same six features are then measured on a 1,105-run synthetic CPM library (Theme 03), which shows most real spheroids fall outside the simulated world (92% beyond p95). Leave-one-out inversion (Theme 04) finds only three weakly identifiable axes (width, J_cm, J_cc) and four non-identifiable ones, so the real-data drug inference (Theme 05) is read as relative shifts on those axes, not absolute biophysical values. **The honest limit, weak identifiability and thin coverage, is the finding, not a failure.**
+
 ## Complete analysis index  (every thesis analysis in this theme)
 
 ### Each analysis, what it shows, its thesis label, and the result

@@ -42,6 +42,33 @@ Eight segmenters were compared on the same 45-image test set: a rule-based basel
 | U-Net (heavy aug.) | not computed | CC-Dice never scored for the U-Net; the old 0.18 was a ceiling claim, not a measurement |
 | Pseudo-label + fine-tune | not computed | CC-Dice never scored for this model |
 
+### What 'U-Net (heavy aug.)' actually means
+
+shared offline set -> U-Net online policy -> standard vs heavy
+
+<details>
+<summary>show the code (rq1_segmentation/scripts/unet/run_experiments.py:70, 84)</summary>
+
+```python
+# EVERY model trains on the same offline-augmented set (51 -> 306 pairs).
+# 'Heavy augmentation' is the winning U-Net's stronger ON-THE-FLY policy,
+# applied per batch during training, NOT a different dataset.
+
+def aug_standard(res):                    def aug_heavy(res):
+    Resize, HFlip, VFlip, Rotate90            Resize, HFlip, VFlip, Rotate90
+    ShiftScaleRotate(0.05, 0.1, 15)          ShiftScaleRotate(0.10, 0.2, 30)   # stronger
+    ElasticTransform(alpha=30)               ElasticTransform(alpha=50)        # stronger
+    RandomBrightnessContrast(0.15)           RandomBrightnessContrast(0.30)    # stronger
+    GaussNoise(p=0.2)                        GaussNoise(10-50, p=0.4)          # stronger
+                                             GridDistortion(0.3)              # + extra
+                                             GaussianBlur(3-7)                # + extra
+                                             CoarseDropout(8 x 32px)          # + extra
+```
+
+</details>
+
+So the leaderboard winner is the resnet34 U-Net trained with aug_heavy: three transforms the standard policy does not use (grid distortion, blur, coarse dropout) plus roughly double the strength on the rest. That heavier regularisation, not a different training set, is what the name refers to (the shared offline set is shown in Theme 00).
+
 ### Per-feature reliability scoreboard - 8 models x 6 shape numbers
 
 ![](../assets/cll/figures/segmentation/icc_ccc_heatmap.png)
