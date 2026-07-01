@@ -533,10 +533,10 @@
         var sv = hv.reduce(function (a, b) { return a + b; }, 0) || 1, sr = hr.reduce(function (a, b) { return a + b; }, 0) || 1;
         var dv = hv.map(function (c) { return c / sv; }), dr = hr.map(function (c) { return c / sr; });
         maxc = Math.max(Math.max.apply(null, dv), Math.max.apply(null, dr));
-        series = [{ h: dr, col: "rgba(21,97,109,0.75)" }, { h: dv, col: "rgba(200,160,92,0.55)" }];
-      } else { var h1 = hist(all, lo, hi, nb); maxc = Math.max.apply(null, h1); series = [{ h: h1, col: "rgba(21,97,109,0.9)" }]; }
+        series = [{ h: dr, col: "rgba(127,179,189,0.82)" }, { h: dv, col: "rgba(200,160,92,0.8)" }];
+      } else { var h1 = hist(all, lo, hi, nb); maxc = Math.max.apply(null, h1); series = [{ h: h1, col: "rgba(200,160,92,0.85)" }]; }
       series.forEach(function (s) { for (var k = 0; k < nb; k++) { var bh = (s.h[k] / (maxc || 1)) * (H - padT - padB), bx = padL + k * bw, by = H - padB - bh; x.fillStyle = s.col; x.fillRect(bx + 0.5, by, bw - 1, bh); } });
-      var mx = px(median(all)); x.setLineDash([4, 4]); x.strokeStyle = C.gold; x.lineWidth = 1.3; x.beginPath(); x.moveTo(mx, padT); x.lineTo(mx, H - padB); x.stroke(); x.setLineDash([]);
+      var mx = px(median(all)); x.setLineDash([4, 4]); x.strokeStyle = C.cream; x.lineWidth = 1.5; x.beginPath(); x.moveTo(mx, padT); x.lineTo(mx, H - padB); x.stroke(); x.setLineDash([]);
       x.fillStyle = C.muted; x.textAlign = "center"; x.fillText((d.labels[cur] || cur) + (isLog(cur) && logMode ? "  (log10)" : ""), (padL + W - padR) / 2, H - 6);
       x.save(); x.translate(13, (padT + H - padB) / 2); x.rotate(-Math.PI / 2); x.textAlign = "center"; x.fillText(byPlate ? "fraction" : "objects", 0, 0); x.restore();
       var st = d.stats[cur], sk = (isLog(cur) && logMode) ? st.skew_log : st.skew;
