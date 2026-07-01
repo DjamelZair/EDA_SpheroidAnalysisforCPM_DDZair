@@ -817,10 +817,38 @@
     draw();
   }
 
+  /* ---------- Q. DRUGSTRIP: drug time-lapse scrubber (image + shape numbers) ---------- */
+  function drugstrip(mount, d) {
+    header(mount, "What the drugs do to morphology", "two dose conditions over five days; pick a drug and a day, watch the spheroid and its shape numbers");
+    var di = 0, pi = 0;
+    var bar = el("div", "iact-controls"); var seg = el("div", "iact-seg"); bar.appendChild(seg); mount.appendChild(bar);
+    var grid = el("div", "iact-2col"); mount.appendChild(grid);
+    var stage = el("div", "iact-stage"); grid.appendChild(stage);
+    var img = el("img", "iact-spheroid"); img.alt = "segmented spheroid under treatment"; stage.appendChild(img);
+    var cap = el("div", "iact-cap"); stage.appendChild(cap);
+    var card = el("div", "iact-card"); grid.appendChild(card);
+    var dayseg = el("div", "iact-seg"); card.appendChild(dayseg);
+    var read = el("div"); card.appendChild(read);
+    function drugBtns() { seg.innerHTML = ""; d.drugs.forEach(function (dr, i) { var b = chip(dr.label.replace(/ \(.*/, ""), i === di); b.onclick = function () { di = i; pi = 0; render(); }; seg.appendChild(b); }); }
+    function dayBtns() { dayseg.innerHTML = ""; d.drugs[di].panels.forEach(function (p, i) { var b = chip("Day " + p.day, i === pi); b.onclick = function () { pi = i; render(); }; dayseg.appendChild(b); }); }
+    function render() {
+      drugBtns(); dayBtns();
+      var dr = d.drugs[di], p = dr.panels[pi];
+      img.src = p.img; cap.textContent = dr.label + " · Day " + p.day + " (" + dr.target + ")";
+      var kv = "<div class='iact-kv' style='margin-top:.6rem'><div class='iact-kvg'>shape numbers, AI-measured</div>"
+        + "<div><span>cluster area</span><b>" + p.area.toLocaleString() + " px</b></div>"
+        + "<div><span>roundness</span><b>" + p.round.toFixed(2) + "</b></div>"
+        + "<div><span>solidity</span><b>" + p.solid.toFixed(2) + "</b></div></div>"
+        + "<p style='font-family:\"Instrument Serif\",serif;font-style:italic;color:var(--gold-3);font-size:1.02rem;line-height:1.4;margin-top:.6rem'>" + dr.caption + "</p>";
+      read.innerHTML = kv;
+    }
+    render();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
     featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech, qcdist: qcdist, fragstruct: fragstruct,
-    qualcoverage: qualcoverage, sobolgap: sobolgap };
+    qualcoverage: qualcoverage, sobolgap: sobolgap, drugstrip: drugstrip };
 
   var HELP = {
     morph: "Pick a parameter with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
@@ -839,6 +867,8 @@
     qcdist: "The filled curve is the distribution of this image-quality metric across the real frames (for intensity, the gold line adds the bright background so you see the two modes). Switch to 'over time' to see the metric's median and interquartile range drift across the imaging time course. The readout states the finding and the method decision it drove.",
     fragstruct: "Three views of how fragmented the segmentation masks are. 'Fragment count' is the distribution of connected components per frame (most frames are multi-object); 'largest-component area' shows that despite the fragments, one component holds nearly all the area; 'over time' shows fragmentation rising across the time course. Together these motivate scoring with CC-Dice and keeping the largest component.",
     qualcoverage: "Each dot is one real control well (n=48), placed by an image-quality metric against how far the well sits from its nearest synthetic spheroid in morphology space. Switch the metric to see which quality predicts distance: focus/blur does (r=+0.43), contrast does not (r=+0.05), and more-fragmented wells sit slightly closer (r=-0.30). Clay dots are beyond the p95 distance (out of library); the gold line is the linear trend.",
+    sobolgap: "For each CPM parameter, the solid gold bar is its direct effect on cluster area (Sobol first-order S1) and the sky extension is its interactions with the other parameters, up to the total effect (ST). A large gap means the parameter acts mostly through interactions, which is what limits how cleanly it can be read back from morphology.",
+    drugstrip: "Pick a drug and a day to see the AI-segmented spheroid (cherry outline) and its shape numbers at that timepoint. High-dose trametinib disintegrates the cluster (area collapses about eightfold); PD098060 keeps it cohesive but contracts it inward, with solidity rising. Two clearly separable drug signatures.",
   };
   function addHelp(m, widget) {
     var head = m.querySelector(".iact-head"); if (!head || !HELP[widget]) return;

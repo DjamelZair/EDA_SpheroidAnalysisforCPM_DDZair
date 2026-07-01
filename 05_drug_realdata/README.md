@@ -13,23 +13,7 @@ Real spheroid trajectories from reference wells across five patients (seven pati
 | Drug-panel BCR shift | weak | Tau (primary): J_cc shift -1.4, CI [-3.0, +0.2], spans zero. End-state: +4.6, CI [+2.1, +7.0], significant; the signal is in the settled morphology. |
 | Reported axes | 3 | the three weakly identifiable axes (width, J_cc, J_cm). |
 
-## What the drugs do to morphology  (three dose conditions)
-
-### High-dose trametinib collapses the cluster - MEK inhibitor, 50 uM
-
-![](../assets/cll/figures/morphology/drug_strip_high_dose.png)
-
-**What it shows.** The cluster loses cohesion and breaks apart over the time course.
-
-**What it motivated (Relative shift on the contact axes).** An end-state shift in the inferred contact parameters.
-
-### PD098060 compacts the cluster - MEK pathway, 100 uM
-
-![](../assets/cll/figures/morphology/drug_strip_pd098060.png)
-
-**What it shows.** The cluster stays cohesive but contracts, a different morphological signature from high-dose trametinib.
-
-**What it motivated (Separable drug signatures).** Distinct drugs leave distinct, separable trajectories.
+## What the drugs do to morphology  (two dose conditions, over five days)
 
 ### Drug response measured automatically from the AI segmenter - three drug conditions, every available timepoint
 

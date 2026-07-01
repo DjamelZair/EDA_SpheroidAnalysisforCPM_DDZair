@@ -891,19 +891,14 @@ THEME5 = [
         dict(lbl="Reported axes", num="3", desc="the three weakly identifiable axes (width, J_cc, J_cm).", numeric=True),
     ]),
     dict(type="section", title='What the <span class="it">drugs</span> do to morphology',
-         right="three dose conditions"),
-    dict(type="figure", img=CLLF + "morphology/drug_strip_high_dose.png", native=True,
-         ttl="High-dose trametinib collapses the cluster", sub="MEK inhibitor, 50 uM",
-         alt="time strip of a high-dose-treated spheroid disintegrating",
-         shows="The cluster loses cohesion and breaks apart over the time course.",
-         informs="An end-state shift in the inferred contact parameters.",
-         informs_tag="Relative shift on the contact axes"),
-    dict(type="figure", img=CLLF + "morphology/drug_strip_pd098060.png", native=True,
-         ttl="PD098060 compacts the cluster", sub="MEK pathway, 100 uM",
-         alt="time strip of a PD098060-treated spheroid compacting",
-         shows="The cluster stays cohesive but contracts, a different morphological signature from "
-               "high-dose trametinib.",
-         informs="Distinct drugs leave distinct, separable trajectories.",
+         right="two dose conditions, over five days"),
+    dict(type="interactive", widget="drugstrip", json="theme5_drugstrip.json",
+         intro="Two treated spheroids over five days, with the AI-segmented outline in cherry. Pick a "
+               "drug and a day: high-dose trametinib disintegrates the cluster (area collapses ~8x), "
+               "while PD098060 keeps it cohesive but contracts it inward (solidity rises to 0.92).",
+         informs="Distinct drugs leave distinct, separable trajectories, which is exactly the signal "
+                 "the inversion reads: high-dose trametinib as a loss of cohesion, PD098060 as "
+                 "compaction.",
          informs_tag="Separable drug signatures"),
     dict(type="chart", id="t5_timecourse", fn="timecourse", height=440,
          title="Drug response measured automatically from the AI segmenter",
