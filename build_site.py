@@ -897,6 +897,18 @@ THEME5 = [
         dict(lbl="Drug-panel BCR shift", num="weak", desc="Tau (primary): J_cc shift -1.4, CI [-3.0, +0.2], spans zero. End-state: +4.6, CI [+2.1, +7.0], significant; the signal is in the settled morphology."),
         dict(lbl="Reported axes", num="3", desc="the three weakly identifiable axes (width, J_cc, J_cm).", numeric=True),
     ]),
+    dict(type="section", title='Real drug wells, <span class="it">up close</span>',
+         right="one frame per mechanism class"),
+    dict(type="interactive", widget="examples", json="theme5_realframes.json",
+         intro="Before the inference, the concrete objects: real drug-treated spheroids at a late "
+               "timepoint, one per mechanism class, with the U-Net outline in gold (toggle it off for "
+               "the raw frame). Click through the untreated control, a BCR inhibitor, a CXCR4 "
+               "antagonist, the MEK inhibitor and the NF-kB inhibitor.",
+         informs="These are the frames the inversion actually reads. Each note gives the class's "
+                 "inferred cell-cell adhesion shift, mostly weak and non-significant; only the MEK "
+                 "inhibitor clears the heuristic. What you see is what the pipeline had to work from.",
+         informs_tag="The concrete object behind the inference"),
+
     dict(type="section", title='What the <span class="it">drugs</span> do to morphology',
          right="two dose conditions, over five days"),
     dict(type="interactive", widget="drugstrip", json="theme5_drugstrip.json",

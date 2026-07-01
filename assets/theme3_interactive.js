@@ -880,7 +880,8 @@
 
   /* ---------- T. EXAMPLES: real spheroid frames with the AI outline ---------- */
   function examples(mount, d) {
-    header(mount, "See a real spheroid", "actual brightfield frames from the corpus; toggle the AI outline and click a thumbnail");
+    var mt = d.meta || {};
+    header(mount, mt.title || "See a real spheroid", mt.sub || "actual brightfield frames from the corpus; toggle the AI outline and click a thumbnail");
     var cur = 0, outline = true;
     var bar = el("div", "iact-controls"); var seg = el("div", "iact-seg"); bar.appendChild(seg); mount.appendChild(bar);
     var oBtn = chip("AI outline", true); seg.appendChild(oBtn);
