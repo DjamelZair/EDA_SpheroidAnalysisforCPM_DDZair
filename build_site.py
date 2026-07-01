@@ -14,7 +14,7 @@ F = "figures/"  # theme-local figure dir
 
 # RQ-tab style cross-nav shown on every built theme page
 NAV = [
-    dict(tag="Theme 00", name="Data inventory", href="00_data_inventory/index.html"),
+    dict(tag="Theme 00", name="Data construction", href="00_data_inventory/index.html"),
     dict(tag="Theme 01", name="Image EDA", href="01_image_intensity_eda/index.html"),
     dict(tag="Theme 02", name="Segmentation", href="02_segmentation/index.html"),
     dict(tag="Theme 03", name="Sim library", href="03_simulation_library/index.html"),
@@ -49,79 +49,206 @@ _fc = _load("theme1_frag_class.json")
 _fo = _load("theme1_focus.json")
 _nc = _load("theme1_ncomp.json")
 
-# ============================ THEME 0 - DATA INVENTORY ============================
-_INVENTORY_ROWS = [
-    ["Patients (CLL donors)", "5 unique", "7 patient-timepoint series (706 sampled at t1/t2/t3); 4 patients in the drug panel", "RQ3 real-data inference"],
-    ["Imaging channel", "1", "Brightfield, single-channel grayscale time-lapse", "All stages"],
-    ["Raw archive", "~99,000 frames", "Full local brightfield archive", "Corpus"],
-    ["Real inference set", "12,485 frames", "Segmented for feature extraction", "Themes 01 & 05"],
-    ["Hand-annotated masks", "51 frames", "About 0.05% of the corpus, the defining constraint", "RQ1 ground truth"],
-    ["Classical pseudo-labels", "4,552 frames", "Classical-pipeline masks for stage-1 pretraining", "RQ1 stage 1"],
-    ["Train / val / test split", "216 / 45 / 45 images", "37 / 9 / 8 spheroids, plate-level stratified", "RQ1"],
-    ["Held-out test", "45 frames", "Never seen during training", "RQ1 evaluation"],
-    ["Drug panel", "23 drugs", "BTKi, Syk, PI3K, JAK, CXCR4, MEK, NF-kB classes", "RQ3 drug response"],
-    ["Real wells (coverage)", "152 wells", "Control, stimulated and drug conditions", "Morphospace coverage"],
-    ["Sampling depth", "~20 timepoints / well", "Median, over roughly 5.5 days", "Time-course features"],
+# ============================ THEME 0 - DATA CONSTRUCTION & PROVENANCE ============================
+# Every count below is read live from disk (find / wc -l / du), not assumed.
+_CORPUS_ROWS = [
+    ["Raw brightfield archive", "99,055 images", "75,043 .tif + 23,913 .jpg + 99 .png, 312 GB", "data/raw/ (delivered)"],
+    ["Delivered lab metadata", "3 workbooks + legend + template", "Pooled AI metadata, keyed VID + Well, Volgnummer = patient", "data/metadata/*.xlsx (delivered)"],
+    ["Hand annotations (VIA)", "6 experiments", "via_region_data JSON polygons + annotated jpgs", "3D annotations/ (delivered)"],
+    ["Ground-truth masks", "51 masks", "VIA polygons rasterised to instance masks", "derived from annotations"],
+    ["Frame-QC table", "12,485 frames", "contrast, focus, fragmentation per segmented frame", "built by build_tables.py"],
+    ["Patient / condition join", "12,485 rows", "frames joined to 5 patients / 7 series, drug + stimulation", "built by patient_map.py"],
+    ["Regionprops feature table", "6 features / frame", "area, diameter, eccentricity, solidity, perimeter, circularity", "built by extract_features.py"],
+    ["Train / val / test split", "216 / 45 / 45 images", "37 / 7 / 7 original spheroids, source-stratified, seed 42", "built by build_training_dataset.py"],
+    ["Classical pseudo-labels", "4,547 masks", "classical-pipeline masks for stage-1 pretraining", "built by the classical pipeline"],
 ]
 
 THEME0 = [
     dict(type="hero",
-         meta=["Theme 00", "Data inventory", "Appendix A.0"],
-         title='What the <span class="gold">dataset</span> <span class="it">is</span>.',
-         caption="Patient-derived CLL spheroid &middot; brightfield &middot; time-lapse",
-         lede="Before any analysis: exactly what data exists. Five CLL patients (seven "
-              "patient-timepoint series), a roughly 99,000-frame brightfield archive, and only 51 "
-              "hand-drawn masks, the single constraint that shapes every downstream method choice.",
-         summary="This theme is the ledger for the whole project: the cohort, the imaging, the frame "
-                 "counts, the label budget, the train/val/test split and the drug panel, all in one "
-                 "place. Theme 01 then characterises what those images **look like**; Themes 02 to 05 "
-                 "build the segmentation, simulation and inference on top of this inventory."),
+         meta=["Theme 00", "Data construction & provenance", "Appendix A.0"],
+         title='How the working data was <span class="it">built</span>.',
+         caption="From two lab archives to the tables every later theme reads",
+         lede="None of the analysis CSVs were handed over. They were constructed from 99,055 raw "
+              "brightfield frames and five delivered metadata workbooks: matched to patients, "
+              "segmented, measured, and split. This theme shows that construction with code.",
+         summary="Before any result, the raw delivery had to become a working corpus. This theme "
+                 "traces it end to end: (A) the raw data as delivered, counted from disk; (B) the "
+                 "match that links image filenames to patient and condition metadata; (C) the derived "
+                 "working tables, each shown as input to construction step to output; and (D) the "
+                 "constructed corpus every later theme consumes. Every count is read live from disk."),
     dict(type="kpis", items=[
-        dict(lbl="Patients", num="5", desc="Unique CLL donors; 7 patient-timepoint series (706 sampled x3).", numeric=True),
-        dict(lbl="Raw frames", num="99k", desc="Brightfield archive; 12,485 in the real inference set.", numeric=True),
-        dict(lbl="Hand-annotated", num="51", desc="About 0.05% of the corpus, the defining constraint.", gold=True, numeric=True),
-        dict(lbl="Drug panel", num="23", desc="Drugs across seven mechanism classes.", gold=True, numeric=True),
+        dict(lbl="Raw images", num="99,055", desc="75,043 tif + 23,913 jpg + 99 png; 312 GB, two lab archives.", numeric=True),
+        dict(lbl="Delivered metadata", num="3+2", desc="3 Pooled AI workbooks + legend + template (VID, Well, Volgnummer).", gold=True),
+        dict(lbl="Hand annotations", num="51", desc="VIA polygons rasterised to masks; ~0.05% of the corpus.", gold=True, numeric=True),
+        dict(lbl="Derived corpus", num="12,485", desc="Frames matched, QC'd and feature-extracted, all constructed.", numeric=True),
     ]),
-    dict(type="figure", img=CLL + "what_we_do_strip.png",
-         ttl="What the pipeline does, end to end", sub="raw frame to outline to shape numbers",
-         alt="raw microscopy, AI segmentation outline, extracted shape numbers",
-         shows="A microscopy frame goes in, the AI draws the spheroid outline, and a handful of "
-               "shape numbers come out. Those numbers are the observables every later stage consumes.",
-         informs="Fixes the unit of analysis: the segmenter is judged on whether these shape numbers "
-                 "are trustworthy, not on raw pixel overlap.",
-         informs_tag="Frames the whole pipeline"),
-    dict(type="section", title='The <span class="it">cohort</span> and corpus, at a glance',
-         right="every asset, counted"),
+
+    # ---- A. RAW DATA AS DELIVERED ----
+    dict(type="section", title='A. The raw data, <span class="it">as delivered</span>',
+         right="counted from disk, not assumed"),
+    dict(type="prose", text=
+         "The lab delivered two archives (Vivek Muniraj, 2025) totalling **312 GB** under "
+         "`data/raw/`. Nothing here is derived: these are the original IncuCyte brightfield "
+         "time-lapses and the metadata workbooks. Every count below comes from `find` and `wc -l` "
+         "run against the disk."),
+    dict(type="code",
+         title="Raw archive layout and image census", sub="read live with du / find",
+         io=["2 delivered archives", "extracted IncuCyte trees", "99,055 frames"],
+         src="$ du -sh data/raw  |  $ find data/raw -iname '*.tif' | wc -l",
+         code="data/raw/                                              # 312 GB, delivered\n"
+              "|- O20250116 ... 1st final data transfer.tar.gz   88 GB -> Drug screens/ (14 exp) + NK/\n"
+              "'- 20250123 ... 2nd final data transfer.7z        71 GB -> Btk/ Refractory/ Ongoing/ T/\n"
+              "        leaf image folders are named 'IncuCyte export'\n\n"
+              "$ find data/raw -iname '*.tif' | wc -l        # 75,043\n"
+              "$ find data/raw -iname '*.jpg' | wc -l        # 23,913\n"
+              "$ find data/raw -iname '*.png' | wc -l        #     99\n"
+              "                                              # = 99,055 brightfield frames\n\n"
+              "filename encodes everything:  VID1797_E4_1_00d03h00m.tif\n"
+              "                              |VID-| |well| |  |-timepoint-|\n"
+              "                                          field  (00d03h00m = 3 h elapsed)",
+         note="The filename is the primary key for every downstream join: VID (video/experiment), "
+              "Well (plate position, one spheroid), field and elapsed timepoint."),
+    dict(type="code",
+         title="Delivered metadata workbooks", sub="lab .xlsx under data/metadata/",
+         io=["5 delivered .xlsx", "one sheet per experiment", "VID + Well + Volgnummer"],
+         src="data/metadata/*.xlsx  (+ metadata_legend.xlsx data dictionary)",
+         code="Btk inhibitors - Pooled AI metadata.xlsx      (8 experiment sheets)\n"
+              "Drug screen 1 - Pooled AI metadata.xlsx       (13 experiment sheets)\n"
+              "Refractory patients - Pooled AI metadata.xlsx (3 experiment sheets)\n"
+              "Template_IncuCyte_metadata_list_for_AI_MH.xlsx  (blank schema)\n"
+              "metadata_legend.xlsx                            (data dictionary)\n\n"
+              "columns:  Experiment | VID | Well | Volgnummer | Sex | Birth year | IGHV |\n"
+              "          Rai Stage | Stimulation | Treatment | Target | Concentration (nM) | ...\n\n"
+              "legend:   VID        = Video ID (one IncuCyte experiment)\n"
+              "          Well       = position in the plate, unique per spheroid\n"
+              "          Volgnummer = number of the patient's blood draw  <-- patient identity",
+         note="Volgnummer is the canonical patient id; VID is the experiment id. They are kept apart "
+              "on purpose (one patient can span several VIDs, see the match below)."),
+
+    # ---- B. THE MATCH ----
+    dict(type="section", title='B. The <span class="it">match</span>: images to patients and conditions',
+         right="filename decode, then a keyed join"),
+    dict(type="prose", text=
+         "The images arrive as bare filenames; the biology lives in the workbooks. Matching the two "
+         "is the join at the heart of the dataset. It is a two-stage design: decode the filename "
+         "into structured fields, then join those fields to the metadata on `(VID, Well)`."),
+    dict(type="code",
+         title="Stage 1: decode the filename", sub="shared/io.py",
+         io=["image stem", "regex", "VID / Well / field / timepoint"],
+         src="shared/io.py:66, 97",
+         code="_VID_PATTERN = re.compile(r\"^(VID\\d+)_([A-Z]\\d+)_(\\d+)_(\\d+d\\d+h\\d+m)(.*)$\")\n\n"
+              "def parse_vid_stem(stem):                 # 'VID1797_E4_1_00d03h00m'\n"
+              "    m = _VID_PATTERN.match(stem)\n"
+              "    return {\"vid\":   m.group(1),          # VID1797\n"
+              "            \"well\":  m.group(2),          # E4\n"
+              "            \"field\": m.group(3),          # 1\n"
+              "            \"timepoint\": m.group(4)}      # 00d03h00m  -> 180 min",
+         note="Older frames use a BF_ / Brightfield_ convention without a VID; those fall back to an "
+              "(experiment, Well) key instead."),
+    dict(type="code",
+         title="Stage 2: join filename fields to patient + condition", sub="imaging_eda/patient_map.py",
+         io=["frame_qc.csv", "merge on (VID, Well)", "patient + treatment per frame"],
+         src="imaging_eda/patient_map.py:58, 68, 105",
+         code="# Volgnummer IS the patient; build a (VID, Well) -> patient lookup\n"
+              "M[\"patient\"] = M[\"Volgnummer\"].map(_norm_vid)\n"
+              "vw = M.set_index([\"VID\", \"Well\"])[\"patient\"].to_dict()\n\n"
+              "# attach patient, drug, target, stimulation to every segmented frame\n"
+              "qc = pd.read_csv(\"frame_qc.csv\")\n"
+              "j  = qc.merge(meta, on=[\"VID\", \"Well\"], how=\"left\")     # <-- the join\n"
+              "j.to_csv(\"frame_patient_treatment.csv\")",
+         note="Excel contamination is handled here: VIDs arrive as 1797.0 and wells as A01, "
+              "normalised to VID1797 / A1 before the join."),
+    dict(type="code",
+         title="The patient roster: 5 patients, 7 series", sub="run_cross_patient_inference.py",
+         io=["6 VID experiments", "hardcoded roster", "5 unique patients"],
+         src="rq3_inference/results_chapter/run_cross_patient_inference.py:46",
+         code="PATIENTS = [                       # (VID, patient_id)\n"
+              "    (1087, \"2089\"),               #  patient 2089\n"
+              "    (1873, \"706_t1\"),             #  patient 706, timepoint 1\n"
+              "    (2017, \"706_t2\"),             #          706, timepoint 2   <- one patient,\n"
+              "    (2319, \"706_t3\"),             #          706, timepoint 3      three VIDs\n"
+              "    (1964, \"EE5.1_refractory\"),   #  refractory patient\n"
+              "    (2359, \"708\"),               #  patient 708\n"
+              "]   #  VID1797 -> patient 267 (control only)\n"
+              "    #  5 unique patients  ->  7 patient-timepoint series",
+         note="This is why the cohort is 5 patients but 7 series: patient 706 was sampled "
+              "longitudinally across three separate IncuCyte runs. VID is never the patient."),
+
+    # ---- C. DERIVED WORKING TABLES ----
+    dict(type="section", title='C. The derived working <span class="it">tables</span>',
+         right="input to construction step to output"),
+    dict(type="prose", text=
+         "With frames matched to biology, the working tables are computed. Each one below is shown "
+         "as its provenance triple: the raw **input**, the **construction step** in code, and the "
+         "**output** file it writes, so it is clear the tables were generated, not received."),
+    dict(type="code",
+         title="Shape features from masks (regionprops)", sub="rq3_inference/extract_features.py",
+         io=["binary mask", "skimage regionprops", "per_image_features.csv (405 rows)"],
+         src="rq3_inference/extract_features.py:128",
+         code="from skimage.measure import regionprops\n\n"
+              "def compute_spheroid_features(mask):\n"
+              "    p = regionprops(mask)[0]                      # the one spheroid region\n"
+              "    area, perim = int(p.area), float(p.perimeter)\n"
+              "    return {\"total_area\": area,\n"
+              "            \"equivalent_diameter\": _equivalent_diameter(p),\n"
+              "            \"eccentricity\": float(p.eccentricity),\n"
+              "            \"solidity\":     float(p.solidity),\n"
+              "            \"perimeter\":    perim,\n"
+              "            \"circularity\":  4*math.pi*area / perim**2}",
+         note="These six numbers are the observables every later theme consumes. Output header: "
+              "image_id, model, total_area, equivalent_diameter, eccentricity, solidity, perimeter, circularity."),
+    dict(type="code",
+         title="Frame quality table (contrast, focus, fragmentation)", sub="imaging_eda/build_tables.py",
+         io=["mask + raw TIFF", "per-frame metrics", "frame_qc.csv (12,485 rows)"],
+         src="imaging_eda/build_tables.py:174, 195",
+         code="# intensity / contrast / focus, per frame\n"
+              "p5, p95 = np.percentile(gray, [5, 95])\n"
+              "michelson_contrast = (p95 - p5) / (p95 + p5)\n"
+              "lap_var            = filters.laplace(gray).var()      # focus\n\n"
+              "# fragmentation, from the connected components of the mask\n"
+              "areas = [r.area for r in regionprops(measure.label(mask))]\n"
+              "frag_index = 1.0 - max(areas) / sum(areas)            # 0 = one blob\n\n"
+              "res.to_csv('imaging_eda/cache/frame_qc.csv')          # 12,485 frames",
+         note="frame_qc.csv is the spine of Theme 01 and the coverage analysis: 12,485 rows, "
+              "40 columns of QC + join keys."),
+    dict(type="code",
+         title="Train / val / test split (source-stratified, seed 42)", sub="build_training_dataset.py",
+         io=["51 spheroids x 6 frames", "stratified shuffle", "train/val/test .txt"],
+         src="rq1_segmentation/scripts/dataset/build_training_dataset.py:344",
+         code="rng = np.random.RandomState(42)\n"
+              "for source in df[\"source\"].unique():        # stratify by source plate\n"
+              "    idx = df[df.source == source].index.values\n"
+              "    rng.shuffle(idx)\n"
+              "    #  ~70 / 15 / 15  ->  train / val / test\n"
+              "for split in [\"train\", \"val\", \"test\"]:\n"
+              "    (out / f\"{split}.txt\").write_text(\"\\n\".join(ids[split]))\n\n"
+              "#  wc -l splits/*.txt  ->  train 216,  val 45,  test 45\n"
+              "#  original spheroids  ->  37 / 7 / 7   (six frames each)",
+         note="The genuinely plate-stratified 5-fold CV split (patient/plate held out) is a separate "
+              "generator, train_pseudolabel.make_folds, used for the pseudo-label model."),
+
+    # ---- D. THE CONSTRUCTED CORPUS ----
+    dict(type="section", title='D. The constructed working <span class="it">corpus</span>',
+         right="every row traceable to a raw input"),
     dict(type="table",
-         title="Data inventory: cohort, imaging, frames, labels, splits and the drug panel",
-         head=["Asset", "Count", "Detail", "Where it is used"],
-         rows=_INVENTORY_ROWS),
-    dict(type="section", title='Corpus scale and the label <span class="it">bottleneck</span>',
-         right="cohort & the defining constraint"),
+         title="From raw delivery to working tables, each traceable to its source",
+         head=["Asset", "Count (from disk)", "What it is", "Origin"],
+         rows=_CORPUS_ROWS,
+         note="Delivered inputs are the raw archive, the metadata workbooks and the VIA annotations; "
+              "everything else in this table was constructed by the scripts named above. The "
+              "51-to-99,055 label ratio (about 0.05%) is the constraint that drives the two-stage "
+              "training in Theme 02."),
     dict(type="chart", id="t0_corpus", fn="barH",
          title="Corpus scale and label scarcity", sub="hover for counts",
          data=dict(labels=["Raw archive", "Inference set", "Pseudo-labels", "Augmented train",
                            "Ground-truth", "Held-out test"],
-                   datasets=[dict(label="frames", data=[99000, 12485, 4552, 306, 51, 45], color=GOLD)],
+                   datasets=[dict(label="frames", data=[99055, 12485, 4547, 306, 51, 45], color=GOLD)],
                    logx=True, xlabel="number of frames (log scale)", dec=0),
-         note="Only 51 of roughly 99,000 frames are hand-annotated (about 0.05%), expanded to 306 "
-              "by augmentation. The held-out test set is 45 frames.",
-         informs="A 1-in-1000 label ratio motivates the two-stage training strategy: pretrain on "
-                 "classical pseudo-labels, then fine-tune on the 51 ground-truth masks.",
+         note="Only 51 of 99,055 frames are hand-annotated (about 0.05%), expanded to 306 by "
+              "augmentation. The held-out test set is 45 frames.",
+         informs="A 1-in-2000 label ratio motivates the two-stage training strategy: pretrain on "
+                 "4,547 classical pseudo-labels, then fine-tune on the 51 ground-truth masks.",
          informs_tag="Decision: two-stage training"),
-    dict(type="figure", img=FIG1 + "fig01_dataset_composition.png", native=True,
-         ttl="Dataset composition", sub="annotated split &middot; real set by class &middot; sampling depth",
-         alt="stacked bars of labelled images by split, real frames by treatment class, and timepoints per well",
-         shows="The 51 ground-truth frames expand to about 255 augmented pairs across the "
-               "train/val/test split; the ~12k-frame inference corpus is dominated by "
-               "CXCR4-antagonist and control wells, each sampled at a median of 20 timepoints over "
-               "roughly 5.5 days.",
-         informs="The label scarcity and the class imbalance together drive the plate-stratified "
-                 "split and the two-stage training that pretrains on pseudo-labels before fine-tuning "
-                 "on the 51 masks.",
-         informs_tag="Cohort & the defining constraint"),
-    dict(type="section", title='Does augmentation cover the real <span class="it">regimes</span>?',
-         right="real vs augmented vs the 51 originals"),
     dict(type="figure", img=FIG1 + "fig06_augmentation_coverage.png", native=True,
          ttl="Does augmentation cover the real regimes?", sub="real vs augmented vs 51 originals",
          alt="contrast, mean-intensity and focus distributions for real, augmented and original frames",
@@ -132,8 +259,9 @@ THEME0 = [
                  "regimes it will meet at inference; the intensity gap is the one residual exposure.",
          informs_tag="Validates heavy augmentation"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 00', chips=[
-        dict(t="RQ1_segmentation/01_data_eda.ipynb", gold=True), dict(t="patient_mapping"),
-        dict(t="augmentation ops"), dict(t="drug panel metadata"), dict(t="5 patients / 7 series")]),
+        dict(t="shared/io.py", gold=True), dict(t="imaging_eda/patient_map.py"),
+        dict(t="imaging_eda/build_tables.py"), dict(t="rq3_inference/extract_features.py"),
+        dict(t="build_training_dataset.py"), dict(t="data/metadata/*.xlsx")]),
     dict(type="bigcta", title='Next: what the <span class="it">signal</span> looks like.',
          links=[dict(t="Theme 01 &middot; Image & intensity EDA &rarr;", href="01_image_intensity_eda/index.html", primary=True),
                 dict(t="Back to index", href="index.html")]),
@@ -738,7 +866,7 @@ THEME5 = [
 ]
 
 
-THEME_SPECS = {0: ("Data inventory - CLL CPM thesis", THEME0),
+THEME_SPECS = {0: ("Data construction & provenance - CLL CPM thesis", THEME0),
                1: ("Image &amp; intensity EDA - CLL CPM thesis", THEME1),
                2: ("Segmentation &amp; feature preservation - CLL CPM thesis", THEME2),
                3: ("Simulation library - CLL CPM thesis", THEME3),
@@ -748,10 +876,10 @@ THEME_SPECS = {0: ("Data inventory - CLL CPM thesis", THEME0),
 
 # ============================ LANDING ====================================================
 LANDING_THEMES = [
-    dict(num="Theme 00", name='Data <span class="it">inventory</span>',
-         lede="The ledger for the whole project: cohort, imaging, frame counts, the 51-mask label "
-              "budget, the train/val/test split and the 23-drug panel, all counted in one place "
-              "before any analysis begins.",
+    dict(num="Theme 00", name='Data <span class="it">construction</span>',
+         lede="Not an inventory of given CSVs but the provenance of built ones: 99,055 raw frames and "
+              "five metadata workbooks, matched to patients, segmented, measured and split, shown with "
+              "the actual construction code.",
          metric="Appendix A.0 &middot; RQ1", href="00_data_inventory/index.html", ready=True),
     dict(num="Theme 01", name='Image &amp; intensity <span class="it">EDA</span>',
          lede="What the segmentation, feature-extraction and inference stages must cope with in the "
@@ -777,7 +905,7 @@ LANDING_THEMES = [
 ]
 
 LANDING_TAPE = [
-    "Data inventory", "5 patients (7 series), 99k frames, 23-drug panel",
+    "Data construction", "99,055 raw frames matched, segmented, split (all built)",
     "Image EDA", "99k frames, 51 hand-annotated",
     "Reproducibility audited", "only U-Net (heavy aug.) crosses the 0.85 reliability bar",
     "Cellular Potts simulation", "1,152 sampled, 1,105 usable runs",

@@ -129,6 +129,25 @@ def _prose(b):
         inner = f'<div class="card-h"><span class="ttl">{b["title"]}</span></div>' + inner
     return f'<section class="card">{inner}</section>'
 
+def _code(b):
+    """A provenance code card: optional input->output flow line, a source caption
+    (file:line), the code itself, and an optional note. `code` is shown verbatim."""
+    import html as _html
+    cap = f'<div class="card-h"><span class="ttl">{b["title"]}</span>' \
+          + (f'<span class="sub">{b["sub"]}</span>' if b.get("sub") else "") + "</div>" if b.get("title") else ""
+    flow = ""
+    if b.get("io"):
+        flow = '<div class="prov-io">' + "".join(
+            f'<span class="prov-step">{inline(s)}</span>'
+            + ('<span class="prov-arrow">&rarr;</span>' if i < len(b["io"]) - 1 else "")
+            for i, s in enumerate(b["io"])) + "</div>"
+    src = f'<div class="code-src">{inline(b["src"])}</div>' if b.get("src") else ""
+    body = _html.escape(b["code"])
+    note = (f'<p style="margin:.9rem 1.7rem 0;font-size:.94rem;line-height:1.6;'
+            f'color:var(--paper);opacity:.9">{inline(b["note"])}</p>') if b.get("note") else ""
+    return (f'<section class="card">{cap}<div style="padding:0 1.7rem 1.4rem">{flow}{src}'
+            f'<pre class="codeblock"><code>{body}</code></pre>{note}</div></section>')
+
 def _table(b):
     head = "".join(f"<th>{inline(c)}</th>" for c in b["head"])
     rows = "".join("<tr>" + "".join(f"<td>{inline(c)}</td>" for c in r) + "</tr>" for r in b["rows"])
@@ -273,7 +292,7 @@ _INTERACTIVE_JS = '<script src="{rel}assets/theme3_interactive.js" defer></scrip
 
 _RENDER = dict(hero=_hero, kpis=_kpis, section=_section, figure=_figure,
                prose=_prose, table=_table, tools=_tools, bigcta=_bigcta, chart=_chart,
-               interactive=_interactive)
+               interactive=_interactive, code=_code)
 
 def render_theme_html(*, title, blocks, rel_root="../", prev_next=None, out_path=None):
     has_charts = any(b["type"] == "chart" for b in blocks)
@@ -354,6 +373,16 @@ def render_theme_markdown(*, title, blocks, out_path=None):
             if b.get("informs"):
                 L += [f"**What it motivated ({_strip(b.get('informs_tag','informs'))}).** "
                       f"{_strip(b['informs'])}", ""]
+        elif t == "code":
+            if b.get("title"):
+                L += [f"### {_strip(b['title'])}", ""]
+            if b.get("io"):
+                L += [" -> ".join(_strip(s) for s in b["io"]), ""]
+            if b.get("src"):
+                L += [f"*{_strip(b['src'])}*", ""]
+            L += ["```python", b["code"], "```", ""]
+            if b.get("note"):
+                L += [_strip(b["note"]), ""]
         elif t == "tools":
             L += ["**Sources / tools:** " + ", ".join(_strip(c["t"]) for c in b["chips"]), ""]
     md = "\n".join(L).rstrip() + "\n"

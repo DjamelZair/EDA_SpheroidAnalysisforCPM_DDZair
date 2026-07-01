@@ -198,3 +198,13 @@ footer a{color:inherit;border-bottom:1px solid currentColor;padding-bottom:1px}
 .card table tbody td:nth-child(3){font-family:'JetBrains Mono',monospace;font-size:0.66rem;color:var(--muted-2)}
 .card table tbody td:last-child{color:var(--cream)}
 @media (max-width:700px){.card table{font-size:0.78rem}.card table tbody td,.card table thead th{padding:0.5rem 0.6rem}}
+
+/* provenance code cards (Theme 00 data construction) */
+.prov-io{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;margin:0 0 1rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em}
+.prov-step{background:rgba(199,160,92,0.12);border:1px solid rgba(199,160,92,0.4);color:var(--gold-3);padding:0.35rem 0.7rem;border-radius:3px}
+.prov-step:first-child{background:rgba(109,217,161,0.12);border-color:rgba(109,217,161,0.4);color:var(--green)}
+.prov-step:last-child{background:rgba(199,160,92,0.22);border-color:var(--gold);color:var(--gold-4)}
+.prov-arrow{color:var(--gold);font-size:0.9rem}
+.code-src{font-family:'JetBrains Mono',monospace;font-size:0.72rem;letter-spacing:0.03em;color:var(--gold-2);margin:0 0 0.5rem;font-weight:600}
+pre.codeblock{margin:0;padding:1.1rem 1.3rem;background:#04252b;border:1px solid rgba(199,160,92,0.28);border-left:3px solid var(--gold);border-radius:4px;overflow-x:auto;box-shadow:inset 0 0 40px rgba(0,0,0,0.25)}
+pre.codeblock code{font-family:'JetBrains Mono',monospace;font-size:0.82rem;line-height:1.65;color:#d6e6e2;white-space:pre;tab-size:4}
