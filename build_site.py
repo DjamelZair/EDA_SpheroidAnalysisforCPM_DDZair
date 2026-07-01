@@ -444,15 +444,14 @@ THEME1 = [
 
     dict(type="section", title='D. From image quality to library <span class="it">coverage</span>',
          right="why the thesis reports relative shifts"),
-    dict(type="figure", img=FIG1 + "fig09_quality_coverage_link.png", native=True,
-         ttl="Image quality predicts distance from the library", sub="real to nearest-synthetic distance",
-         alt="real-to-synthetic NN distance against fragmentation, contrast and focus",
-         shows="How far a real well sits from its nearest synthetic spheroid grows with fragmentation "
-               "(r=0.30) and focus (r=0.43) but not with contrast (r=0.05): the qualities hardest to "
-               "segment are also the least covered by the simulation library.",
-         informs="This is the mechanism behind the ~90% of real wells that fall outside the synthetic "
-                 "library, and the reason the inference is reported as relative shifts rather than "
-                 "absolute parameter values.",
+    dict(type="interactive", widget="qualcoverage", json="theme1_qualcoverage.json",
+         intro="Each dot is one real control well (n=48). Switch the image-quality metric to see which "
+               "one predicts how far the well sits from its nearest synthetic spheroid: blur (focus) "
+               "does, contrast does not, and more-fragmented wells sit slightly closer.",
+         informs="Distance rises with blur (focus r=+0.43) but is flat against contrast (r=+0.05); "
+                 "more-fragmented wells sit slightly closer (r=-0.30), since the library's dispersed "
+                 "synthetic morphologies resemble broken spheroids. Either way, image quality shapes "
+                 "coverage, so the inference is reported as relative shifts rather than absolutes.",
          informs_tag="Why relative shifts, not absolutes"),
 
     dict(type="prose", title="Sources (canonical, executable)",

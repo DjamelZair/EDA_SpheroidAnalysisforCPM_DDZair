@@ -769,9 +769,34 @@
     draw();
   }
 
+  /* ---------- O. QUALCOVERAGE: image quality vs distance from the library ---------- */
+  function qualcoverage(mount, d) {
+    header(mount, "Image quality vs distance from the library", "each dot is a real control well; does image quality predict how far it sits from the synthetic library?");
+    var mi = 0;
+    var bar = el("div", "iact-controls"); var seg = el("div", "iact-seg"); bar.appendChild(seg); mount.appendChild(bar);
+    var leg = el("div", "iact-readout"); leg.innerHTML = "<span style='color:" + C.clay + "'>&#9679; beyond p95 (out of library)</span> &nbsp; <span style='color:" + C.sky + "'>&#9679; within</span> &nbsp;&middot;&nbsp; gold line = linear trend";
+    mount.appendChild(leg);
+    var canvas = mkCanvas(mount, 300); var read = el("div", "iact-readout"); mount.appendChild(read);
+    function btns() { seg.innerHTML = ""; d.metrics.forEach(function (m, i) { var b = chip(m.label.replace(/ \(.*/, "") + "  r=" + (m.r > 0 ? "+" : "") + m.r, i === mi); b.onclick = function () { mi = i; draw(); }; seg.appendChild(b); }); }
+    function draw() {
+      btns();
+      var m = d.metrics[mi], x = ctxOf(canvas), W = canvas.clientWidth, H = 300;
+      var padx = (m.xhi - m.xlo) * 0.06 || 0.01;
+      var ax = scatterAxes(x, W, H, [m.xlo - padx, m.xhi + padx], [d.ylo, d.yhi]);
+      x.strokeStyle = C.gold; x.lineWidth = 2; x.beginPath(); x.moveTo(ax.px(m.xlo), ax.py(m.slope * m.xlo + m.intercept)); x.lineTo(ax.px(m.xhi), ax.py(m.slope * m.xhi + m.intercept)); x.stroke();
+      d.points.forEach(function (p) { var X = ax.px(p[m.key]), Y = ax.py(p.nn); x.beginPath(); x.arc(X, Y, 4, 0, 7); x.fillStyle = p.out ? C.clay : C.sky; x.globalAlpha = 0.85; x.fill(); x.globalAlpha = 1; });
+      x.fillStyle = C.muted; x.textAlign = "center"; x.font = "11px 'DM Sans'"; x.fillText(m.label, W / 2, H - 3);
+      x.save(); x.translate(12, H / 2 - 6); x.rotate(-Math.PI / 2); x.fillText("distance to nearest synthetic", 0, 0); x.restore();
+      read.innerHTML = "Correlation with distance: <b style='color:" + (Math.abs(m.r) >= 0.3 ? C.gold : C.muted) + ";font-size:1.02rem'>r = " + (m.r > 0 ? "+" : "") + m.r.toFixed(2) + "</b>. " + d.note + " <b style='color:" + C.goldL + "'>" + d.decision + "</b>";
+      canvas._draw = draw;
+    }
+    draw();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
-    featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech, qcdist: qcdist, fragstruct: fragstruct };
+    featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech, qcdist: qcdist, fragstruct: fragstruct,
+    qualcoverage: qualcoverage };
 
   var HELP = {
     morph: "Pick a parameter with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
@@ -789,6 +814,7 @@
     drugmech: "Click a drug-mechanism class to read what it targets, how it acts on a CLL cell, and the effect it is expected to have on the spheroid. The animation shows that effect: cells spread apart (looser) or pull together (more compact) relative to the dashed unstimulated baseline, driven by the inferred cell-cell adhesion shift for that class. Remember the shift is a relative, inferred parameter, not a physical measurement, and only the MEK inhibitor clears the significance heuristic (on just four wells).",
     qcdist: "The filled curve is the distribution of this image-quality metric across the real frames (for intensity, the gold line adds the bright background so you see the two modes). Switch to 'over time' to see the metric's median and interquartile range drift across the imaging time course. The readout states the finding and the method decision it drove.",
     fragstruct: "Three views of how fragmented the segmentation masks are. 'Fragment count' is the distribution of connected components per frame (most frames are multi-object); 'largest-component area' shows that despite the fragments, one component holds nearly all the area; 'over time' shows fragmentation rising across the time course. Together these motivate scoring with CC-Dice and keeping the largest component.",
+    qualcoverage: "Each dot is one real control well (n=48), placed by an image-quality metric against how far the well sits from its nearest synthetic spheroid in morphology space. Switch the metric to see which quality predicts distance: focus/blur does (r=+0.43), contrast does not (r=+0.05), and more-fragmented wells sit slightly closer (r=-0.30). Clay dots are beyond the p95 distance (out of library); the gold line is the linear trend.",
   };
   function addHelp(m, widget) {
     var head = m.querySelector(".iact-head"); if (!head || !HELP[widget]) return;

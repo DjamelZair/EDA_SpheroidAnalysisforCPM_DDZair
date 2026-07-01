@@ -53,14 +53,6 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 ## D. From image quality to library coverage  (why the thesis reports relative shifts)
 
-### Image quality predicts distance from the library - real to nearest-synthetic distance
-
-![](../assets/cll/figures/01_image_eda/fig09_quality_coverage_link.png)
-
-**What it shows.** How far a real well sits from its nearest synthetic spheroid grows with fragmentation (r=0.30) and focus (r=0.43) but not with contrast (r=0.05): the qualities hardest to segment are also the least covered by the simulation library.
-
-**What it motivated (Why relative shifts, not absolutes).** This is the mechanism behind the ~90% of real wells that fall outside the synthetic library, and the reason the inference is reported as relative shifts rather than absolute parameter values.
-
 ### Sources (canonical, executable)
 
 This reader consolidates and re-orders the data EDA into the thesis's decision order. Interactive charts are computed from the same local CSVs the notebooks use (`imaging_eda/cache/labelled_qc.csv`, `frame_qc.csv`, `rq1_segmentation/results/feature_validation/timecourse_full_features.csv`); raster panels are the on-brand figures from the thesis figure set. Open the source notebooks for the full code and every panel:
