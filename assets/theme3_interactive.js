@@ -819,7 +819,8 @@
 
   /* ---------- Q. DRUGSTRIP: drug time-lapse scrubber (image + shape numbers) ---------- */
   function drugstrip(mount, d) {
-    header(mount, "What the drugs do to morphology", "two dose conditions over five days; pick a drug and a day, watch the spheroid and its shape numbers");
+    var mt = d.meta || {};
+    header(mount, mt.title || "What the drugs do to morphology", mt.sub || "two dose conditions over five days; pick a drug and a day, watch the spheroid and its shape numbers");
     var di = 0, pi = 0;
     var bar = el("div", "iact-controls"); var seg = el("div", "iact-seg"); bar.appendChild(seg); mount.appendChild(bar);
     var grid = el("div", "iact-2col"); mount.appendChild(grid);
@@ -845,10 +846,42 @@
     render();
   }
 
+  /* ---------- R. GALLERY: clickable grid of synthetic spheroid renders ---------- */
+  function gallery(mount, d) {
+    header(mount, "Sixteen synthetic spheroids", "a diversity sample from the 1,105-run library; click one to read its morphology");
+    var grid = el("div", "iact-gallery"); mount.appendChild(grid);
+    var card = el("div", "iact-readout"); card.innerHTML = d.note; mount.appendChild(card);
+    d.items.forEach(function (it) {
+      var cell = el("div", "iact-gcell");
+      var img = el("img"); img.src = it.img; img.alt = "synthetic spheroid " + it.id; cell.appendChild(img);
+      cell.appendChild(el("div", "iact-gcap", "sample " + it.id));
+      cell.onclick = function () {
+        card.innerHTML = "<b>sample " + it.id + "</b> &middot; area " + (it.area ? Math.round(it.area).toLocaleString() : "-") + " px &middot; circularity " + (it.circ != null ? it.circ.toFixed(2) : "-") + " &middot; solidity " + (it.solid != null ? it.solid.toFixed(2) : "-") + ". " + d.note;
+        Array.prototype.forEach.call(grid.children, function (c) { c.className = "iact-gcell"; }); cell.className = "iact-gcell on";
+      };
+      grid.appendChild(cell);
+    });
+  }
+
+  /* ---------- S. TIMELAPSE: scrub a spheroid through time ---------- */
+  function timelapse(mount, d) {
+    header(mount, "When the spheroid disintegrates", "the hardest test frame across five days; drag to scrub time");
+    var i = 0;
+    var stage = el("div", "iact-stage"); mount.appendChild(stage);
+    var img = el("img", "iact-spheroid"); img.alt = "spheroid over time"; stage.appendChild(img);
+    var cap = el("div", "iact-cap"); stage.appendChild(cap);
+    var sliderWrap = el("div", "iact-slider"); mount.appendChild(sliderWrap);
+    var slider = el("input"); slider.type = "range"; slider.min = 0; slider.max = d.frames.length - 1; slider.step = 1; slider.value = 0; sliderWrap.appendChild(slider);
+    var read = el("div", "iact-readout"); read.innerHTML = d.note; mount.appendChild(read);
+    function draw() { var f = d.frames[i]; img.src = f.img; cap.innerHTML = "Day " + f.day + " &middot; " + f.hour + "h" + (f.day === 4 && f.hour === 20 ? " <span style='color:" + C.gold + "'>(held-out test frame)</span>" : ""); }
+    slider.oninput = function () { i = +slider.value; draw(); };
+    draw();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
     featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech, qcdist: qcdist, fragstruct: fragstruct,
-    qualcoverage: qualcoverage, sobolgap: sobolgap, drugstrip: drugstrip };
+    qualcoverage: qualcoverage, sobolgap: sobolgap, drugstrip: drugstrip, gallery: gallery, timelapse: timelapse };
 
   var HELP = {
     morph: "Pick a parameter with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",

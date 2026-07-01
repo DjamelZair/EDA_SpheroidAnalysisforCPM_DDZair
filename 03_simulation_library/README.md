@@ -27,14 +27,6 @@ The pipeline only works because the identical six features are measured on real 
 
 ## What the library looks like  (16 random samples at the final step)
 
-### Sixteen synthetic spheroids from the simulation library - final MCS, one replicate
-
-![](fig/saltelli_gallery.png)
-
-**What it shows.** Each panel is one sampled parameter vector rendered at the final simulation step, with cells coloured individually. The samples span compact, loosely packed, and fully dispersed morphologies.
-
-**What it motivated (Shows the library's morphological spread).** Confirms visually that the sampled parameter space produces a wide morphological range, the diversity the inversion relies on.
-
 ## Across the morphospace  (1,105 samples, click any one)
 
 ## Which parameters drive cluster size?  (Sobol indices, direct vs total effect)

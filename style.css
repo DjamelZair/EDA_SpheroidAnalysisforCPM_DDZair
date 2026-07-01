@@ -229,3 +229,11 @@ details.codefold pre.codeblock{margin:0}
 .hero h1,.sec-h h2,.bhero h1{word-spacing:0.06em;line-height:1.06}
 
 .display,.brand-name,.hero h1,.bhero h1,.sec-h h2,.card-h .ttl,.big-cta h3,.stack-row .lbl{text-transform:none}
+
+/* synthetic-spheroid gallery widget */
+.iact-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:.6rem;margin:.9rem 0 .4rem}
+.iact-gcell{cursor:pointer;border:1px solid rgba(199,160,92,.25);border-radius:4px;overflow:hidden;background:var(--teal-1);transition:transform .15s,border-color .15s}
+.iact-gcell:hover{border-color:var(--gold);transform:translateY(-2px)}
+.iact-gcell.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.iact-gcell img{width:100%;display:block}
+.iact-gcap{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--gold-3);text-align:center;padding:.32rem;text-transform:uppercase;letter-spacing:.06em}

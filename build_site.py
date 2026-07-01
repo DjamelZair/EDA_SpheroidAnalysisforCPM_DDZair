@@ -560,12 +560,11 @@ THEME2 = [
         dict(lbl="Reliability bar", num="&ge; 0.85", desc="Concordance threshold from the radiomics standard (IBSI).", numeric=True),
     ]),
 
-    dict(type="figure", img="fig/overlay_dark.png", native=True,
-         ttl="What the chosen segmenter produces", sub="real frames, three drug conditions, three days",
-         alt="real microscopy with the AI segmentation outline in gold",
-         shows="The gold outline is the U-Net's call on frames it never saw in training; the boxes "
-               "show the shape numbers (area, circularity, solidity) extracted from each.",
-         informs="The unit of evaluation is these extracted numbers, not the pixel mask.",
+    dict(type="interactive", widget="drugstrip", json="theme2_overlay.json",
+         intro="The U-Net's call (gold outline) on real treated frames it never saw in training. Pick a "
+               "condition and a day: the shape numbers beside it are read straight off the mask.",
+         informs="The unit of evaluation is these extracted numbers, not the pixel mask, which is why "
+                 "the segmenter is chosen on feature preservation.",
          informs_tag="Why feature preservation, not pixels"),
 
     dict(type="section", title='Model <span class="it">leaderboard</span>', right="switch the metric"),
@@ -630,13 +629,12 @@ THEME2 = [
          informs_tag="Negative result: cleanup is cosmetic for feature preservation"),
 
     dict(type="section", title='Hardest <span class="it">case</span>', right="a fully fragmented spheroid"),
-    dict(type="figure", img="fig/hardest_dark.png", native=True,
-         ttl="When the spheroid disintegrates", sub="VID3201 F3, trametinib 50 uM, full time-lapse",
-         alt="a heavily fragmented spheroid time-lapse, day 0 to day 4",
-         shows="Under high-dose drug the spheroid breaks into many pieces. Pixel overlap drops for "
-               "every model; area and diameter stay reliable while roundness and elongation collapse.",
-         informs="This split is the entire reason the audit was needed, and why F3 is reported "
-                 "separately rather than excluded.",
+    dict(type="interactive", widget="timelapse", json="theme2_f3.json",
+         intro="The hardest test frame (VID3201 F3, trametinib 50 uM). Drag the slider across five days "
+               "at four-hour cadence to watch the spheroid break into many pieces.",
+         informs="Under high-dose drug, pixel overlap drops for every model while area and diameter "
+                 "stay reliable and roundness collapses. This split is the whole reason the "
+                 "feature-preservation audit was needed, and why F3 is reported separately.",
          informs_tag="Validates the feature-preservation audit"),
     dict(type="chart", id="t2_f3", fn="barH", height=360,
          title="Classical pipeline on the hardest frame", sub="top 10 of the classical preproc / segmenter sweep",
@@ -728,14 +726,12 @@ THEME3 = [
          informs_tag="Beyond the thesis: live morph"),
     dict(type="section", title='What the <span class="it">library</span> looks like',
          right="16 random samples at the final step"),
-    dict(type="figure", img="fig/saltelli_gallery.png", native=True,
-         ttl="Sixteen synthetic spheroids from the simulation library", sub="final MCS, one replicate",
-         alt="gallery of 16 simulated CPM spheroids spanning the parameter space",
-         shows="Each panel is one sampled parameter vector rendered at the final simulation step, "
-               "with cells coloured individually. The samples span compact, loosely packed, and "
-               "fully dispersed morphologies.",
-         informs="Confirms visually that the sampled parameter space produces a wide morphological "
-                 "range, the diversity the inversion relies on.",
+    dict(type="interactive", widget="gallery", json="theme3_gallery.json",
+         intro="Sixteen sampled parameter vectors rendered at the final simulation step. Click any "
+               "spheroid to read its area, circularity and solidity: the samples span compact, loosely "
+               "packed and fully dispersed morphologies.",
+         informs="The sampled parameter space produces a wide morphological range, the diversity the "
+                 "inversion relies on.",
          informs_tag="Shows the library's morphological spread"),
     dict(type="section", title='Across the <span class="it">morphospace</span>',
          right="1,105 samples, click any one"),

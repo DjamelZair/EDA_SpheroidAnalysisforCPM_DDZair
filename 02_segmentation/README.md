@@ -13,14 +13,6 @@ Eight segmenters were compared on the same 45-image test set: a rule-based basel
 | Best pixel Dice | 0.829 | U-Net; nnU-Net essentially tied at 0.831. |
 | Reliability bar | &ge; 0.85 | Concordance threshold from the radiomics standard (IBSI). |
 
-### What the chosen segmenter produces - real frames, three drug conditions, three days
-
-![](fig/overlay_dark.png)
-
-**What it shows.** The gold outline is the U-Net's call on frames it never saw in training; the boxes show the shape numbers (area, circularity, solidity) extracted from each.
-
-**What it motivated (Why feature preservation, not pixels).** The unit of evaluation is these extracted numbers, not the pixel mask.
-
 ## Model leaderboard  (switch the metric)
 
 ### Ranking flips with the metric - click to switch
@@ -80,14 +72,6 @@ So the leaderboard winner is the resnet34 U-Net trained with aug_heavy: three tr
 **What it motivated (Negative result: cleanup is cosmetic for feature preservation).** On the metric that matters for the next stage this cleanup does not move the needle: it rescues pixel overlap, not shape-number reliability.
 
 ## Hardest case  (a fully fragmented spheroid)
-
-### When the spheroid disintegrates - VID3201 F3, trametinib 50 uM, full time-lapse
-
-![](fig/hardest_dark.png)
-
-**What it shows.** Under high-dose drug the spheroid breaks into many pieces. Pixel overlap drops for every model; area and diameter stay reliable while roundness and elongation collapse.
-
-**What it motivated (Validates the feature-preservation audit).** This split is the entire reason the audit was needed, and why F3 is reported separately rather than excluded.
 
 ### Classical pipeline on the hardest frame - top 10 of the classical preproc / segmenter sweep
 
