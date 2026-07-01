@@ -313,16 +313,15 @@ THEME0 = [
     # ---- augmentation: shared offline set + the U-Net's heavier online policy ----
     dict(type="section", title='Augmentation: a <span class="it">shared</span> set, plus a heavier U-Net policy',
          right="two different things, often confused"),
-    dict(type="figure", img=FIG1 + "fig06_augmentation_coverage.png", native=True,
-         ttl="Does the offline augmented set cover the real regimes?", sub="real vs augmented vs 51 originals",
-         alt="contrast, mean-intensity and focus distributions for real, augmented and original frames",
-         shows="The offline augmented training set (the 51 originals expanded to 306 pairs, shared by "
-               "every model) spans 100% of the real contrast range and 91% of the focus "
-               "(Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is "
-               "the axis it covers least.",
-         informs="This figure is about the offline augmented dataset that all candidates share. It is a "
-                 "separate thing from the 'heavy augmentation' U-Net variant, which is a training-time "
-                 "policy detailed in Theme 02, where that U-Net wins.",
+    dict(type="interactive", widget="augcover", json="theme0_augcoverage.json",
+         intro="The offline augmented training set (51 originals expanded to 306 pairs) is shared by "
+               "every candidate model. Does it span the image-quality regimes the real frames actually "
+               "show? Switch between contrast, intensity and focus: the filled curve is the 12,485 real "
+               "frames, the gold line the augmented set, the dashed line the 51 originals.",
+         informs="Contrast (100%) and focus (91%) are well covered, but only 18% of real frames fall in "
+                 "the augmented brightness range: intensity is the one regime the training set "
+                 "under-samples. This is the offline set, separate from the 'heavy augmentation' U-Net "
+                 "policy detailed in Theme 02.",
          informs_tag="Offline set, shared by all models"),
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 00', chips=[
         dict(t="shared/io.py", gold=True), dict(t="imaging_eda/patient_map.py"),
@@ -685,7 +684,7 @@ THEME2 = [
 CLLF = "../assets/cll/figures/"
 MUT = "rgba(168,181,184,0.55)"
 
-# ---- Theme 3 data: CPM parameter sweeps (how each knob changes cluster size) ----
+# ---- Theme 3 data: CPM parameter sweeps (how each parameter changes cluster size) ----
 _sw = _loadc("cpm_sweeps.json")
 _SW_ORDER = ["width", "contact", "contact_no", "neighbor", "lambda", "temp"]
 _sw_nice = {"width": "target volume (width)", "contact": "cell-cell adhesion",
@@ -710,13 +709,13 @@ THEME3 = [
          caption="Cellular Potts Model spheroid, synthetic lattice",
          lede="With a segmenter that preserves the six shape numbers (Theme 02), those same features "
               "can now be measured on simulated spheroids, so real and synthetic morphology become "
-              "directly comparable. Seven simulation knobs, swept one at a time and jointly, build the "
+              "directly comparable. Seven simulation parameters, swept one at a time and jointly, build the "
               "library the real spheroids are matched against.",
          summary="The pipeline only works because the identical six features are measured on real and "
                  "synthetic spheroids. A Cellular Potts Model with seven parameters (cell-cell and "
                  "cell-medium adhesion, contact range, neighbour order, volume elasticity, target "
                  "volume, and motility) is sampled to build a reference library of morphology "
-                 "trajectories. This theme shows how each knob changes the simulated cluster, and "
+                 "trajectories. This theme shows how each parameter changes the simulated cluster, and "
                  "accounts for which runs were usable."),
     dict(type="kpis", items=[
         dict(lbl="CPM parameters", num="7", desc="Swept one-at-a-time and jointly (Saltelli).", numeric=True),
@@ -724,20 +723,20 @@ THEME3 = [
         dict(lbl="Usable runs", num="1,105", desc="After dropping degenerate masks.", gold=True, numeric=True),
         dict(lbl="Dropped", num="47", desc="Empty or single-pixel masks, removed.", numeric=True),
     ]),
-    dict(type="section", title='How each <span class="it">knob</span> changes morphology',
+    dict(type="section", title='How each <span class="it">parameter</span> changes morphology',
          right="one-at-a-time sweeps"),
     dict(type="chart", id="t3_sweep", fn="sweepline", height=400,
          title="Cluster area vs parameter level", sub="switch the parameter",
          toggle=[(k, _sw_nice[k]) for k in _SW_ORDER], data=_SWEEP,
          note="Target volume (width) and cell-cell adhesion move cluster area the most; neighbour "
               "order and motility barely move it on their own.",
-         informs="Identifies which knobs leave a size signature in morphology, the precondition "
+         informs="Identifies which parameters leave a size signature in morphology, the precondition "
                  "for being identifiable later.",
          informs_tag="Sets up the identifiability question"),
-    dict(type="section", title='From <span class="it">knob to spheroid</span>',
+    dict(type="section", title='From <span class="it">parameter to spheroid</span>',
          right="live morph, beyond the thesis"),
     dict(type="interactive", widget="morph", json="theme3_morph.json",
-         intro="The thesis only shows static sweep curves. Here you grab a knob (target volume or "
+         intro="The thesis only shows static sweep curves. Here you grab a parameter (target volume or "
                "cell-cell adhesion J_cc) and watch a real rendered spheroid grow or compact while its "
                "cluster-area curve tracks the move.",
          informs="Binds the rendered CPM lattice to the swept parameter, so size and shape respond as "
@@ -759,25 +758,25 @@ THEME3 = [
     dict(type="interactive", widget="morphospace", json="theme3_morphospace.json",
          intro="Every dot is one of 1,105 synthetic spheroids. Click one to read the exact seven CPM "
                "parameters that produced it and the morphology that resulted. Swap the axes, recolour "
-               "by any knob, or highlight the morphological extremes.",
+               "by any parameter, or highlight the morphological extremes.",
          informs="Turns the library from a 16-panel gallery into a navigable map, where any point "
                  "reveals its generating parameters and shape.",
          informs_tag="Beyond the thesis: navigable library"),
-    dict(type="section", title='Which knobs <span class="it">drive</span> cluster size?',
+    dict(type="section", title='Which parameters <span class="it">drive</span> cluster size?',
          right="Sobol indices, direct vs total effect"),
     dict(type="figure", img=CLLF + "cpm/sobol_S1_vs_ST.png", native=True,
          ttl="Sobol first-order vs total effect", sub="share of variance in cluster area",
          alt="Sobol S1 and ST bars per parameter",
-         shows="Direct effect (S1) is how much a knob alone moves area; total effect (ST) adds its "
-               "interactions with the other knobs. A large gap means the knob acts mostly through those interactions.",
+         shows="Direct effect (S1) is how much a parameter alone moves area; total effect (ST) adds its "
+               "interactions with the other parameters. A large gap means the parameter acts mostly through those interactions.",
          informs="Target volume dominates; cell-cell and cell-medium adhesion carry sizeable "
-                 "interaction effects. These interactions limit how cleanly a single knob can be "
+                 "interaction effects. These interactions limit how cleanly a single parameter can be "
                  "read back from morphology.",
          informs_tag="Interactions bound identifiability"),
     dict(type="section", title='The <span class="it">surrogate</span>, opened up',
          right="XGBoost, cross-validated"),
     dict(type="interactive", widget="surrogate", json="theme3_surrogate.json",
-         intro="A gradient-boosted surrogate predicts each shape feature from the seven knobs. Toggle "
+         intro="A gradient-boosted surrogate predicts each shape feature from the seven parameters. Toggle "
                "between how well it predicts (per-feature cross-validated R-squared, click a bar for "
                "the five folds) and what drives each feature (Sobol direct, total, and interaction gap).",
          informs="Circularity is near-perfectly predictable while eccentricity is the weak link; the "
@@ -809,7 +808,7 @@ THEME3 = [
     dict(type="tools", label='<span class="it">Sources</span> &middot; Theme 03', chips=[
         dict(t="cpm_sweeps.json", gold=True), dict(t="CompuCell3D"), dict(t="Saltelli design"),
         dict(t="VTK feature extraction"), dict(t="1,105-run library")]),
-    dict(type="bigcta", title='Next: which knobs are <span class="it">identifiable</span>?',
+    dict(type="bigcta", title='Next: which parameters are <span class="it">identifiable</span>?',
          links=[dict(t="Theme 04 &middot; Identifiability &rarr;", href="04_separability_identifiability/index.html", primary=True),
                 dict(t="Back to index", href="index.html")]),
 ]
@@ -817,10 +816,10 @@ THEME3 = [
 THEME4 = [
     dict(type="hero",
          meta=["Theme 04", "Separability & identifiability", "Appendix D to H"],
-         title='Which knobs are <span class="it">recoverable</span>?',
+         title='Which parameters are <span class="it">recoverable</span>?',
          caption="Leave-one-out inversion on the 1,105-run library",
          lede="The parameter interactions and the thin real-world coverage seen in Theme 03 predict "
-              "that some knobs will be unreadable; leave-one-out inversion quantifies exactly which. "
+              "that some parameters will be unreadable; leave-one-out inversion quantifies exactly which. "
               "None of the seven reach the identifiable band: three are weakly identifiable, four are "
               "non-identifiable, and the analysis says so honestly.",
          summary="Leave-one-out inversion on the 1,105-run library measures how well each CPM "
@@ -859,7 +858,7 @@ THEME4 = [
          informs="Size features anchor the inversion; shape features add little once size is fixed, "
                  "consistent with the segmentation audit in Theme 02.",
          informs_tag="Connects back to feature preservation"),
-    dict(type="section", title='Which knobs are <span class="it">identifiable</span>?',
+    dict(type="section", title='Which parameters are <span class="it">identifiable</span>?',
          right="leave-one-out recovery"),
     dict(type="interactive", widget="idbars", json="theme4_identifiability.json",
          intro="Per-parameter recovery R-squared from the inversion benchmark. Two matchers: the "
@@ -875,9 +874,9 @@ THEME4 = [
     dict(type="section", title='Feature to parameter <span class="it">sensitivity</span>',
          right="surrogate Sobol total-effect weights"),
     dict(type="interactive", widget="heatmap", json="theme4_discriminability_heatmap.json",
-         intro="How much each shape feature responds to each CPM knob, as XGBoost-surrogate Sobol "
-               "total-effect weights (per-knob min-max normalised, clipped at 0.05). Brighter gold means "
-               "more sensitive; click a cell to read its value. All seven knobs are shown: width and volume "
+         intro="How much each shape feature responds to each CPM parameter, as XGBoost-surrogate Sobol "
+               "total-effect weights (per-parameter min-max normalised, clipped at 0.05). Brighter gold means "
+               "more sensitive; click a cell to read its value. All seven parameters are shown: width and volume "
                "elasticity drive size, while contact J and cell-medium adhesion drive shape.",
          informs="Area and circularity carry most of the recoverable signal, consistent with the "
                  "identifiability ranking above.",
@@ -942,6 +941,18 @@ THEME5 = [
               "held-out test set (area and diameter above the 0.85 concordance bar), and the inference "
               "uses only those same features. The trust is inherited from that audit, not re-measured "
               "on unlabelled real data."),
+    dict(type="section", title='How each mechanism <span class="it">class</span> works',
+         right="target, mechanism, and simulated spheroid effect"),
+    dict(type="interactive", widget="drugmech", json="theme5_drugmech.json",
+         intro="The panel spans ten mechanism classes. Click one to see what it targets, how it acts on "
+               "a CLL cell, and a stylised simulation of the effect on the spheroid: cells spread apart "
+               "(looser) or pull together (more compact) relative to the unstimulated baseline, driven "
+               "by the class's inferred cell-cell adhesion shift.",
+         informs="Most classes hit the B-cell-receptor axis (BTK, Syk, PI3K), which maintains the "
+                 "adhesion that holds the spheroid together, so the prior is loosening. The inferred "
+                 "shifts are mostly weak and non-significant; only the MEK inhibitor clears the "
+                 "heuristic, and even that on four wells. The honest read is small, uncertain effects.",
+         informs_tag="Beyond the thesis: mechanism to morphology"),
     dict(type="section", title='Drug panel, <span class="it">drug by drug</span>',
          right="inferred delta J_cc with intervals"),
     dict(type="interactive", widget="forest", json="theme5_drug_forest.json",

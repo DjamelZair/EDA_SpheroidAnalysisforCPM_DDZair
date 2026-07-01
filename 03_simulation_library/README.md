@@ -2,9 +2,9 @@
 
 **Thesis target:** Theme 03 / Synthetic CPM library / Appendix C & F.
 
-> With a segmenter that preserves the six shape numbers (Theme 02), those same features can now be measured on simulated spheroids, so real and synthetic morphology become directly comparable. Seven simulation knobs, swept one at a time and jointly, build the library the real spheroids are matched against.
+> With a segmenter that preserves the six shape numbers (Theme 02), those same features can now be measured on simulated spheroids, so real and synthetic morphology become directly comparable. Seven simulation parameters, swept one at a time and jointly, build the library the real spheroids are matched against.
 
-The pipeline only works because the identical six features are measured on real and synthetic spheroids. A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion, contact range, neighbour order, volume elasticity, target volume, and motility) is sampled to build a reference library of morphology trajectories. This theme shows how each knob changes the simulated cluster, and accounts for which runs were usable.
+The pipeline only works because the identical six features are measured on real and synthetic spheroids. A Cellular Potts Model with seven parameters (cell-cell and cell-medium adhesion, contact range, neighbour order, volume elasticity, target volume, and motility) is sampled to build a reference library of morphology trajectories. This theme shows how each parameter changes the simulated cluster, and accounts for which runs were usable.
 
 | Metric | Value | Note |
 |---|---|---|
@@ -13,7 +13,7 @@ The pipeline only works because the identical six features are measured on real 
 | Usable runs | 1,105 | After dropping degenerate masks. |
 | Dropped | 47 | Empty or single-pixel masks, removed. |
 
-## How each knob changes morphology  (one-at-a-time sweeps)
+## How each parameter changes morphology  (one-at-a-time sweeps)
 
 ### Cluster area vs parameter level - switch the parameter
 
@@ -21,9 +21,9 @@ The pipeline only works because the identical six features are measured on real 
 
 **What it shows.** Target volume (width) and cell-cell adhesion move cluster area the most; neighbour order and motility barely move it on their own.
 
-**What it motivated (Sets up the identifiability question).** Identifies which knobs leave a size signature in morphology, the precondition for being identifiable later.
+**What it motivated (Sets up the identifiability question).** Identifies which parameters leave a size signature in morphology, the precondition for being identifiable later.
 
-## From knob to spheroid  (live morph, beyond the thesis)
+## From parameter to spheroid  (live morph, beyond the thesis)
 
 ## What the library looks like  (16 random samples at the final step)
 
@@ -37,15 +37,15 @@ The pipeline only works because the identical six features are measured on real 
 
 ## Across the morphospace  (1,105 samples, click any one)
 
-## Which knobs drive cluster size?  (Sobol indices, direct vs total effect)
+## Which parameters drive cluster size?  (Sobol indices, direct vs total effect)
 
 ### Sobol first-order vs total effect - share of variance in cluster area
 
 ![](../assets/cll/figures/cpm/sobol_S1_vs_ST.png)
 
-**What it shows.** Direct effect (S1) is how much a knob alone moves area; total effect (ST) adds its interactions with the other knobs. A large gap means the knob acts mostly through those interactions.
+**What it shows.** Direct effect (S1) is how much a parameter alone moves area; total effect (ST) adds its interactions with the other parameters. A large gap means the parameter acts mostly through those interactions.
 
-**What it motivated (Interactions bound identifiability).** Target volume dominates; cell-cell and cell-medium adhesion carry sizeable interaction effects. These interactions limit how cleanly a single knob can be read back from morphology.
+**What it motivated (Interactions bound identifiability).** Target volume dominates; cell-cell and cell-medium adhesion carry sizeable interaction effects. These interactions limit how cleanly a single parameter can be read back from morphology.
 
 ## The surrogate, opened up  (XGBoost, cross-validated)
 

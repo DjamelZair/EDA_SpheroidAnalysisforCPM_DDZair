@@ -1,8 +1,8 @@
-# Which knobs are recoverable?
+# Which parameters are recoverable?
 
 **Thesis target:** Theme 04 / Separability & identifiability / Appendix D to H.
 
-> The parameter interactions and the thin real-world coverage seen in Theme 03 predict that some knobs will be unreadable; leave-one-out inversion quantifies exactly which. None of the seven reach the identifiable band: three are weakly identifiable, four are non-identifiable, and the analysis says so honestly.
+> The parameter interactions and the thin real-world coverage seen in Theme 03 predict that some parameters will be unreadable; leave-one-out inversion quantifies exactly which. None of the seven reach the identifiable band: three are weakly identifiable, four are non-identifiable, and the analysis says so honestly.
 
 Leave-one-out inversion on the 1,105-run library measures how well each CPM parameter is recovered from morphology (R squared of recovered vs true). Cell-medium width, cell-medium adhesion and cell-cell adhesion are weakly identifiable; the other four are non-identifiable. These are the verified numbers from the recovery benchmark, not the optimistic error metric used elsewhere.
 
@@ -33,7 +33,7 @@ Leave-one-out inversion on the 1,105-run library measures how well each CPM para
 
 **What it motivated (Connects back to feature preservation).** Size features anchor the inversion; shape features add little once size is fixed, consistent with the segmentation audit in Theme 02.
 
-## Which knobs are identifiable?  (leave-one-out recovery)
+## Which parameters are identifiable?  (leave-one-out recovery)
 
 ## Feature to parameter sensitivity  (surrogate Sobol total-effect weights)
 

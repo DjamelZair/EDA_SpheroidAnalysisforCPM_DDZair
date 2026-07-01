@@ -274,14 +274,6 @@ The genuinely plate-stratified 5-fold CV split (patient/plate held out) is a sep
 
 ## Augmentation: a shared set, plus a heavier U-Net policy  (two different things, often confused)
 
-### Does the offline augmented set cover the real regimes? - real vs augmented vs 51 originals
-
-![](../assets/cll/figures/01_image_eda/fig06_augmentation_coverage.png)
-
-**What it shows.** The offline augmented training set (the 51 originals expanded to 306 pairs, shared by every model) spans 100% of the real contrast range and 91% of the focus (Laplacian-variance) range, but only 18% of the mean-intensity range; brightness is the axis it covers least.
-
-**What it motivated (Offline set, shared by all models).** This figure is about the offline augmented dataset that all candidates share. It is a separate thing from the 'heavy augmentation' U-Net variant, which is a training-time policy detailed in Theme 02, where that U-Net wins.
-
 ## Complete analysis index  (every thesis analysis in this theme)
 
 ### Each analysis, what it shows, its thesis label, and the result

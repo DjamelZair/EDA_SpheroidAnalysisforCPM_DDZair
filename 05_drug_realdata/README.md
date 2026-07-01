@@ -43,6 +43,8 @@ Real spheroid trajectories from reference wells across five patients (seven pati
 
 The real inference spheroids have no human-drawn masks to check against, so there is no real-data agreement heatmap to show here. The reliability guarantee comes from Theme 02: the segmenter was chosen because its six shape numbers agree with human ones on the held-out test set (area and diameter above the 0.85 concordance bar), and the inference uses only those same features. The trust is inherited from that audit, not re-measured on unlabelled real data.
 
+## How each mechanism class works  (target, mechanism, and simulated spheroid effect)
+
 ## Drug panel, drug by drug  (inferred delta J_cc with intervals)
 
 ## The whole arc, in one line  (what the six themes add up to)

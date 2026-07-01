@@ -58,7 +58,7 @@
 
   /* ---------- A. MORPH STUDIO: slider morphs spheroid + redraws curves ---------- */
   function morphStudio(mount, d) {
-    header(mount, "The simulator's response", "drag a knob, watch the spheroid and its cluster size respond");
+    header(mount, "The simulator's response", "drag a parameter, watch the spheroid and its cluster size respond");
     var keys = Object.keys(d.params);
     var cur = keys.indexOf("width") >= 0 ? "width" : keys[0];
     var feat = "total_area";
@@ -140,7 +140,7 @@
 
   /* ---------- B. MORPHOSPACE EXPLORER: clickable 1105-sample cloud ---------- */
   function morphospace(mount, d) {
-    header(mount, "The simulation library", "every point is one of 1,105 synthetic spheroids - click to read its 7 CPM knobs");
+    header(mount, "The simulation library", "every point is one of 1,105 synthetic spheroids - click to read its 7 CPM parameters");
     var feats = d.meta.features, pLabels = d.meta.params;
     var ax1 = (d.meta.default_axes && d.meta.default_axes[0]) || "total_area";
     var ay1 = (d.meta.default_axes && d.meta.default_axes[1]) || "circularity";
@@ -298,7 +298,7 @@
         var fl = dropdown(s.features.map(function (f) { return { value: f, label: f.replace(/_/g, " ") }; }), feated);
         var lf = el("label", "iact-field"); lf.appendChild(el("span", "iact-flab", "feature")); lf.appendChild(fl); seg.appendChild(lf);
         ["S1", "ST", "gap"].forEach(function (m) { var b = chip(m === "S1" ? "direct (S1)" : m === "ST" ? "total (ST)" : "interaction gap", metric === m); b.onclick = function () { metric = m; render(); }; seg.appendChild(b); });
-        body.appendChild(el("div", "iact-readout", "How much each knob drives <b>" + feated.replace(/_/g, " ") + "</b>. Big total-vs-direct gap = the knob acts through interactions."));
+        body.appendChild(el("div", "iact-readout", "How much each parameter drives <b>" + feated.replace(/_/g, " ") + "</b>. Big total-vs-direct gap = the parameter acts through interactions."));
         var c = mkCanvas(body, 34 * s.parameters.length + 24);
         var fi = s.features.indexOf(feated);
         var vals = s.parameters.map(function (p, j) { var v = metric === "S1" ? s.S1[fi][j] : metric === "ST" ? s.ST[fi][j] : (s.gap ? s.gap[fi][j] : s.ST[fi][j] - s.S1[fi][j]); return { p: p, v: v }; });
@@ -388,8 +388,8 @@
 
   /* ---------- G. DISCRIMINABILITY HEATMAP (Theme 04) ---------- */
   function heatmap(mount, d) {
-    header(mount, "Feature to parameter sensitivity", "surrogate Sobol total-effect weights, per knob");
-    var note = el("div", "iact-readout"); note.innerHTML = "Each cell is the XGBoost-surrogate Sobol total-effect weight (per-knob min-max normalised). Brighter gold = that feature is more sensitive to that knob. Click a cell to read its value."; mount.appendChild(note);
+    header(mount, "Feature to parameter sensitivity", "surrogate Sobol total-effect weights, per parameter");
+    var note = el("div", "iact-readout"); note.innerHTML = "Each cell is the XGBoost-surrogate Sobol total-effect weight (per-parameter min-max normalised). Brighter gold = that feature is more sensitive to that parameter. Click a cell to read its value."; mount.appendChild(note);
     var ncol = d.params.length;
     var g = el("div"); g.style.display = "grid"; g.style.gridTemplateColumns = "minmax(96px,1.1fr) repeat(" + ncol + ",1fr)"; g.style.gap = "3px"; g.style.marginTop = "0.8rem"; mount.appendChild(g);
     function cell(txt, cls) { var c = el("div", cls); c.textContent = txt; c.style.padding = "0.5rem 0.3rem"; c.style.fontFamily = "'JetBrains Mono',monospace"; c.style.fontSize = "0.62rem"; c.style.textAlign = "center"; return c; }
@@ -411,7 +411,7 @@
 
   /* ---------- H. IDENTIFIABILITY EXPLORER (Theme 04) ---------- */
   function idbars(mount, d) {
-    header(mount, "Which knobs are recoverable?", "leave-one-out recovery R-squared per parameter");
+    header(mount, "Which parameters are recoverable?", "leave-one-out recovery R-squared per parameter");
     var TIER = { identifiable: C.green, weak: C.gold, "non-identifiable": C.muted };
     var vkeys = Object.keys(d.variants), cur = vkeys.indexOf("tau") >= 0 ? "tau" : vkeys[0];
     var seg = el("div", "iact-seg"); mount.appendChild(seg);
@@ -582,22 +582,120 @@
     draw();
   }
 
+  /* ---------- K. AUGCOVER: augmentation coverage as density curves ---------- */
+  function augcover(mount, d) {
+    header(mount, "Does augmentation cover the real regimes?", "real frames vs augmented vs the 51 originals; switch the metric");
+    var mi = 0;
+    var bar = el("div", "iact-controls"); mount.appendChild(bar);
+    var seg = el("div", "iact-seg"); bar.appendChild(seg);
+    var leg = el("div", "iact-readout");
+    leg.innerHTML = "<span style='color:" + C.sky + "'>&#9608; real frames</span> &nbsp; <span style='color:" + C.gold + "'>&#9473; augmented</span> &nbsp; <span style='color:" + C.clay + "'>&#9548; the 51 originals</span> &nbsp;&middot;&nbsp; shaded = augmented range";
+    mount.appendChild(leg);
+    var canvas = mkCanvas(mount, 300);
+    var read = el("div", "iact-readout"); mount.appendChild(read);
+    function btns() { seg.innerHTML = ""; d.metrics.forEach(function (m, i) { var b = chip(m.label.replace(/ \(.*/, ""), i === mi); b.onclick = function () { mi = i; draw(); }; seg.appendChild(b); }); }
+    function draw() {
+      btns();
+      var m = d.metrics[mi], x = ctxOf(canvas), W = canvas.clientWidth, H = 300;
+      var padL = 46, padR = 16, padT = 14, padB = 44, lo = m.lo, hi = m.hi;
+      var cx = m.centers, N = cx.length;
+      var px = function (v) { return lerp(padL, W - padR, (v - lo) / (hi - lo || 1)); };
+      var maxd = Math.max(Math.max.apply(null, m.real), Math.max.apply(null, m.augmented), Math.max.apply(null, m.originals)) || 1;
+      var py = function (v) { return lerp(H - padB, padT, v / maxd); };
+      x.clearRect(0, 0, W, H);
+      // augmented-range band
+      x.fillStyle = "rgba(200,160,92,0.10)"; x.fillRect(px(m.aug_lo), padT, Math.max(1, px(m.aug_hi) - px(m.aug_lo)), H - padT - padB);
+      // grid + x ticks
+      x.strokeStyle = C.grid; x.fillStyle = C.muted; x.lineWidth = 1; x.font = "11px 'DM Sans'";
+      for (var t = 0; t <= 4; t++) { var gx = lerp(padL, W - padR, t / 4), gv = lerp(lo, hi, t / 4); x.beginPath(); x.moveTo(gx, padT); x.lineTo(gx, H - padB); x.stroke(); x.textAlign = "center"; x.fillStyle = C.muted; x.fillText(m.log ? ("1e" + Math.round(gv)) : gv.toFixed(2), gx, H - padB + 16); }
+      // real: filled area
+      x.beginPath(); x.moveTo(px(cx[0]), py(0));
+      for (var i = 0; i < N; i++) x.lineTo(px(cx[i]), py(m.real[i]));
+      x.lineTo(px(cx[N - 1]), py(0)); x.closePath(); x.fillStyle = "rgba(127,179,189,0.32)"; x.fill();
+      x.beginPath(); for (i = 0; i < N; i++) { var X = px(cx[i]), Y = py(m.real[i]); i ? x.lineTo(X, Y) : x.moveTo(X, Y); } x.strokeStyle = C.sky; x.lineWidth = 1.5; x.stroke();
+      // originals: dashed clay
+      x.setLineDash([5, 4]); x.beginPath(); for (i = 0; i < N; i++) { X = px(cx[i]); Y = py(m.originals[i]); i ? x.lineTo(X, Y) : x.moveTo(X, Y); } x.strokeStyle = C.clay; x.lineWidth = 1.6; x.stroke(); x.setLineDash([]);
+      // augmented: solid gold
+      x.beginPath(); for (i = 0; i < N; i++) { X = px(cx[i]); Y = py(m.augmented[i]); i ? x.lineTo(X, Y) : x.moveTo(X, Y); } x.strokeStyle = C.gold; x.lineWidth = 2.2; x.stroke();
+      // axis labels
+      x.fillStyle = C.muted; x.textAlign = "center"; x.font = "11px 'DM Sans'"; x.fillText(m.label, (padL + W - padR) / 2, H - 4);
+      x.save(); x.translate(13, (padT + H - padB) / 2); x.rotate(-Math.PI / 2); x.fillText("density", 0, 0); x.restore();
+      read.innerHTML = "<b style='color:" + (m.coverage >= 80 ? C.green : m.coverage >= 40 ? C.gold : C.clay) + ";font-size:1.05rem'>" + m.coverage + "%</b> of real frames fall inside the augmented range. " + (m.coverage >= 80 ? "Well covered: the U-Net trains across the regimes it will meet." : "The gap is the residual exposure at inference (brightness is the least-covered axis).");
+      canvas._draw = draw;
+    }
+    draw();
+  }
+
+  /* ---------- L. DRUGMECH: mechanism-class explorer with a simulated spheroid response ---------- */
+  function drugmech(mount, d) {
+    header(mount, "How each mechanism class works", "click a drug class for its target, mechanism, and the simulated effect on the spheroid");
+    var cur = 0, spread = 1, target = 1, raf = null, seed = 1;
+    var bar = el("div", "iact-controls"); mount.appendChild(bar);
+    var seg = el("div", "iact-seg"); bar.appendChild(seg);
+    var grid = el("div", "iact-2col"); mount.appendChild(grid);
+    var stage = el("div", "iact-stage"); grid.appendChild(stage);
+    var canvas = mkCanvas(stage, 240);
+    var cap = el("div", "iact-cap"); stage.appendChild(cap);
+    var card = el("div", "iact-card"); grid.appendChild(card);
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    var cells = []; for (var i = 0; i < 74; i++) { cells.push({ a: rnd() * 6.283, r: Math.sqrt(rnd()), jx: rnd() - 0.5, jy: rnd() - 0.5, ph: rnd() * 6.283 }); }
+    function obs(c) { return c.djcc > 1.2 ? "looser" : c.djcc < -1.2 ? "more compact" : "little net change"; }
+    var EXP = { loosen: 1.34, revert: 1.18, compact: 0.78, shrink: 0.6, mixed: 1.0 };
+    function tgt(c) { return EXP[c.expect] || 1.0; }
+    function buttons() { seg.innerHTML = ""; d.classes.forEach(function (c, i) { var b = chip(c.class, i === cur); b.onclick = function () { cur = i; select(); }; seg.appendChild(b); }); }
+    function draw() {
+      var x = ctxOf(canvas), W = canvas.clientWidth, H = 240, cx = W / 2, cy = H / 2;
+      x.clearRect(0, 0, W, H);
+      var R0 = Math.min(W, H) * 0.32, R = R0 * spread;
+      x.setLineDash([4, 5]); x.strokeStyle = "rgba(168,181,184,0.5)"; x.lineWidth = 1; x.beginPath(); x.arc(cx, cy, R0, 0, 7); x.stroke(); x.setLineDash([]);
+      var scat = Math.max(0, spread - 0.62) * 9;
+      cells.forEach(function (p) {
+        var X = cx + Math.cos(p.a) * p.r * R + p.jx * scat, Y = cy + Math.sin(p.a) * p.r * R + p.jy * scat;
+        x.beginPath(); x.arc(X, Y, 3.3, 0, 7); x.fillStyle = "rgba(243,236,214,0.92)"; x.fill();
+      });
+      x.fillStyle = C.muted; x.font = "10px 'DM Sans'"; x.textAlign = "left"; x.fillText("dashed = unstimulated baseline", 8, H - 8);
+      canvas._draw = draw;
+    }
+    function animate() { spread += (target - spread) * 0.07; draw(); if (Math.abs(target - spread) > 0.002) raf = requestAnimationFrame(animate); }
+    function select() {
+      buttons();
+      var c = d.classes[cur]; target = tgt(c);
+      var exp = { loosen: "loosening", revert: "reverts stimulation", compact: "compaction", shrink: "shrinkage (apoptotic)", mixed: "no consistent prediction" }[c.expect] || c.expect;
+      cap.innerHTML = "expected effect: <b style='color:" + (target > 1.02 ? C.gold : target < 0.98 ? C.sky : C.muted) + "'>" + exp + "</b>";
+      var sc = c.sig === "sig" ? C.green : c.sig === "borderline" ? C.gold : C.muted;
+      var h = "<div class='iact-cardh'>" + c.full + " <span class='iact-badge' style='background:" + sc + ";color:var(--teal-1)'>" + c.sig + "</span></div>";
+      var kv = "<div class='iact-kv'><div class='iact-kvg'>" + c.class + " &middot; " + c.drugs.slice(0, 3).join(", ") + (c.drugs.length > 3 ? " +" + (c.drugs.length - 3) : "") + "</div>"
+        + "<div><span>target</span><b>" + c.target + "</b></div>"
+        + "<div><span>expected effect</span><b>" + exp + "</b></div>"
+        + "<div><span>inferred &Delta;J_cc</span><b style='color:" + sc + "'>" + (c.djcc > 0 ? "+" : "") + c.djcc.toFixed(2) + " [" + c.lo.toFixed(1) + ", " + c.hi.toFixed(1) + "]</b></div>"
+        + "<div><span>observed shift</span><b>" + obs(c) + " (" + c.sig + ")</b></div>"
+        + "<div><span>wells</span><b>" + c.n + "</b></div></div>";
+      var body = "<p style='font-size:.9rem;line-height:1.55;margin:.6rem 0 .4rem;opacity:.92'>" + c.mech + "</p>"
+        + "<p style='font-family:\"Instrument Serif\",serif;font-style:italic;color:var(--gold-3);font-size:1.02rem;line-height:1.4'>" + c.takeaway + "</p>";
+      card.innerHTML = h + kv + body;
+      if (raf) cancelAnimationFrame(raf); animate();
+    }
+    select();
+  }
+
   var WIDGETS = { morph: morphStudio, morphospace: morphospace, coverage: coverage, surrogate: surrogate,
     qcthreshold: qcthreshold, modelscatter: modelscatter, heatmap: heatmap, idbars: idbars, forest: forest,
-    featdist: featdist, compose: compose };
+    featdist: featdist, compose: compose, augcover: augcover, drugmech: drugmech };
 
   var HELP = {
-    morph: "Pick a knob with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
-    morphospace: "Each dot is one synthetic spheroid. Click a dot to read its 7 CPM parameters and resulting morphology. Outlined dots also have a rendered spheroid image; faded dots show parameters only. Use the dropdowns to change the axes or recolour by a knob, and Highlight extremes to flag the morphological corners.",
+    morph: "Pick a parameter with the buttons (target volume or cell-cell adhesion J_cc), then drag the slider to a level. The rendered spheroid and the cluster-area curve both update to that level. Use the dropdown to change which feature the curve shows.",
+    morphospace: "Each dot is one synthetic spheroid. Click a dot to read its 7 CPM parameters and resulting morphology. Outlined dots also have a rendered spheroid image; faded dots show parameters only. Use the dropdowns to change the axes or recolour by a parameter, and Highlight extremes to flag the morphological corners.",
     coverage: "Grey dots are synthetic spheroids and coloured dots are the real wells, projected into the same PCA space. Drag the threshold to set how far a real well must sit from the nearest synthetic spheroid to count as outside the library; the headline count and the red/green colouring update.",
-    surrogate: "Two tabs. 'How well can it predict' shows the surrogate's cross-validated R-squared per shape feature (click a bar for its 5 folds). 'What drives each feature' shows Sobol importances per knob, with a feature dropdown and a direct / total / interaction-gap toggle.",
+    surrogate: "Two tabs. 'How well can it predict' shows the surrogate's cross-validated R-squared per shape feature (click a bar for its 5 folds). 'What drives each feature' shows Sobol importances per parameter, with a feature dropdown and a direct / total / interaction-gap toggle.",
     qcthreshold: "Pick a quality metric with the buttons, then drag the threshold. Gold dots pass your bar and red dots fail, and the headline shows how many of the 12,480 frames pass.",
     modelscatter: "Each dot is a segmentation model, placed by pixel overlap (Dice) against shape-number agreement (CCC). Click a model to see its overall metrics, per-feature reliability and training configuration.",
-    heatmap: "Each cell is the XGBoost-surrogate Sobol total-effect weight: how much a shape feature (row) responds to a CPM knob (column), min-max normalised per knob. Brighter gold means more sensitive. Click a cell to read its value. All seven knobs are shown: width and volume elasticity drive size, while contact J and cell-medium adhesion drive shape.",
+    heatmap: "Each cell is the XGBoost-surrogate Sobol total-effect weight: how much a shape feature (row) responds to a CPM parameter (column), min-max normalised per parameter. Brighter gold means more sensitive. Click a cell to read its value. All seven parameters are shown: width and volume elasticity drive size, while contact J and cell-medium adhesion drive shape.",
     idbars: "Bars are the per-parameter recovery R-squared under the selected matcher (toggle tau primary, end-state secondary, or Wasserstein third). Green, gold and grey mean identifiable, weakly identifiable and non-identifiable; the dashed line is the 0.70 identifiable bar. Click a bar for Pearson, sample count and error.",
     forest: "Each row is a drug's inferred cell-cell adhesion shift (median) with its q25 to q75 spread; the dashed line is no change (zero). Colour shows significance, a heuristic where the spread excludes zero (not a formal statistical test). Click a drug to see the individual wells behind its estimate.",
     featdist: "Pick one of the six shape features with the buttons to see its distribution across the 557 annotated spheroid objects, with the gold dashed line at the median. 'log axis' (for the size features) shows how a log scale fixes their heavy skew. 'split by plate' overlays the held-out VID3201 plate in gold against the other plates, exposing the batch effect that motivates plate-stratified splitting.",
     compose: "Use the dropdown to break the 12,485 inference frames down by drug-mechanism class, patient, stimulation or condition, and toggle count versus percent. It shows the corpus is not balanced: CXCR4-antagonist wells and the longitudinal patient 706 dominate, and drug frames outnumber controls roughly seven to one, which is why the training split is stratified by plate rather than shuffled.",
+    augcover: "Each curve is a distribution of one image-quality metric: the filled area is the real inference frames, the gold line the augmented training set, and the dashed clay line the 51 hand-annotated originals. Switch the metric (contrast, intensity, focus). The shaded band and the headline percent show how much of the real data falls inside the augmented range: contrast and focus are well covered, but brightness (mean intensity) is not, which is the one regime the training set under-samples.",
+    drugmech: "Click a drug-mechanism class to read what it targets, how it acts on a CLL cell, and the effect it is expected to have on the spheroid. The animation shows that effect: cells spread apart (looser) or pull together (more compact) relative to the dashed unstimulated baseline, driven by the inferred cell-cell adhesion shift for that class. Remember the shift is a relative, inferred parameter, not a physical measurement, and only the MEK inhibitor clears the significance heuristic (on just four wells).",
   };
   function addHelp(m, widget) {
     var head = m.querySelector(".iact-head"); if (!head || !HELP[widget]) return;
