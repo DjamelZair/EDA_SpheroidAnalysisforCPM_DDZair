@@ -87,7 +87,7 @@ Brightfield microscopy of patient-derived CLL spheroids is low-contrast, unevenl
 
 *(interactive chart in the HTML version)*
 
-**What it shows.** A single teaser: Syk-inhibitor and CXCR4-antagonist wells fragment most; BTK, NF-kB and MALT1 inhibitors sit lowest. Counts are large, unequal and plate-level, so this is read as an association only. The full drug-response analysis, auto-measured trajectories, per-drug inferred shifts and the BCR axis, lives in Theme 05.
+**What it shows.** A single teaser: Syk-inhibitor and CXCR4-antagonist wells fragment most; BTK, NF-kB and MALT1 inhibitors sit lowest. Counts are large, unequal and plate-level, so this is read as an association only. The full drug-response analysis, auto-measured trajectories, per-drug inferred shifts and the BCR axis, lives in [Theme 05](../05_drug_realdata/index.html).
 
 **What it motivated (Preview only: full drug panel in Theme 05).** Previews the RQ3 drug-response story and shows the most drug-responsive classes are the hardest to segment, which is exactly why the segmenter is chosen on feature preservation rather than pixel overlap.
 

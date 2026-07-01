@@ -39,13 +39,9 @@ Real spheroid trajectories from reference wells across five patients (seven pati
 
 **What it motivated (Feeds the inversion).** This is the observable the inference consumes: a per-condition shape trajectory that the CPM matcher compares against the synthetic library to produce the per-condition parameter shifts.
 
-### Feature agreement on the real data - AI-derived vs reference
+### Why we trust these real-data features
 
-![](../assets/cll/figures/morphology/icc_ccc_heatmap.png)
-
-**What it shows.** Agreement between AI-derived and reference shape numbers on the real spheroids, the same reliability check applied in Theme 02.
-
-**What it motivated (Closes the loop with RQ1).** Confirms the real-data features used for inversion are the reliable ones.
+The real inference spheroids have no human-drawn masks to check against, so there is no real-data agreement heatmap to show here. The reliability guarantee comes from Theme 02: the segmenter was chosen because its six shape numbers agree with human ones on the held-out test set (area and diameter above the 0.85 concordance bar), and the inference uses only those same features. The trust is inherited from that audit, not re-measured on unlabelled real data.
 
 ## Drug panel, drug by drug  (inferred delta J_cc with intervals)
 

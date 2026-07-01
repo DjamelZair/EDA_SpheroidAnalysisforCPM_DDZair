@@ -450,13 +450,12 @@ THEME1 = [
          note="A single teaser: Syk-inhibitor and CXCR4-antagonist wells fragment most; BTK, NF-kB and "
               "MALT1 inhibitors sit lowest. Counts are large, unequal and plate-level, so this is read "
               "as an association only. The full drug-response analysis, auto-measured trajectories, "
-              "per-drug inferred shifts and the BCR axis, lives in Theme 05.",
+              "per-drug inferred shifts and the BCR axis, lives in "
+              "[Theme 05](../05_drug_realdata/index.html).",
          informs="Previews the RQ3 drug-response story and shows the most drug-responsive classes are "
                  "the hardest to segment, which is exactly why the segmenter is chosen on feature "
                  "preservation rather than pixel overlap.",
          informs_tag="Preview only: full drug panel in Theme 05"),
-    dict(type="bigcta", title='This is only a teaser. The full <span class="it">drug panel</span> lives in Theme 05.',
-         links=[dict(t="Theme 05 &middot; Drug & real-data inference &rarr;", href="05_drug_realdata/index.html", primary=True)]),
 
     dict(type="section", title='D. From image quality to library <span class="it">coverage</span>',
          right="why the thesis reports relative shifts"),
@@ -936,13 +935,13 @@ THEME5 = [
                  "that the CPM matcher compares against the synthetic library to produce the "
                  "per-condition parameter shifts.",
          informs_tag="Feeds the inversion"),
-    dict(type="figure", img=CLLF + "morphology/icc_ccc_heatmap.png", native=True,
-         ttl="Feature agreement on the real data", sub="AI-derived vs reference",
-         alt="heatmap of feature agreement on real data",
-         shows="Agreement between AI-derived and reference shape numbers on the real spheroids, the "
-               "same reliability check applied in Theme 02.",
-         informs="Confirms the real-data features used for inversion are the reliable ones.",
-         informs_tag="Closes the loop with RQ1"),
+    dict(type="prose", title="Why we trust these real-data features",
+         text="The real inference spheroids have no human-drawn masks to check against, so there is no "
+              "real-data agreement heatmap to show here. The reliability guarantee comes from Theme 02: "
+              "the segmenter was chosen because its six shape numbers agree with human ones on the "
+              "held-out test set (area and diameter above the 0.85 concordance bar), and the inference "
+              "uses only those same features. The trust is inherited from that audit, not re-measured "
+              "on unlabelled real data."),
     dict(type="section", title='Drug panel, <span class="it">drug by drug</span>',
          right="inferred delta J_cc with intervals"),
     dict(type="interactive", widget="forest", json="theme5_drug_forest.json",
