@@ -18,7 +18,7 @@ from pathlib import Path
 FONTS = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">'
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-    '<link href="https://fonts.googleapis.com/css2?family=Anton&'
+    '<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&'
     'family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&'
     'family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&'
     'display=swap" rel="stylesheet">'
